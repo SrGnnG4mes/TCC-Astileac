@@ -35,6 +35,7 @@ astileac/
 ├── backend/       API REST em Spring Boot
 ├── frontend/      Aplicação Angular
 ├── docs/          Documentação do TCC (LaTeX) e diagramas
+│   └── tcc/       Fonte LaTeX do TCC
 └── README.md
 ```
 
@@ -70,7 +71,7 @@ A aplicação sobe em `http://localhost:4200`
 
 ## Modelo de dados
 
-O diagrama entidade-relacionamento está em `docs/astileac_der.mermaid`.
+O diagrama entidade-relacionamento está em `docs/ASTILEAC-BD.mmd`.
 
 ## Licença
 
