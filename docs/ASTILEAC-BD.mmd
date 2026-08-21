@@ -1,0 +1,90 @@
+erDiagram
+	direction TB
+	PROFISSIONAL {
+		bigint id PK ""  
+		varchar nome  ""  
+		varchar cpf UK ""  
+		date data_nascimento  ""  
+		date data_associacao  ""  
+		boolean ativo  ""  
+	}
+
+	ENDERECO {
+		bigint id PK ""  
+		bigint profissional_id FK ""  
+		varchar cep  ""  
+		varchar logradouro  ""  
+		varchar numero  ""  
+		varchar complemento  ""  
+		varchar bairro  ""  
+		varchar cidade  ""  
+		char uf  ""  
+	}
+
+	CONTATO {
+		bigint id PK ""  
+		bigint profissional_id FK ""  
+		varchar tipo  ""  
+		varchar valor  ""  
+		boolean principal  ""  
+	}
+
+	AREA_ATUACAO {
+		bigint id PK ""  
+		varchar nome UK ""  
+		varchar descricao  ""  
+	}
+
+	PROFISSIONAL_AREA {
+		bigint profissional_id PK "tambem FK"  
+		bigint area_atuacao_id PK "tambem FK"  
+		date data_inicio  ""  
+	}
+
+	FORMACAO {
+		bigint id PK ""  
+		bigint profissional_id FK ""  
+		varchar nivel  ""  
+		varchar curso  ""  
+		varchar instituicao  ""  
+		int ano_conclusao  ""  
+	}
+
+	CERTIFICADO {
+		bigint id PK ""  
+		bigint profissional_id FK ""  
+		bigint formacao_id FK ""  
+		varchar titulo  ""  
+		varchar instituicao_emissora  ""  
+		int carga_horaria  ""  
+		date data_emissao  ""  
+		varchar arquivo_path  ""  
+	}
+
+	VINCULO_EMPREGATICIO {
+		bigint id PK ""  
+		bigint profissional_id FK ""  
+		varchar instituicao  ""  
+		varchar cargo  ""  
+		varchar tipo_vinculo  ""  
+		date data_inicio  ""  
+		date data_fim  ""  
+		boolean atual  ""  
+	}
+
+	USUARIO {
+		bigint id PK ""  
+		bigint profissional_id FK ""  
+		varchar login UK ""  
+		varchar senha_hash  ""  
+		varchar perfil  ""  
+	}
+
+	PROFISSIONAL||--o|ENDERECO:"reside em"
+	PROFISSIONAL||--o{CONTATO:"possui"
+	PROFISSIONAL||--o{PROFISSIONAL_AREA:"atua em"
+	AREA_ATUACAO||--o{PROFISSIONAL_AREA:"classifica"
+	PROFISSIONAL||--o{FORMACAO:"concluiu"
+	FORMACAO||--o|CERTIFICADO:"e comprovada por"
+	PROFISSIONAL||--o{VINCULO_EMPREGATICIO:"mantem"
+	PROFISSIONAL||--o|USUARIO:"acessa por"

@@ -1,0 +1,283 @@
+\documentclass[
+        oneside,      %%coloque  % no inicio desta linha para imprimir frente e verso 
+        english,			
+%	french,				
+%	spanish, 
+        brazil			 
+        ]{abntspiifac}
+
+\usepackage[brazil]{babel}
+\usepackage[T1]{fontenc}		
+\usepackage[utf8]{inputenc}		%% Para converter automaticamente acentos como digitados normalmente no teclado.
+\usepackage{lastpage}			
+\usepackage{indentfirst}		
+\usepackage{color}			
+\usepackage{graphicx}			
+\usepackage[protrusion=true,expansion=false]{microtype} %% expansion=false: compatível com fontes não-vetoriais
+\usepackage{hyperref}
+\usepackage{xurl}
+\usepackage{array}              %% Para as tabelas
+\usepackage{booktabs}           %% Linhas de tabela mais limpas
+%pacote natbib para citações
+\usepackage[round]{natbib} %para o sistema autor-data (round = parênteses, mais próximo da ABNT)
+\bibliographystyle{plainnat}
+
+%% -----------------------------------------------------------------------------
+
+\titulo{Sistema web de cadastro e gestão de profissionais para a ASTILEAC} 
+\subtitulo{uma aplicação para o registro de formações, certificações e áreas de atuação de tradutores e intérpretes de Libras no Estado do Acre}
+\autor{Gabriel Nascimento Nogueira} 
+\autorVirg{Nogueira, Gabriel Nascimento} 
+\local{Rio Branco-AC} 
+\data{2026} 
+\orientador[Orientador:]{Marlon Amaro Coelho Teixeira} 
+%\coorientador[Coorientador:]{Nome e sobrenome} 
+\orientadorTitulo{Prof. Dr.} 
+%\coorientadorTitulo{Titulação} 
+\instituicao{Instituto Federal do Acre}
+\campus{Campus Rio Branco} %%CONFERIR o seu campus
+\programa{Tecnologia em Sistemas Para Internet} 
+\objeto{Projeto de Trabalho de Conclusão de Curso (graduação)}  
+\natureza{Projeto de Trabalho de Conclusão de Curso apresentado à coordenação do Curso Superior de Tecnologia em Sistemas Para Internet, do Instituto Federal do Acre, como requisito parcial para avaliação da disciplina.}
+
+\finalcatalog{1. Libras. 2. Tradutor e intérprete. 3. Sistema web. 4. Spring. 5. Angular. I. Teixeira, Marlon Amaro Coelho, orient. II. Título.}
+
+\begin{document}
+
+%% ELEMENTOS PRÉ-TEXTUAIS
+
+\inserecapa
+
+\inserefolhaderosto
+
+%% OBS.: Em um PROJETO de pesquisa, a ficha catalográfica e a folha de aprovação
+%% normalmente NÃO são exigidas (pertencem à versão final da monografia).
+%% Se o seu professor exigir, basta remover os "%" abaixo.
+
+%\inserecatalog  
+
+%\begin{folhadeaprovacao}
+%\inicfolhaaprov
+%Aprovada em (dia) de (mês) de (ano)
+%\vfill
+%\begin{center} BANCA EXAMINADORA \end{center}
+%\assinatura{\insereorientadorTitulo~\insereorientador \ - Orientador \\ Instituto Federal do Acre}
+%\assinatura{Titulação Nome e sobrenome \\ Instituto Federal do Acre}
+%\assinatura{Titulação Nome e sobrenome  \\ Instituto Federal do Acre} 
+%\end{folhadeaprovacao}
+%\cleardoublepage 
+
+
+%% RESUMOS
+
+\begin{resumo}
+
+A profissão de tradutor, intérprete e guia-intérprete da Língua Brasileira de Sinais (Libras) é regulamentada por legislação específica, que estabelece requisitos de formação e de proficiência para o exercício da atividade. Nesse contexto, as associações estaduais da categoria desempenham papel relevante na organização profissional, mas frequentemente carecem de instrumentos informatizados para manter atualizados os dados de seus associados. Este projeto propõe o desenvolvimento de um sistema web de cadastro e gestão de profissionais para a Associação dos Profissionais Tradutores e Intérpretes de Língua Brasileira de Sinais no Estado do Acre (ASTILEAC), contemplando o registro de dados pessoais e de contato, endereço, áreas de atuação, formações acadêmicas, certificados e vínculos empregatícios atuais. A solução será construída em arquitetura cliente-servidor desacoplada, com \textit{back-end} desenvolvido em Java com o \textit{framework} Spring, expondo uma interface de programação de aplicações no estilo REST, e \textit{front-end} desenvolvido em Angular, responsável pela interface com o usuário. A metodologia caracteriza-se como pesquisa aplicada, de natureza tecnológica, conduzida segundo o modelo de desenvolvimento em cascata, contemplando o levantamento de requisitos junto à diretoria da associação, a modelagem conceitual, lógica e física do banco de dados, a implementação das camadas de persistência, de serviço e de apresentação, e a validação da ferramenta com os usuários. Espera-se que o sistema substitua os registros dispersos por uma base de dados única e confiável, facilite a comprovação documental exigida pela legislação e permita à associação localizar rapidamente profissionais habilitados por área de atuação, contribuindo para a organização da categoria e para a qualificação do atendimento à comunidade surda acreana. \\[18pt]
+Palavras-chave: Libras. Tradutor e intérprete. Sistema web. Spring. Angular.
+\end{resumo}
+ 
+ 
+\begin{resumo}[ABSTRACT]
+ \begin{otherlanguage*}{english}
+
+The profession of translator, interpreter, and guide-interpreter of the Brazilian Sign Language (Libras) is regulated by specific legislation, which establishes training and proficiency requirements for practicing the activity. In this context, state associations play a relevant role in professional organization, but often lack computerized tools to keep their members' data up to date. This project proposes the development of a web system for the registration and management of professionals for the Association of Professional Translators and Interpreters of Brazilian Sign Language in the State of Acre (ASTILEAC), covering the recording of personal and contact data, address, areas of practice, academic background, certificates, and current employment relationships. The solution will be built using a decoupled client-server architecture, with a back-end developed in Java using the Spring framework, exposing a REST-style application programming interface, and a front-end developed in Angular, responsible for the user interface. The methodology is characterized as applied, technological research, conducted according to the waterfall development model, comprising requirements gathering with the association's board, conceptual, logical, and physical database modeling, implementation of the persistence, service, and presentation layers, and validation of the tool with users. It is expected that the system will replace scattered records with a single, reliable database, facilitate the documentary evidence required by legislation, and allow the association to quickly locate qualified professionals by area of practice, contributing to the organization of the category and to the quality of service provided to the deaf community in Acre.\\[18pt]
+Keywords: Libras. Translator and interpreter. Web system. Spring. Angular.
+ \end{otherlanguage*}
+\end{resumo}
+
+
+%% Sumário
+
+\pdfbookmark[0]{\contentsname}{toc}
+\tableofcontents*
+\cleardoublepage
+
+%% ----------------------------------------------------------
+
+%% ELEMENTOS TEXTUAIS
+\textual
+
+
+\chapter{INTRODUÇÃO}
+
+A Língua Brasileira de Sinais (Libras) foi reconhecida legalmente como meio de comunicação e expressão das comunidades surdas brasileiras pela Lei n. 10.436/2002, posteriormente regulamentada pelo Decreto n. 5.626/2005 \citep{brasil2002lei10436,brasil2005decreto5626}. Esse marco legal consolidou a figura do tradutor e intérprete de Libras como profissional indispensável à efetivação do direito à comunicação e à acessibilidade das pessoas surdas, atuação posteriormente reforçada pela Lei Brasileira de Inclusão da Pessoa com Deficiência \citep{brasil2015lbi}.
+
+O exercício dessa profissão passou a ser regulamentado pela Lei n. 12.319/2010, recentemente alterada pela Lei n. 14.704/2023, que ampliou o alcance da norma ao incluir expressamente a figura do guia-intérprete e ao estabelecer, de forma detalhada, os requisitos de titulação exigidos para o exercício profissional \citep{brasil2010lei12319,brasil2023lei14704}. Como consequência dessa evolução normativa, a comprovação documental de formação, de certificação e de proficiência tornou-se elemento central da vida profissional dessa categoria, o que demanda organização e guarda sistemática desses registros.
+
+É nesse cenário que atuam as associações estaduais de profissionais tradutores e intérpretes, entre elas a Associação dos Profissionais Tradutores e Intérpretes de Língua Brasileira de Sinais no Estado do Acre (ASTILEAC), entidade sem fins lucrativos sediada em Rio Branco que congrega e representa os profissionais da área no estado. Essas associações precisam conhecer o perfil de seus associados -- quem são, onde atuam, que formações possuem e em quais áreas estão habilitados -- tanto para representá-los institucionalmente quanto para atender às demandas de contratação encaminhadas por órgãos públicos, instituições de ensino e pela própria comunidade surda.
+
+Ocorre que esses dados, na ausência de um sistema informatizado, tendem a permanecer dispersos em planilhas, mensagens e documentos em papel, sob a guarda de poucas pessoas. Tal fragmentação dificulta a atualização das informações, compromete a confiabilidade dos registros e torna lenta qualquer consulta, como a busca por profissionais habilitados em determinada área de atuação. Diante disso, formula-se o seguinte problema de pesquisa: como organizar, de maneira centralizada, confiável e acessível, as informações profissionais dos associados da ASTILEAC?
+
+Como resposta, este trabalho tem como objetivo geral desenvolver um sistema web de cadastro e gestão de profissionais para a ASTILEAC, construído com o \textit{framework} Spring no \textit{back-end} e com Angular no \textit{front-end}, capaz de registrar dados pessoais, endereço, contatos, áreas de atuação, formações, certificados e vínculos empregatícios dos associados, oferecendo à entidade uma base de dados única e consultável.
+
+
+\chapter{REVISÃO DE LITERATURA}
+
+Esta seção apresenta os referenciais que fundamentam o trabalho, organizados em três eixos: o profissional tradutor e intérprete de Libras e o seu marco legal; o papel das associações profissionais e a gestão da informação cadastral; e as tecnologias que sustentam a solução proposta.
+
+\section{O TRADUTOR E INTÉRPRETE DE LIBRAS E SEU MARCO LEGAL}
+
+O reconhecimento da Libras como sistema linguístico de natureza visual-motora, dotado de estrutura gramatical própria, ocorreu com a Lei n. 10.436/2002 \citep{brasil2002lei10436}. O Decreto n. 5.626/2005, ao regulamentá-la, dedicou capítulo específico à formação do tradutor e intérprete de Libras -- Língua Portuguesa, estabelecendo que ela deve efetivar-se por meio de curso superior de Tradução e Interpretação com habilitação em Libras -- Língua Portuguesa, e admitindo, em caráter transitório, a formação em nível médio por meio de cursos de educação profissional, de extensão universitária e de formação continuada \citep{brasil2005decreto5626}.
+
+\citet{quadros2004tradutor} destaca que a atuação desse profissional não se limita à transposição de palavras entre duas línguas, envolvendo competências linguísticas, tradutórias e éticas construídas ao longo de um percurso formativo continuado. Essa característica ajuda a compreender por que o histórico de formações e certificações constitui informação central do perfil profissional: é justamente esse acúmulo que qualifica a atuação em contextos distintos.
+
+A regulamentação da profissão veio com a Lei n. 12.319/2010, substancialmente alterada pela Lei n. 14.704/2023 \citep{brasil2010lei12319,brasil2023lei14704}. A nova redação passou a contemplar, além do tradutor e intérprete, o guia-intérprete, profissional que domina formas de comunicação utilizadas por pessoas surdocegas, e estabeleceu que a atividade pode ser exercida em qualquer área ou situação em que pessoas surdas ou surdocegas precisem se comunicar. A legislação define ainda que o exercício da profissão é privativo de diplomados em curso técnico de nível médio na área, de bacharéis em Tradução e Interpretação em Libras ou em Letras -- Libras, e de diplomados em outras áreas que possuam cursos de formação com carga horária mínima estabelecida e aprovação em exame de proficiência.
+
+Duas consequências dessa moldura legal interessam diretamente a este projeto. A primeira é que a habilitação profissional depende de documentos comprobatórios variados -- diplomas, certificados de cursos e resultados de exames de proficiência --, o que reforça a necessidade de um registro estruturado dessa documentação. A segunda é que a atuação se distribui por diferentes contextos, como o educacional, o jurídico, o da saúde e o artístico-cultural, o que torna a área de atuação um atributo relevante do perfil de cada profissional.
+
+\section{ASSOCIAÇÕES PROFISSIONAIS E GESTÃO DA INFORMAÇÃO CADASTRAL}
+
+As associações estaduais de tradutores e intérpretes de língua de sinais constituem instâncias de organização da categoria, atuando na representação política, na formação continuada e na articulação com órgãos públicos e com a comunidade surda. A ASTILEAC, fundada em 2008 e sediada em Rio Branco, integra esse movimento associativo no Acre, promovendo encontros e ações de valorização profissional.
+
+Para exercer essas funções, tais entidades dependem de informações atualizadas sobre seus associados. A manutenção desses dados em meios não estruturados, como planilhas isoladas ou documentos em papel, produz problemas conhecidos na literatura de bancos de dados: redundância, inconsistência entre cópias, dificuldade de acesso concorrente e fragilidade quanto à integridade das informações \citep{elmasri2019sistemas}. A adoção de um sistema gerenciador de banco de dados, ao contrário, permite centralizar os registros, impor regras de integridade e viabilizar consultas eficientes, como a recuperação de todos os profissionais habilitados em determinada área de atuação.
+
+Cabe observar que os dados tratados por um sistema dessa natureza são dados pessoais, submetidos à Lei Geral de Proteção de Dados Pessoais \citep{brasil2018lgpd}. Tal condição impõe cuidados de projeto quanto à finalidade da coleta, ao consentimento do associado e ao controle de acesso às informações, aspectos que serão considerados na modelagem e na implementação do sistema.
+
+\section{TECNOLOGIAS PARA DESENVOLVIMENTO WEB}
+
+A solução proposta adota arquitetura cliente-servidor desacoplada, na qual a lógica de negócio e a persistência residem no servidor e a interface com o usuário é executada no navegador. A comunicação entre as duas partes dá-se por meio de uma interface de programação de aplicações no estilo REST, formalizado por \citet{fielding2000rest}, que define restrições como a comunicação sem estado, a identificação de recursos por URLs e o uso dos métodos do protocolo HTTP. Essa separação favorece a manutenibilidade e permite que a mesma interface de serviços atenda, futuramente, a outros clientes, como um aplicativo móvel.
+
+No \textit{back-end} será utilizado o Spring, conjunto de projetos da plataforma Java amplamente adotado no desenvolvimento corporativo. O Spring Boot simplifica a configuração da aplicação e a exposição de serviços web, enquanto o Spring Data JPA abstrai o acesso ao banco de dados por meio do mapeamento objeto-relacional \citep{walls2022spring,pivotal2026spring}. No \textit{front-end} será empregado o Angular, plataforma mantida pelo Google para a construção de aplicações web baseadas em componentes, que oferece recursos de roteamento, validação de formulários e consumo de serviços HTTP \citep{google2026angular}.
+
+A organização do sistema em camadas -- apresentação, serviço e persistência -- segue princípios consolidados da Engenharia de Software, que associam o baixo acoplamento e a alta coesão à manutenibilidade das soluções \citep{sommerville2019engenharia,pressman2016engenharia}.
+
+
+\chapter{JUSTIFICATIVA}
+
+A escolha do tema justifica-se, inicialmente, pela sua relevância social. O tradutor e intérprete de Libras é figura essencial à garantia do direito à comunicação das pessoas surdas, e a organização da categoria repercute diretamente na qualidade do atendimento prestado à comunidade surda acreana. Ao dotar a ASTILEAC de um instrumento capaz de mapear quem são seus profissionais e em que áreas atuam, o sistema contribui para que demandas de interpretação sejam atendidas com maior agilidade e por profissionais adequadamente habilitados.
+
+Justifica-se, em segundo lugar, pela pertinência em relação ao marco legal da profissão. A Lei n. 14.704/2023 tornou mais explícitos os requisitos de titulação para o exercício da atividade \citep{brasil2023lei14704}, o que amplia a importância de manter organizados os registros de formação e certificação de cada profissional. Um sistema que armazene esses documentos de forma estruturada facilita tanto a comprovação individual quanto a construção de um panorama coletivo da qualificação da categoria no estado.
+
+Do ponto de vista técnico, a proposta justifica-se por substituir registros dispersos e de manutenção precária por uma base de dados única, sujeita a regras de integridade e passível de consulta imediata \citep{elmasri2019sistemas}. A adoção de uma arquitetura desacoplada, com serviços REST no \textit{back-end}, ainda deixa aberta a possibilidade de evolução futura da solução, inclusive com uma versão móvel, sem reescrita da lógica de negócio.
+
+Por fim, o trabalho mostra-se pertinente do ponto de vista formativo, pois articula conhecimentos centrais do curso de Tecnologia em Sistemas para Internet -- modelagem de dados, desenvolvimento \textit{back-end} e \textit{front-end}, construção e consumo de APIs e engenharia de software -- na solução de um problema concreto de uma entidade da sociedade civil local.
+
+
+\chapter{OBJETIVOS}
+
+\section{OBJETIVO GERAL}
+
+Desenvolver um sistema web de cadastro e gestão de profissionais para a Associação dos Profissionais Tradutores e Intérpretes de Língua Brasileira de Sinais no Estado do Acre (ASTILEAC), utilizando o \textit{framework} Spring no \textit{back-end} e Angular no \textit{front-end}, de modo a centralizar os dados pessoais, formativos e profissionais dos associados em uma base única e consultável.
+
+\section{OBJETIVOS ESPECÍFICOS}
+
+\begin{itemize}
+    \item Levantar, junto à diretoria da ASTILEAC, os requisitos funcionais e não funcionais do sistema, identificando as informações que devem compor o cadastro dos associados;
+    \item Elaborar a modelagem conceitual, lógica e física do banco de dados, contemplando dados pessoais, endereço, contatos, áreas de atuação, formações, certificados e vínculos empregatícios;
+    \item Implementar o \textit{back-end} da aplicação em Java com o \textit{framework} Spring, expondo os serviços necessários por meio de uma API REST e realizando a persistência dos dados;
+    \item Desenvolver o \textit{front-end} em Angular, com formulários de cadastro, telas de consulta e mecanismos de busca de profissionais por área de atuação;
+    \item Implementar mecanismos de autenticação e de controle de acesso, observando os princípios da Lei Geral de Proteção de Dados Pessoais;
+    \item Realizar testes de funcionamento e validar o sistema junto aos representantes da associação, avaliando a adequação das funcionalidades às necessidades da entidade.
+\end{itemize}
+
+
+\chapter{MATERIAL E MÉTODOS}
+
+\section{CARACTERIZAÇÃO DA PESQUISA}
+
+Quanto à natureza, esta pesquisa classifica-se como aplicada, de caráter tecnológico, uma vez que se destina à construção de um artefato de software para a solução de um problema prático identificado na ASTILEAC. Quanto aos objetivos, caracteriza-se como descritiva e exploratória, pois envolve o levantamento das necessidades da entidade e a análise dos requisitos legais que incidem sobre o cadastro profissional. O estudo será desenvolvido em Rio Branco, no Acre, tendo como público de referência a diretoria e os associados da entidade.
+
+\section{MODELO DE DESENVOLVIMENTO}
+
+Para a condução do desenvolvimento adotar-se-á o modelo em cascata, no qual as etapas se organizam de forma sequencial -- requisitos, projeto, implementação, testes e implantação \citep{sommerville2019engenharia}. A escolha justifica-se pelo escopo bem delimitado do sistema, pela estabilidade esperada dos requisitos e pelo caráter acadêmico do trabalho. As etapas previstas são:
+
+\begin{itemize}
+    \item \textbf{Levantamento de requisitos:} reuniões com a diretoria da associação para definir os campos do cadastro, os perfis de usuário e as regras de negócio;
+    \item \textbf{Projeto:} modelagem do banco de dados (conceitual, lógica e física), definição da arquitetura em camadas, especificação dos \textit{endpoints} da API e prototipação das telas;
+    \item \textbf{Implementação:} desenvolvimento do \textit{back-end} em Spring, com mapeamento objeto-relacional e exposição dos serviços REST, e do \textit{front-end} em Angular, com os formulários e as consultas previstas;
+    \item \textbf{Testes:} verificação das funcionalidades, das validações de formulário e da integridade dos dados persistidos;
+    \item \textbf{Implantação e validação:} disponibilização de uma versão de avaliação e coleta de retorno junto aos usuários da associação.
+\end{itemize}
+
+\section{REQUISITOS FUNCIONAIS PRELIMINARES}
+
+A partir da demanda inicial apresentada pela associação, foram identificados os requisitos funcionais preliminares relacionados no Quadro \ref{tab:requisitos}, os quais serão detalhados e validados na etapa de levantamento.
+
+\begin{table}[!htb]
+\centering
+\caption{Requisitos funcionais preliminares do sistema.}
+\label{tab:requisitos}
+\footnotesize
+\begin{tabular}{>{\raggedright}p{2cm} p{10.5cm}}
+\toprule
+\textbf{Código} & \textbf{Descrição} \\
+\midrule
+RF01 & Cadastrar profissional com nome e demais dados de identificação \\
+RF02 & Registrar o endereço do profissional \\
+RF03 & Registrar contatos do profissional (e-mail e telefone) \\
+RF04 & Associar ao profissional uma ou mais áreas de atuação (educacional, jurídica, saúde, artístico-cultural e outras) \\
+RF05 & Registrar as formações já realizadas pelo profissional \\
+RF06 & Cadastrar certificados, com os dados da instituição emissora e a carga horária \\
+RF07 & Registrar os vínculos empregatícios atuais do profissional \\
+RF08 & Consultar e filtrar profissionais, especialmente por área de atuação \\
+RF09 & Autenticar usuários e controlar o acesso conforme o perfil \\
+\bottomrule
+\end{tabular}\\
+{\footnotesize Fonte: Elaborado pelo autor.}
+\end{table}
+
+\section{ARQUITETURA E TECNOLOGIAS}
+
+O sistema será estruturado em arquitetura cliente-servidor desacoplada. O \textit{back-end}, desenvolvido em Java com o \textit{framework} Spring, concentrará a lógica de negócio e a persistência, organizando-se nas camadas de controle, serviço e repositório, e disponibilizará os dados por meio de uma API REST. O \textit{front-end}, desenvolvido em Angular, consumirá essa API e será responsável pela interface com o usuário, incluindo formulários de cadastro, listagens e filtros de busca. As tecnologias previstas estão relacionadas no Quadro \ref{tab:tecnologias}.
+
+\begin{table}[!htb]
+\centering
+\caption{Ferramentas e tecnologias previstas para o projeto.}
+\label{tab:tecnologias}
+\footnotesize
+\begin{tabular}{>{\raggedright}p{4.5cm} p{8cm}}
+\toprule
+\textbf{Finalidade} & \textbf{Tecnologia prevista} \\
+\midrule
+Linguagem do \textit{back-end} & Java \\
+\textit{Framework} do \textit{back-end} & Spring (Spring Boot, Spring Data JPA, Spring Security) \\
+\textit{Front-end} & Angular (TypeScript, HTML e CSS) \\
+Comunicação & API REST, com dados em formato JSON \\
+Banco de dados & Sistema gerenciador de banco de dados relacional \\
+Modelagem & Diagramas entidade-relacionamento, de casos de uso e de classes \\
+Controle de versão & Git \\
+\bottomrule
+\end{tabular}\\
+{\footnotesize Fonte: Elaborado pelo autor.}
+\end{table}
+
+
+\chapter{CRONOGRAMA}
+
+A execução do projeto está prevista para oito meses, distribuídos conforme as etapas do modelo em cascata. O Quadro \ref{tab:cronograma} relaciona as atividades planejadas aos meses de execução, em que o símbolo ``X'' indica o período previsto para cada atividade.
+
+\begin{table}[!htb]
+\centering
+\caption{Cronograma de execução do projeto.}
+\label{tab:cronograma}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{p{5.2cm} *{8}{c}}
+\toprule
+\textbf{Atividade} & \textbf{M1} & \textbf{M2} & \textbf{M3} & \textbf{M4} & \textbf{M5} & \textbf{M6} & \textbf{M7} & \textbf{M8} \\
+\midrule
+Revisão de literatura              & X & X &   &   &   &   &   & X \\
+Levantamento de requisitos         & X & X &   &   &   &   &   &   \\
+Modelagem do banco de dados        &   & X & X &   &   &   &   &   \\
+Projeto da arquitetura e telas     &   &   & X & X &   &   &   &   \\
+Implementação do \textit{back-end} &   &   &   & X & X &   &   &   \\
+Implementação do \textit{front-end} &   &   &   &   & X & X &   &   \\
+Testes                             &   &   &   &   &   & X & X &   \\
+Validação com a ASTILEAC           &   &   &   &   &   &   & X & X \\
+Redação final do trabalho          &   &   &   &   &   &   & X & X \\
+\bottomrule
+\end{tabular}\\
+{\footnotesize Fonte: Elaborado pelo autor.}
+\end{table}
+
+
+%%%%%%%%%%%%%%%%%%
+%% ELEMENTOS POS-TEXTUAIS
+
+\postextual 
+
+\bibliography{refs}
+
+%%% ---Fim do documento
+\end{document}
