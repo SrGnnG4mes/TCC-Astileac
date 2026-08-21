@@ -1,0 +1,36 @@
+# --- Backend (Java / Maven / Spring Boot) ---
+backend/target/
+backend/src/main/resources/application-local.properties
+backend/uploads/
+*.class
+*.jar
+!.mvn/wrapper/maven-wrapper.jar
+
+# --- Frontend (Angular / Node) ---
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+npm-debug.log*
+
+# --- IDE ---
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+
+# --- LaTeX (docs/tcc) ---
+docs/tcc/*.aux
+docs/tcc/*.bbl
+docs/tcc/*.bcf
+docs/tcc/*.blg
+docs/tcc/*.log
+docs/tcc/*.out
+docs/tcc/*.toc
+docs/tcc/*.lof
+docs/tcc/*.lot
+docs/tcc/*.fls
+docs/tcc/*.fdb_latexmk
+docs/tcc/*.synctex.gz
+docs/tcc/*.run.xml
+docs/tcc/*.xml
