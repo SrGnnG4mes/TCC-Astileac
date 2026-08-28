@@ -252,6 +252,14 @@ Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.propertie
 > `/hello` já existente). Testado ponta a ponta via `curl` contra o banco local: criar (201),
 > listar/buscar (200), não encontrado (404), CPF duplicado (409), validação (400), atualizar
 > (200), remover (204).
+>
+> **Testes automatizados** para o CRUD de profissional (15 testes, `BUILD SUCCESS`):
+> `ProfissionalServiceTest` (unidade, Mockito puro, sem Spring/banco) e
+> `ProfissionalControllerTest` (fatia web, `@WebMvcTest` + `MockMvc`, service mockado com
+> `@MockitoBean`). Pacotes conferidos direto nos `.jar` do Boot 4.1.1 antes de usar (mudaram
+> do 3.x): `@WebMvcTest` agora é `org.springframework.boot.webmvc.test.autoconfigure`,
+> `@DataJpaTest` é `org.springframework.boot.data.jpa.test.autoconfigure`, e `@MockBean` foi
+> **removido** — usa-se `@MockitoBean` (`org.springframework.test.context.bean.override.mockito`).
 
 ### Próximos passos (nesta ordem)
 1. ~~Migrations Flyway `V1` — criar as 9 tabelas + carga inicial das áreas de atuação~~ ✅
