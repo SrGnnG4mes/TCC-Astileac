@@ -241,11 +241,22 @@ Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.propertie
 > `VARCHAR` — a validação (`ddl-auto=validate`) só passa com `@JdbcTypeCode(SqlTypes.CHAR)`
 > explícito (`columnDefinition` sozinho não afeta a validação, só a geração de DDL).
 > Validado rodando a aplicação de verdade contra o banco local antes de commitar.
+>
+> **CRUD de profissional (Passo 3)** na branch `feat/cadastro-profissional`. DTOs como
+> `record` (imutáveis, sem boilerplate). `GlobalExceptionHandler` (`@RestControllerAdvice`)
+> centraliza erros: 404 (não encontrado), 409 (CPF duplicado), 400 (Bean Validation).
+> `SecurityConfig` com `permitAll` **temporário** — libera os endpoints sem autenticação só
+> até o Passo 6 (RF09) implementar login de verdade contra a tabela `USUARIO`; sem isso,
+> o Spring Security exigiria login com senha aleatória gerada a cada boot, inviabilizando
+> testar no Swagger. Endpoints em `/profissionais` (sem prefixo `/api`, consistente com o
+> `/hello` já existente). Testado ponta a ponta via `curl` contra o banco local: criar (201),
+> listar/buscar (200), não encontrado (404), CPF duplicado (409), validação (400), atualizar
+> (200), remover (204).
 
 ### Próximos passos (nesta ordem)
 1. ~~Migrations Flyway `V1` — criar as 9 tabelas + carga inicial das áreas de atuação~~ ✅
 2. ~~Entidades JPA + repositories~~ ✅
-3. CRUD de profissional (service, DTOs, controller) — o caminho completo de uma feature
+3. ~~CRUD de profissional (service, DTOs, controller) — o caminho completo de uma feature~~ ✅
 4. Demais cadastros: endereço, contatos, áreas, formações, certificados, vínculos
 5. Consulta e filtro por área de atuação (RF08)
 6. Autenticação e perfis (RF09)
