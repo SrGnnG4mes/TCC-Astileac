@@ -233,10 +233,18 @@ Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.propertie
 > Maven Wrapper (`./mvnw`, `.mvn/wrapper/`) gerado via start.spring.io. Formato moderno
 > (`distributionType=only-script`): não versiona `.jar`, o próprio `./mvnw` baixa o Apache
 > Maven na primeira execução.
+>
+> Entidades JPA para as 9 tabelas, mapeamento **unidirecional** (child → Profissional, sem
+> coleções bidirecionais) para simplicidade. `PROFISSIONAL_AREA` usa `@EmbeddedId`
+> (`ProfissionalAreaId`) pela chave composta. Único ponto que exigiu atenção: a coluna
+> `endereco.uf` é `CHAR(2)` no banco, e por padrão o Hibernate mapeia `String` para
+> `VARCHAR` — a validação (`ddl-auto=validate`) só passa com `@JdbcTypeCode(SqlTypes.CHAR)`
+> explícito (`columnDefinition` sozinho não afeta a validação, só a geração de DDL).
+> Validado rodando a aplicação de verdade contra o banco local antes de commitar.
 
 ### Próximos passos (nesta ordem)
 1. ~~Migrations Flyway `V1` — criar as 9 tabelas + carga inicial das áreas de atuação~~ ✅
-2. Entidades JPA + repositories
+2. ~~Entidades JPA + repositories~~ ✅
 3. CRUD de profissional (service, DTOs, controller) — o caminho completo de uma feature
 4. Demais cadastros: endereço, contatos, áreas, formações, certificados, vínculos
 5. Consulta e filtro por área de atuação (RF08)
