@@ -8,4 +8,6 @@ public interface AreaAtuacaoRepository extends JpaRepository<AreaAtuacao, Long> 
 
 	Optional<AreaAtuacao> findByNome(String nome);
 
+	boolean existsByNome(String nome);
+
 }
