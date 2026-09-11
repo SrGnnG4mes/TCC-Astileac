@@ -155,6 +155,8 @@ Chave primária **composta**: `profissional_id` + `area_atuacao_id`. Mais `data_
 | RF07 | Registrar vínculos empregatícios atuais |
 | RF08 | Consultar e filtrar profissionais, **especialmente por área de atuação** |
 | RF09 | Autenticar usuários e controlar acesso por perfil |
+| RF10 | Atender aos direitos do titular: exportar os próprios dados e pedir a eliminação deles |
+| RF11 | Registrar quem consultou ou alterou dado pessoal |
 
 RF08 é o caso de uso mais importante na prática: é como a associação atende a uma demanda
 ("preciso de um intérprete para audiência judicial").
@@ -290,12 +292,35 @@ Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.propertie
 > ligado, a desligar no perfil do ambiente quando houver deploy; sem `@Version`
 > (bloqueio otimista), decisão consciente.
 
+> **RF10 e RF11 — LGPD** (branch `feat/direitos-titular-log-acesso`, migration `V4`).
+> - **RF10, direitos do titular (Art. 18).** `GET .../dados-pessoais` exporta tudo sobre a
+>   pessoa, com CPF inteiro: o destinatário é o próprio titular, mascarar para ele mesmo não
+>   protege ninguém. Inclui formações, certificados e vínculos mesmo antes de esses cadastros
+>   terem endpoint — exportação incompleta não cumpre o direito.
+> - **Janela de arrependimento de 30 dias.** `DELETE .../dados-pessoais/exclusao` não apaga:
+>   marca `data_exclusao_solicitada`, **bloqueia** o cadastro (some das listagens, Art. 18, IV)
+>   e devolve **200 com mensagem explícita** do prazo, da data exata e de como desfazer — por
+>   isso não é 204 sem corpo. `POST .../exclusao/cancelamento` desfaz. O `ExpurgoAgendado`
+>   roda às 3h e apaga em definitivo o que passou do prazo, filhos antes do pai.
+>   Optou-se por **apagar e não anonimizar**: numa base pequena, a combinação de áreas,
+>   formações e vínculos reidentifica a pessoa.
+> - **RF11, registro de acesso (Art. 46).** Capturado num `HandlerInterceptor`, não espalhado
+>   pelos services: não há como esquecer de registrar num endpoint novo. Em troca, registra a
+>   operação HTTP, não quais campos foram lidos. Grava em transação própria
+>   (`REQUIRES_NEW`) — se a operação falhar, o registro de que alguém tentou permanece.
+> - **Autor fica `nao-autenticado` até o Passo 6.** Sem RF09 o sistema não tem como saber quem
+>   é; é uma linha para trocar quando a autenticação existir.
+> - Efeito colateral a saber: o `` carrega os `WebMvcConfigurer` (logo o interceptor)
+>   mas não ``, então toda fatia web precisa de ` LogAcessoService`.
+
 ### Próximos passos (nesta ordem)
 1. ~~Migrations Flyway `V1` — criar as 9 tabelas + carga inicial das áreas de atuação~~ ✅
 2. ~~Entidades JPA + repositories~~ ✅
 3. ~~CRUD de profissional (service, DTOs, controller) — o caminho completo de uma feature~~ ✅
 3.5. ~~Endurecimento: exposição de rede, CPF mascarado + paginação, validação de CPF,
    tratamento de erros, índices~~ ✅
+3.7. ~~RF10 (direitos do titular) e RF11 (registro de acesso) — exigências da LGPD~~ ✅
+
 4. Demais cadastros: endereço, contatos, áreas, formações, certificados, vínculos
 5. Consulta e filtro por área de atuação (RF08)
 6. Autenticação e perfis (RF09)

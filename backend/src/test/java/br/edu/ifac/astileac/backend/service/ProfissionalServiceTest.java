@@ -119,7 +119,7 @@ class ProfissionalServiceTest {
 	@Test
 	void deveListarProfissionaisPaginadosComCpfMascarado() {
 		Pageable pagina = PageRequest.of(0, 20);
-		when(profissionalRepository.findAll(pagina))
+		when(profissionalRepository.findByDataExclusaoSolicitadaIsNull(pagina))
 				.thenReturn(new PageImpl<>(List.of(entidadeExistente()), pagina, 1));
 
 		Page<ProfissionalResumoDTO> resultado = profissionalService.listar(pagina);
