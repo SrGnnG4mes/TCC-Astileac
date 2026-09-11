@@ -71,7 +71,8 @@ astileac/
 │   ├── tcc/                    ← fonte LaTeX (tcc.tex, abntspiifac.cls, refs.bib)
 │   ├── ASTILEAC-BD.mmd         ← diagrama entidade-relacionamento (Mermaid)
 │   ├── ASTILEAC-BDimage.png    ← DER exportado como imagem
-│   └── ASTILEAC_Projeto_TCC.pdf ← documento do TCC compilado
+│   ├── ASTILEAC_Projeto_TCC.pdf ← documento do TCC compilado
+│   └── ASTILEAC.postman_collection.json ← coleção de demonstração da API
 ├── .gitignore
 ├── CLAUDE.md
 └── README.md
@@ -346,6 +347,29 @@ Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.propertie
 >   PostgreSQL escolher começar pela área; num `EXISTS` correlacionado ele pode preferir a
 >   PK composta. Confirmar com `EXPLAIN` sobre volume real antes de afirmar ganho no TCC.
 
+> **RF09 — autenticação e perfis** (branch `feat/autenticacao-e-perfis`, 64 testes).
+> - **Sessão com cookie, não JWT.** Logout com JWT exigiria lista de revogação — o estado
+>   que o "stateless" prometia evitar. O cookie é `HttpOnly` (XSS não lê); token em
+>   `localStorage` seria legível. Escala horizontal, o problema que JWT resolve, não existe
+>   num sistema interno com um servidor só.
+> - **`GET /autenticacao/csrf` existe por necessidade, não por gosto.** Desde o Security 6 o
+>   token é resolvido preguiçosamente: o cookie só é escrito quando alguém **lê** o token.
+>   Sem esse endpoint a SPA nunca receberia o cookie e o próprio login seria bloqueado por
+>   falta de token. Descoberto rodando — o login dava 403 em vez de 401.
+> - **`@PreAuthorize("hasRole(ADMIN) or @autorizacao.eOProprioProfissional(#id)")`.** O perfil
+>   fica com o mecanismo padrão do Spring e o bean cuida só da propriedade do registro.
+>   Não é estética: com a checagem de perfil dentro do bean, a regra seria intestável com
+>   `@WithMockUser`.
+> - **O catch-all do `GlobalExceptionHandler` transformava negação de acesso em 500.** Pego
+>   pelo teste de autorização, não por leitura. Handler de `AccessDeniedException` agora vem
+>   antes do genérico.
+> - **Testes de autorização importam o `SecurityConfig` e não usam `addFilters = false`.** Sem
+>   isso o method security fica desligado e as anotações passariam despercebidas — o teste
+>   diria que está tudo bem sem ter verificado nada.
+> - **Bootstrap do primeiro admin por propriedade local**, não por seed em migration: senha
+>   padrão em migration iria para o Git. Sem a propriedade, não cria nada e avisa.
+> - `/hello` removido: era temporário e cumpriu o papel.
+
 ### Próximos passos (nesta ordem)
 1. ~~Migrations Flyway `V1` — criar as 9 tabelas + carga inicial das áreas de atuação~~ ✅
 2. ~~Entidades JPA + repositories~~ ✅
@@ -356,7 +380,7 @@ Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.propertie
 
 4. ~~Demais cadastros: endereço, contatos, áreas, formações, certificados, vínculos~~ ✅
 5. ~~Consulta e filtro por área de atuação (RF08)~~ ✅
-6. Autenticação e perfis (RF09)
+6. ~~Autenticação e perfis (RF09)~~ ✅ (falta verificar as regras de perfil com um admin real)
 7. Front-end Angular: formulários e telas de consulta
 8. Upload de certificados
 9. Testes e validação com a ASTILEAC

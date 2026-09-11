@@ -3,6 +3,7 @@ package br.edu.ifac.astileac.backend.service;
 import br.edu.ifac.astileac.backend.dto.LogAcessoResponseDTO;
 import br.edu.ifac.astileac.backend.entity.AcaoLog;
 import br.edu.ifac.astileac.backend.entity.LogAcesso;
+import br.edu.ifac.astileac.backend.security.UsuarioLogado;
 import br.edu.ifac.astileac.backend.repository.LogAcessoRepository;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,14 @@ public class LogAcessoService {
 	 * Enquanto o RF09 nao existe, nao ha usuario autenticado para
 	 * registrar. Trocar por quem esta logado e o trabalho do Passo 6.
 	 */
-	public static final String AUTOR_SEM_AUTENTICACAO = "nao-autenticado";
+	/**
+	 * Registrado quando nao ha ninguem autenticado -- o que, depois
+	 * do RF09, so acontece nas rotas abertas. Os registros antigos
+	 * mantem este valor, e isso esta correto: eles foram feitos
+	 * mesmo sem autenticacao, e reescrever historico e justamente o
+	 * que um log nao pode permitir.
+	 */
+	public static final String SEM_AUTENTICACAO = "nao-autenticado";
 
 	/**
 	 * Nome da entidade raiz no log. Igual ao primeiro segmento da URL,
@@ -34,6 +42,7 @@ public class LogAcessoService {
 	public static final String ENTIDADE_PROFISSIONAL = "PROFISSIONAIS";
 
 	private final LogAcessoRepository logAcessoRepository;
+	private final UsuarioLogado usuarioLogado;
 
 	/**
 	 * Grava em transacao PROPRIA (REQUIRES_NEW). Se a operacao que
@@ -45,7 +54,7 @@ public class LogAcessoService {
 	public void registrar(AcaoLog acao, String entidade, Long registroId, String origem, String detalhe) {
 		LogAcesso log = new LogAcesso();
 		log.setDataHora(LocalDateTime.now());
-		log.setAutor(AUTOR_SEM_AUTENTICACAO);
+		log.setAutor(usuarioLogado.loginAtual());
 		log.setOrigem(origem);
 		log.setAcao(acao);
 		log.setEntidade(entidade);
