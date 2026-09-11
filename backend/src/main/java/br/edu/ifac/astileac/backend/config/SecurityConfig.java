@@ -67,6 +67,10 @@ public class SecurityConfig {
 						// O token CSRF precisa ser alcancavel antes do login:
 						// sem ele o proprio POST de login seria bloqueado.
 						.requestMatchers(HttpMethod.GET, "/autenticacao/csrf").permitAll()
+						// Interface de teste, servida pelo proprio backend. Fica na
+						// mesma origem da API, o que dispensa CORS: o navegador
+						// manda o cookie de sessao sem configuracao extra.
+						.requestMatchers(HttpMethod.GET, "/", "/index.html").permitAll()
 						.requestMatchers(HttpMethod.POST, "/autenticacao/login").permitAll()
 						// Documentacao da API. Desligar no ambiente de destino
 						// (ver application.properties).
