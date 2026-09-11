@@ -161,7 +161,7 @@ class ProfissionalControllerTest {
 	void deveListarProfissionaisPaginadosComCpfMascarado() throws Exception {
 		Pageable pagina = PageRequest.of(0, 20);
 		ProfissionalResumoDTO resumo = new ProfissionalResumoDTO(1L, "Maria Silva", "***.***.777-35", true);
-		when(profissionalService.listar(any(Pageable.class)))
+		when(profissionalService.consultar(any(), any(), any(), any(Pageable.class)))
 				.thenReturn(new PageImpl<>(List.of(resumo), pagina, 1));
 
 		mockMvc.perform(get("/profissionais"))
