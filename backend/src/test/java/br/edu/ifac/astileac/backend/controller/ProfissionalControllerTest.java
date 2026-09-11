@@ -15,6 +15,7 @@ import br.edu.ifac.astileac.backend.dto.ProfissionalResponseDTO;
 import br.edu.ifac.astileac.backend.dto.ProfissionalResumoDTO;
 import br.edu.ifac.astileac.backend.exception.CpfJaCadastradoException;
 import br.edu.ifac.astileac.backend.exception.RecursoNaoEncontradoException;
+import br.edu.ifac.astileac.backend.service.LogAcessoService;
 import br.edu.ifac.astileac.backend.service.ProfissionalService;
 import java.time.LocalDate;
 import java.util.List;
@@ -46,9 +47,17 @@ class ProfissionalControllerTest {
 	@MockitoBean
 	private ProfissionalService profissionalService;
 
+	/**
+	 * O @WebMvcTest carrega os WebMvcConfigurer -- logo o WebConfig e o
+	 * LogAcessoInterceptor --, mas nao carrega @Service. Sem este mock o
+	 * contexto nem sobe. A auditoria (RF11) tem teste proprio.
+	 */
+	@MockitoBean
+	private LogAcessoService logAcessoService;
+
 	private ProfissionalResponseDTO respostaValida() {
 		return new ProfissionalResponseDTO(
-				1L, "Maria Silva", CPF_VALIDO, LocalDate.of(1990, 5, 10), LocalDate.of(2024, 1, 15), true);
+				1L, "Maria Silva", CPF_VALIDO, LocalDate.of(1990, 5, 10), LocalDate.of(2024, 1, 15), true, null);
 	}
 
 	private String corpoValido() {

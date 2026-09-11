@@ -46,7 +46,9 @@ public class ProfissionalService {
 	 */
 	@Transactional(readOnly = true)
 	public Page<ProfissionalResumoDTO> listar(Pageable pageable) {
-		return profissionalRepository.findAll(pageable).map(this::toResumoDTO);
+		// Quem pediu exclusao fica bloqueado durante a janela de
+		// arrependimento: nao aparece nas consultas da associacao.
+		return profissionalRepository.findByDataExclusaoSolicitadaIsNull(pageable).map(this::toResumoDTO);
 	}
 
 	@Transactional(readOnly = true)
@@ -124,7 +126,8 @@ public class ProfissionalService {
 				profissional.getCpf(),
 				profissional.getDataNascimento(),
 				profissional.getDataAssociacao(),
-				profissional.getAtivo()
+				profissional.getAtivo(),
+				profissional.getDataExclusaoSolicitada()
 		);
 	}
 
