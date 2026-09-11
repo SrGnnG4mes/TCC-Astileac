@@ -13,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfException;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -113,10 +114,23 @@ public class SecurityConfig {
 							resp.setContentType(MediaType.APPLICATION_JSON_VALUE);
 							resp.getWriter().write("{\"status\":401,\"mensagem\":\"Autenticacao necessaria\"}");
 						})
+						// Duas causas muito diferentes chegam aqui como o mesmo
+						// 403: token CSRF ausente/invalido e falta de
+						// permissao. Tratar as duas com a mesma mensagem torna
+						// o erro indiagnosticavel -- quem recebe nao sabe se
+						// deve renovar o token ou se simplesmente nao pode
+						// fazer aquilo. Distinguir nao vaza nada: nao revela
+						// dado nem estrutura interna, so diz o que corrigir.
 						.accessDeniedHandler((req, resp, ex) -> {
+							boolean falhaDeCsrf = ex instanceof CsrfException;
 							resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
 							resp.setContentType(MediaType.APPLICATION_JSON_VALUE);
-							resp.getWriter().write("{\"status\":403,\"mensagem\":\"Acesso negado\"}");
+							resp.getWriter().write(falhaDeCsrf
+									? "{\"status\":403,\"mensagem\":\"Token CSRF ausente ou invalido. "
+											+ "Obtenha um novo em GET /autenticacao/csrf e envie no cabecalho "
+											+ "X-XSRF-TOKEN.\"}"
+									: "{\"status\":403,\"mensagem\":\"Acesso negado: seu perfil nao permite "
+											+ "esta operacao\"}");
 						}));
 
 		return http.build();
