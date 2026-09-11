@@ -47,6 +47,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		return resposta(HttpStatus.CONFLICT, ex.getMessage());
 	}
 
+	@ExceptionHandler(RegraDeNegocioException.class)
+	public ResponseEntity<ErroRespostaDTO> tratarRegraDeNegocio(RegraDeNegocioException ex) {
+		return resposta(HttpStatus.BAD_REQUEST, ex.getMessage());
+	}
+
 	/**
 	 * Violacao de restricao do banco -- tipicamente tentar remover um
 	 * profissional que ainda tem endereco, contato, formacao,
