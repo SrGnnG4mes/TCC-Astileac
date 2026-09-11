@@ -1,0 +1,839 @@
+{
+	"info": {
+		"name": "ASTILEAC — API (TCC)",
+		"description": "Coleção de demonstração da API do sistema ASTILEAC.\n\nAs requisições estão na ordem dos requisitos funcionais e encadeiam entre si: rode com o Collection Runner, de cima para baixo, e cada pasta aproveita o que a anterior criou.\n\nANTES DE RODAR:\n1. Suba o backend: `cd backend && ./mvnw spring-boot:run`\n2. Preencha as variáveis `login` e `senha` da coleção com a conta administrativa criada pelo bootstrap (as mesmas de app.admin.* no application-local.properties).\n\nSOBRE O CSRF: a API usa sessão com cookie, protegida contra CSRF. A primeira requisição busca o token e o guarda numa variável; as requisições de escrita o enviam no cabeçalho X-XSRF-TOKEN. O cookie de sessão o próprio Postman gerencia.\n\nAs asserções não conferem só o status: verificam as decisões de projeto (CPF mascarado na listagem, erro que não vaza CPF, associado que não alcança cadastro alheio, prazo de 30 dias na exclusão).",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{ "key": "baseUrl", "value": "http://localhost:8080" },
+		{ "key": "login", "value": "" },
+		{ "key": "senha", "value": "" },
+		{ "key": "csrfToken", "value": "" },
+		{ "key": "profissionalId", "value": "" },
+		{ "key": "outroProfissionalId", "value": "" },
+		{ "key": "formacaoId", "value": "" },
+		{ "key": "contatoEmailId", "value": "" },
+		{ "key": "cpfValido", "value": "11144477735" },
+		{ "key": "outroCpfValido", "value": "52998224725" }
+	],
+	"item": [
+		{
+			"name": "0. Sessão (RF09)",
+			"item": [
+				{
+					"name": "Obter token CSRF",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('200', () => pm.response.to.have.status(200));",
+						"const corpo = pm.response.json();",
+						"pm.collectionVariables.set('csrfToken', corpo.token);",
+						"pm.test('Token entregue e cookie escrito', () => {",
+						"    pm.expect(corpo.token).to.be.a('string').and.not.empty;",
+						"    pm.expect(corpo.headerName).to.eql('X-XSRF-TOKEN');",
+						"});",
+						"// Sem este endpoint a SPA nunca receberia o cookie CSRF e o",
+						"// próprio login seria bloqueado por falta de token."
+					] } }],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{baseUrl}}/autenticacao/csrf", "host": ["{{baseUrl}}"], "path": ["autenticacao", "csrf"] }
+					}
+				},
+				{
+					"name": "Rota protegida SEM login → 401",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('401 sem autenticação', () => pm.response.to.have.status(401));",
+						"pm.test('Responde JSON, não página de login', () => {",
+						"    pm.expect(pm.response.json().mensagem).to.include('Autenticacao');",
+						"});"
+					] } }],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{baseUrl}}/profissionais", "host": ["{{baseUrl}}"], "path": ["profissionais"] }
+					}
+				},
+				{
+					"name": "Login com senha errada → 401",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('401', () => pm.response.to.have.status(401));",
+						"pm.test('Não revela se o login existe', () => {",
+						"    pm.expect(pm.response.json().mensagem).to.eql('Credenciais invalidas');",
+						"});"
+					] } }],
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }],
+						"body": { "mode": "urlencoded", "urlencoded": [
+							{ "key": "login", "value": "{{login}}" },
+							{ "key": "senha", "value": "senha-propositalmente-errada" }
+						] },
+						"url": { "raw": "{{baseUrl}}/autenticacao/login", "host": ["{{baseUrl}}"], "path": ["autenticacao", "login"] }
+					}
+				},
+				{
+					"name": "Login",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('200 — sessão estabelecida', () => pm.response.to.have.status(200));",
+						"",
+						"// O Spring Security ROTACIONA o token CSRF no login, como",
+						"// proteção contra fixação de sessão. O token obtido antes",
+						"// de entrar fica obsoleto, e a primeira escrita depois dele",
+						"// receberia 403. Aqui recapturamos o token novo do cookie.",
+						"const tokenNovo = pm.cookies.get('XSRF-TOKEN');",
+						"if (tokenNovo) { pm.collectionVariables.set('csrfToken', tokenNovo); }",
+						"pm.test('Token CSRF renovado apos o login', () => {",
+						"    pm.expect(pm.collectionVariables.get('csrfToken')).to.not.be.empty;",
+						"});",
+						"if (pm.response.code !== 200) {",
+						"    console.log('Preencha as variáveis login e senha da coleção com a conta do bootstrap.');",
+						"}"
+					] } }],
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }],
+						"body": { "mode": "urlencoded", "urlencoded": [
+							{ "key": "login", "value": "{{login}}" },
+							{ "key": "senha", "value": "{{senha}}" }
+						] },
+						"url": { "raw": "{{baseUrl}}/autenticacao/login", "host": ["{{baseUrl}}"], "path": ["autenticacao", "login"] }
+					}
+				},
+				{
+					"name": "Quem sou eu",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('200', () => pm.response.to.have.status(200));",
+						"const eu = pm.response.json();",
+						"pm.test('Perfil ADMIN', () => pm.expect(eu.perfil).to.eql('ADMIN'));",
+						"pm.test('Não devolve dado sensível', () => {",
+						"    pm.expect(eu).to.not.have.property('senha');",
+						"    pm.expect(eu).to.not.have.property('cpf');",
+						"});"
+					] } }],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{baseUrl}}/autenticacao/eu", "host": ["{{baseUrl}}"], "path": ["autenticacao", "eu"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "1. Profissional (RF01)",
+			"item": [
+				{
+					"name": "Cadastrar profissional",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('201', () => pm.response.to.have.status(201));",
+						"const p = pm.response.json();",
+						"pm.collectionVariables.set('profissionalId', p.id);",
+						"pm.test('Nasce ativo', () => pm.expect(p.ativo).to.be.true);"
+					] } }],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }
+						],
+						"body": { "mode": "raw", "raw": "{\n  \"nome\": \"Maria Silva\",\n  \"cpf\": \"{{cpfValido}}\",\n  \"dataNascimento\": \"1990-05-10\",\n  \"dataAssociacao\": \"2024-01-15\"\n}" },
+						"url": { "raw": "{{baseUrl}}/profissionais", "host": ["{{baseUrl}}"], "path": ["profissionais"] }
+					}
+				},
+				{
+					"name": "Cadastrar segundo profissional",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('201', () => pm.response.to.have.status(201));",
+						"pm.collectionVariables.set('outroProfissionalId', pm.response.json().id);"
+					] } }],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }
+						],
+						"body": { "mode": "raw", "raw": "{\n  \"nome\": \"Joao Souza\",\n  \"cpf\": \"{{outroCpfValido}}\",\n  \"dataNascimento\": \"1985-02-20\",\n  \"dataAssociacao\": \"2023-06-01\"\n}" },
+						"url": { "raw": "{{baseUrl}}/profissionais", "host": ["{{baseUrl}}"], "path": ["profissionais"] }
+					}
+				},
+				{
+					"name": "CPF com dígito verificador errado → 400",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('400', () => pm.response.to.have.status(400));",
+						"pm.test('Recusa CPF que não é real', () => {",
+						"    pm.expect(pm.response.json().mensagem).to.include('cpf');",
+						"});",
+						"// 12345678901 tem 11 dígitos mas não é um CPF válido."
+					] } }],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }
+						],
+						"body": { "mode": "raw", "raw": "{\n  \"nome\": \"Fulano de Teste\",\n  \"cpf\": \"12345678901\",\n  \"dataNascimento\": \"1990-05-10\",\n  \"dataAssociacao\": \"2024-01-15\"\n}" },
+						"url": { "raw": "{{baseUrl}}/profissionais", "host": ["{{baseUrl}}"], "path": ["profissionais"] }
+					}
+				},
+				{
+					"name": "CPF duplicado → 409 (sem vazar o CPF)",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('409', () => pm.response.to.have.status(409));",
+						"pm.test('LGPD: a mensagem NÃO repete o CPF consultado', () => {",
+						"    pm.expect(pm.response.json().mensagem).to.not.include(pm.collectionVariables.get('cpfValido'));",
+						"});",
+						"// Repetir o valor transformaria a diferença entre 201 e 409",
+						"// numa consulta: bastaria testar CPFs para descobrir quem é",
+						"// associado da ASTILEAC."
+					] } }],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }
+						],
+						"body": { "mode": "raw", "raw": "{\n  \"nome\": \"Outra Pessoa\",\n  \"cpf\": \"{{cpfValido}}\",\n  \"dataNascimento\": \"1992-08-30\",\n  \"dataAssociacao\": \"2024-03-01\"\n}" },
+						"url": { "raw": "{{baseUrl}}/profissionais", "host": ["{{baseUrl}}"], "path": ["profissionais"] }
+					}
+				},
+				{
+					"name": "Ficha completa (CPF inteiro)",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('200', () => pm.response.to.have.status(200));",
+						"pm.test('Na ficha o CPF vem inteiro', () => {",
+						"    pm.expect(pm.response.json().cpf).to.eql(pm.collectionVariables.get('cpfValido'));",
+						"});",
+						"// Quem chega aqui é a diretoria ou o próprio titular:",
+						"// o @PreAuthorize já garantiu isso."
+					] } }],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{baseUrl}}/profissionais/{{profissionalId}}", "host": ["{{baseUrl}}"], "path": ["profissionais", "{{profissionalId}}"] }
+					}
+				},
+				{
+					"name": "Listagem (CPF mascarado)",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('200', () => pm.response.to.have.status(200));",
+						"const pagina = pm.response.json();",
+						"pm.test('LGPD, princípio da necessidade: CPF mascarado na lista', () => {",
+						"    pagina.content.forEach(p => {",
+						"        pm.expect(p.cpfMascarado).to.match(/^\\*\\*\\*\\.\\*\\*\\*\\./);",
+						"        pm.expect(p).to.not.have.property('cpf');",
+						"    });",
+						"});",
+						"pm.test('Vem paginado', () => pm.expect(pagina.page).to.have.property('totalElements'));",
+						"// Achar alguém numa lista não exige o CPF inteiro de todos."
+					] } }],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{baseUrl}}/profissionais", "host": ["{{baseUrl}}"], "path": ["profissionais"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Endereço e contatos (RF02, RF03)",
+			"item": [
+				{
+					"name": "Endereço — criar (PUT)",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('200', () => pm.response.to.have.status(200));",
+						"pm.collectionVariables.set('enderecoId', pm.response.json().id);"
+					] } }],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }
+						],
+						"body": { "mode": "raw", "raw": "{\n  \"cep\": \"69900000\",\n  \"logradouro\": \"Rua das Palmeiras\",\n  \"numero\": \"120\",\n  \"complemento\": \"Apto 3\",\n  \"bairro\": \"Centro\",\n  \"cidade\": \"Rio Branco\",\n  \"uf\": \"AC\"\n}" },
+						"url": { "raw": "{{baseUrl}}/profissionais/{{profissionalId}}/endereco", "host": ["{{baseUrl}}"], "path": ["profissionais", "{{profissionalId}}", "endereco"] }
+					}
+				},
+				{
+					"name": "Endereço — PUT de novo substitui, não duplica",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('200', () => pm.response.to.have.status(200));",
+						"pm.test('Mesmo id: substituiu o registro', () => {",
+						"    pm.expect(pm.response.json().id).to.eql(Number(pm.collectionVariables.get('enderecoId')));",
+						"});",
+						"pm.test('Dados trocados', () => pm.expect(pm.response.json().cidade).to.eql('Cruzeiro do Sul'));",
+						"// Relação 1:1: PUT é idempotente por natureza aqui."
+					] } }],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }
+						],
+						"body": { "mode": "raw", "raw": "{\n  \"cep\": \"69980000\",\n  \"logradouro\": \"Av. Brasil\",\n  \"numero\": \"45\",\n  \"complemento\": null,\n  \"bairro\": \"Centro\",\n  \"cidade\": \"Cruzeiro do Sul\",\n  \"uf\": \"AC\"\n}" },
+						"url": { "raw": "{{baseUrl}}/profissionais/{{profissionalId}}/endereco", "host": ["{{baseUrl}}"], "path": ["profissionais", "{{profissionalId}}", "endereco"] }
+					}
+				},
+				{
+					"name": "Contato — e-mail principal",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('201', () => pm.response.to.have.status(201));",
+						"pm.collectionVariables.set('contatoEmailId', pm.response.json().id);",
+						"pm.test('É o principal', () => pm.expect(pm.response.json().principal).to.be.true);"
+					] } }],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }
+						],
+						"body": { "mode": "raw", "raw": "{\n  \"tipo\": \"EMAIL\",\n  \"valor\": \"maria@exemplo.com\",\n  \"principal\": true\n}" },
+						"url": { "raw": "{{baseUrl}}/profissionais/{{profissionalId}}/contatos", "host": ["{{baseUrl}}"], "path": ["profissionais", "{{profissionalId}}", "contatos"] }
+					}
+				},
+				{
+					"name": "Contato — e-mail com formato inválido → 400",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('400', () => pm.response.to.have.status(400));",
+						"// O formato de 'valor' depende de 'tipo'. É checagem cruzada",
+						"// entre campos, então fica no service, não no Bean Validation."
+					] } }],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }
+						],
+						"body": { "mode": "raw", "raw": "{\n  \"tipo\": \"EMAIL\",\n  \"valor\": \"isto-nao-e-um-email\",\n  \"principal\": false\n}" },
+						"url": { "raw": "{{baseUrl}}/profissionais/{{profissionalId}}/contatos", "host": ["{{baseUrl}}"], "path": ["profissionais", "{{profissionalId}}", "contatos"] }
+					}
+				},
+				{
+					"name": "Contato — telefone principal (tipo diferente, não conflita)",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('201', () => pm.response.to.have.status(201));",
+						"pm.test('Telefone também pode ser principal', () => pm.expect(pm.response.json().principal).to.be.true);"
+					] } }],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }
+						],
+						"body": { "mode": "raw", "raw": "{\n  \"tipo\": \"TELEFONE\",\n  \"valor\": \"68999998888\",\n  \"principal\": true\n}" },
+						"url": { "raw": "{{baseUrl}}/profissionais/{{profissionalId}}/contatos", "host": ["{{baseUrl}}"], "path": ["profissionais", "{{profissionalId}}", "contatos"] }
+					}
+				},
+				{
+					"name": "Contato — novo e-mail principal desmarca o anterior",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('201', () => pm.response.to.have.status(201));"
+					] } }],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }
+						],
+						"body": { "mode": "raw", "raw": "{\n  \"tipo\": \"EMAIL\",\n  \"valor\": \"maria.nova@exemplo.com\",\n  \"principal\": true\n}" },
+						"url": { "raw": "{{baseUrl}}/profissionais/{{profissionalId}}/contatos", "host": ["{{baseUrl}}"], "path": ["profissionais", "{{profissionalId}}", "contatos"] }
+					}
+				},
+				{
+					"name": "Contatos — conferir a regra do principal",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('200', () => pm.response.to.have.status(200));",
+						"const contatos = pm.response.json();",
+						"const emailAntigo = contatos.find(c => c.id === Number(pm.collectionVariables.get('contatoEmailId')));",
+						"pm.test('O e-mail principal anterior foi desmarcado', () => pm.expect(emailAntigo.principal).to.be.false);",
+						"const principaisEmail = contatos.filter(c => c.tipo === 'EMAIL' && c.principal);",
+						"pm.test('Um único e-mail principal', () => pm.expect(principaisEmail).to.have.lengthOf(1));",
+						"const principaisTelefone = contatos.filter(c => c.tipo === 'TELEFONE' && c.principal);",
+						"pm.test('E o telefone principal não foi afetado', () => pm.expect(principaisTelefone).to.have.lengthOf(1));"
+					] } }],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{baseUrl}}/profissionais/{{profissionalId}}/contatos", "host": ["{{baseUrl}}"], "path": ["profissionais", "{{profissionalId}}", "contatos"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Áreas de atuação (RF04)",
+			"item": [
+				{
+					"name": "Listar áreas (carga inicial da V2)",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('200', () => pm.response.to.have.status(200));",
+						"const areas = pm.response.json();",
+						"pm.test('As cinco áreas previstas existem', () => pm.expect(areas.length).to.be.at.least(5));",
+						"pm.collectionVariables.set('areaJuridicaId', areas.find(a => a.nome === 'juridica').id);",
+						"pm.collectionVariables.set('areaEducacionalId', areas.find(a => a.nome === 'educacional').id);"
+					] } }],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{baseUrl}}/areas-atuacao", "host": ["{{baseUrl}}"], "path": ["areas-atuacao"] }
+					}
+				},
+				{
+					"name": "Maria atua em jurídica",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('201', () => pm.response.to.have.status(201));"
+					] } }],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }
+						],
+						"body": { "mode": "raw", "raw": "{\n  \"areaAtuacaoId\": {{areaJuridicaId}},\n  \"dataInicio\": \"2022-03-01\"\n}" },
+						"url": { "raw": "{{baseUrl}}/profissionais/{{profissionalId}}/areas", "host": ["{{baseUrl}}"], "path": ["profissionais", "{{profissionalId}}", "areas"] }
+					}
+				},
+				{
+					"name": "Maria também atua em educacional",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('201', () => pm.response.to.have.status(201));",
+						"// O ponto do modelo N:N: atuar em mais de uma área ao mesmo tempo."
+					] } }],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }
+						],
+						"body": { "mode": "raw", "raw": "{\n  \"areaAtuacaoId\": {{areaEducacionalId}},\n  \"dataInicio\": \"2020-01-10\"\n}" },
+						"url": { "raw": "{{baseUrl}}/profissionais/{{profissionalId}}/areas", "host": ["{{baseUrl}}"], "path": ["profissionais", "{{profissionalId}}", "areas"] }
+					}
+				},
+				{
+					"name": "Mesma área duas vezes → 409",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('409', () => pm.response.to.have.status(409));",
+						"// A chave primária composta (profissional, área) é a própria",
+						"// identidade do registro."
+					] } }],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }
+						],
+						"body": { "mode": "raw", "raw": "{\n  \"areaAtuacaoId\": {{areaJuridicaId}},\n  \"dataInicio\": \"2023-01-01\"\n}" },
+						"url": { "raw": "{{baseUrl}}/profissionais/{{profissionalId}}/areas", "host": ["{{baseUrl}}"], "path": ["profissionais", "{{profissionalId}}", "areas"] }
+					}
+				},
+				{
+					"name": "João atua em jurídica",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('201', () => pm.response.to.have.status(201));"
+					] } }],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }
+						],
+						"body": { "mode": "raw", "raw": "{\n  \"areaAtuacaoId\": {{areaJuridicaId}},\n  \"dataInicio\": \"2021-05-01\"\n}" },
+						"url": { "raw": "{{baseUrl}}/profissionais/{{outroProfissionalId}}/areas", "host": ["{{baseUrl}}"], "path": ["profissionais", "{{outroProfissionalId}}", "areas"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "4. Formações, certificados e vínculos (RF05–RF07)",
+			"item": [
+				{
+					"name": "Formação concluída",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('201', () => pm.response.to.have.status(201));",
+						"pm.collectionVariables.set('formacaoId', pm.response.json().id);"
+					] } }],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }
+						],
+						"body": { "mode": "raw", "raw": "{\n  \"nivel\": \"graduacao\",\n  \"curso\": \"Letras Libras\",\n  \"instituicao\": \"Universidade Federal do Acre\",\n  \"anoConclusao\": 2015\n}" },
+						"url": { "raw": "{{baseUrl}}/profissionais/{{profissionalId}}/formacoes", "host": ["{{baseUrl}}"], "path": ["profissionais", "{{profissionalId}}", "formacoes"] }
+					}
+				},
+				{
+					"name": "Formação anterior ao nascimento → 400",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('400', () => pm.response.to.have.status(400));",
+						"pm.test('Explica o motivo', () => pm.expect(pm.response.json().mensagem).to.include('nascimento'));",
+						"// A regra cruza com um dado do profissional, então o Bean",
+						"// Validation não alcança: fica no service."
+					] } }],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }
+						],
+						"body": { "mode": "raw", "raw": "{\n  \"nivel\": \"graduacao\",\n  \"curso\": \"Curso Impossivel\",\n  \"instituicao\": \"Instituicao X\",\n  \"anoConclusao\": 1985\n}" },
+						"url": { "raw": "{{baseUrl}}/profissionais/{{profissionalId}}/formacoes", "host": ["{{baseUrl}}"], "path": ["profissionais", "{{profissionalId}}", "formacoes"] }
+					}
+				},
+				{
+					"name": "Certificado vinculado à formação",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('201', () => pm.response.to.have.status(201));",
+						"pm.test('arquivoPath nulo: o documento chega no upload (Passo 8)', () => {",
+						"    pm.expect(pm.response.json().arquivoPath).to.be.null;",
+						"});",
+						"// O cliente não escolhe o caminho de armazenamento — é por aí",
+						"// que entraria path traversal."
+					] } }],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }
+						],
+						"body": { "mode": "raw", "raw": "{\n  \"formacaoId\": {{formacaoId}},\n  \"titulo\": \"Interpretacao em contexto juridico\",\n  \"instituicaoEmissora\": \"ASTILEAC\",\n  \"cargaHoraria\": 40,\n  \"dataEmissao\": \"2023-06-15\"\n}" },
+						"url": { "raw": "{{baseUrl}}/profissionais/{{profissionalId}}/certificados", "host": ["{{baseUrl}}"], "path": ["profissionais", "{{profissionalId}}", "certificados"] }
+					}
+				},
+				{
+					"name": "Certificado na formação de OUTRA pessoa → 404",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('404', () => pm.response.to.have.status(404));",
+						"// Formação e certificado são o que comprova habilitação legal",
+						"// (Lei 14.704/2023). Deixar pendurar certificado em formação",
+						"// alheia corromperia justamente o dado que o sistema existe",
+						"// para tornar confiável."
+					] } }],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }
+						],
+						"body": { "mode": "raw", "raw": "{\n  \"formacaoId\": {{formacaoId}},\n  \"titulo\": \"Tentativa indevida\",\n  \"instituicaoEmissora\": \"X\",\n  \"cargaHoraria\": 10,\n  \"dataEmissao\": \"2024-01-10\"\n}" },
+						"url": { "raw": "{{baseUrl}}/profissionais/{{outroProfissionalId}}/certificados", "host": ["{{baseUrl}}"], "path": ["profissionais", "{{outroProfissionalId}}", "certificados"] }
+					}
+				},
+				{
+					"name": "Vínculo em andamento (sem data de fim)",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('201', () => pm.response.to.have.status(201));",
+						"pm.test('atual derivado como true', () => pm.expect(pm.response.json().atual).to.be.true);",
+						"// 'atual' nunca é recebido do cliente: é derivado de dataFim.",
+						"// Assim não há como gravar uma contradição."
+					] } }],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }
+						],
+						"body": { "mode": "raw", "raw": "{\n  \"instituicao\": \"Instituto Federal do Acre\",\n  \"cargo\": \"Interprete de Libras\",\n  \"tipoVinculo\": \"efetivo\",\n  \"dataInicio\": \"2020-03-01\",\n  \"dataFim\": null\n}" },
+						"url": { "raw": "{{baseUrl}}/profissionais/{{profissionalId}}/vinculos", "host": ["{{baseUrl}}"], "path": ["profissionais", "{{profissionalId}}", "vinculos"] }
+					}
+				},
+				{
+					"name": "Vínculo encerrado",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('201', () => pm.response.to.have.status(201));",
+						"pm.test('atual derivado como false', () => pm.expect(pm.response.json().atual).to.be.false);",
+						"// O histórico é mantido, não só o vínculo vigente."
+					] } }],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }
+						],
+						"body": { "mode": "raw", "raw": "{\n  \"instituicao\": \"Escola Estadual\",\n  \"cargo\": \"Interprete\",\n  \"tipoVinculo\": \"temporario\",\n  \"dataInicio\": \"2015-02-01\",\n  \"dataFim\": \"2019-12-20\"\n}" },
+						"url": { "raw": "{{baseUrl}}/profissionais/{{profissionalId}}/vinculos", "host": ["{{baseUrl}}"], "path": ["profissionais", "{{profissionalId}}", "vinculos"] }
+					}
+				},
+				{
+					"name": "Período invertido → 400",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('400', () => pm.response.to.have.status(400));"
+					] } }],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }
+						],
+						"body": { "mode": "raw", "raw": "{\n  \"instituicao\": \"Teste\",\n  \"cargo\": \"Teste\",\n  \"tipoVinculo\": \"efetivo\",\n  \"dataInicio\": \"2020-03-01\",\n  \"dataFim\": \"2019-01-01\"\n}" },
+						"url": { "raw": "{{baseUrl}}/profissionais/{{profissionalId}}/vinculos", "host": ["{{baseUrl}}"], "path": ["profissionais", "{{profissionalId}}", "vinculos"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Consulta por área — RF08",
+			"description": "O caso de uso que justifica o sistema: a associação recebe \"preciso de um intérprete para audiência judicial\" e precisa responder rápido.",
+			"item": [
+				{
+					"name": "Intérpretes da área jurídica",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('200', () => pm.response.to.have.status(200));",
+						"const pagina = pm.response.json();",
+						"pm.test('Encontra os dois intérpretes da área', () => {",
+						"    pm.expect(pagina.page.totalElements).to.eql(2);",
+						"});",
+						"pm.test('Maria aparece UMA vez, apesar de atuar em duas áreas', () => {",
+						"    const marias = pagina.content.filter(p => p.nome === 'Maria Silva');",
+						"    pm.expect(marias).to.have.lengthOf(1);",
+						"});",
+						"// É por isso que o filtro usa EXISTS e não JOIN: com JOIN ela",
+						"// viria duplicada e a contagem da paginação ficaria errada."
+					] } }],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{baseUrl}}/profissionais?area=juridica", "host": ["{{baseUrl}}"], "path": ["profissionais"], "query": [{ "key": "area", "value": "juridica" }] }
+					}
+				},
+				{
+					"name": "Área educacional",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('200', () => pm.response.to.have.status(200));",
+						"pm.test('Só a Maria atua em educacional', () => {",
+						"    pm.expect(pm.response.json().page.totalElements).to.eql(1);",
+						"});"
+					] } }],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{baseUrl}}/profissionais?area=educacional", "host": ["{{baseUrl}}"], "path": ["profissionais"], "query": [{ "key": "area", "value": "educacional" }] }
+					}
+				},
+				{
+					"name": "Área em MAIÚSCULAS encontra o mesmo",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('200', () => pm.response.to.have.status(200));",
+						"pm.test('Normalização: JURIDICA = juridica', () => {",
+						"    pm.expect(pm.response.json().page.totalElements).to.eql(2);",
+						"});"
+					] } }],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{baseUrl}}/profissionais?area=JURIDICA", "host": ["{{baseUrl}}"], "path": ["profissionais"], "query": [{ "key": "area", "value": "JURIDICA" }] }
+					}
+				},
+				{
+					"name": "Filtros combinados: jurídica + nome",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('200', () => pm.response.to.have.status(200));",
+						"pm.test('Um resultado', () => pm.expect(pm.response.json().page.totalElements).to.eql(1));",
+						"pm.test('E é a Maria', () => pm.expect(pm.response.json().content[0].nome).to.eql('Maria Silva'));"
+					] } }],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{baseUrl}}/profissionais?area=juridica&nome=maria", "host": ["{{baseUrl}}"], "path": ["profissionais"], "query": [
+							{ "key": "area", "value": "juridica" },
+							{ "key": "nome", "value": "maria" }
+						] }
+					}
+				}
+			]
+		},
+		{
+			"name": "6. Direitos do titular — RF10 (LGPD Art. 18)",
+			"item": [
+				{
+					"name": "Exportar todos os dados da pessoa",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('200', () => pm.response.to.have.status(200));",
+						"const dados = pm.response.json();",
+						"pm.test('Exportação COMPLETA — nada pode faltar', () => {",
+						"    ['identificacao', 'endereco', 'contatos', 'areasDeAtuacao',",
+						"     'formacoes', 'certificados', 'vinculosEmpregaticios']",
+						"        .forEach(secao => pm.expect(dados).to.have.property(secao));",
+						"});",
+						"pm.test('CPF inteiro: o destinatário é o próprio titular', () => {",
+						"    pm.expect(dados.identificacao.cpf).to.eql(pm.collectionVariables.get('cpfValido'));",
+						"});",
+						"// Uma exportação que omite dados não cumpre o Art. 18."
+					] } }],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{baseUrl}}/profissionais/{{profissionalId}}/dados-pessoais", "host": ["{{baseUrl}}"], "path": ["profissionais", "{{profissionalId}}", "dados-pessoais"] }
+					}
+				},
+				{
+					"name": "Pedir exclusão dos dados",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('200 com corpo, não 204 vazio', () => pm.response.to.have.status(200));",
+						"const r = pm.response.json();",
+						"pm.test('A pessoa é informada do prazo de 30 dias', () => {",
+						"    pm.expect(r.diasParaArrependimento).to.eql(30);",
+						"    pm.expect(r.mensagem).to.include('30 dias');",
+						"    pm.expect(r.mensagem).to.include('mudar de ideia');",
+						"});",
+						"pm.test('E de como desfazer', () => pm.expect(r.comoCancelar).to.be.a('string').and.not.empty);",
+						"pm.test('Com data exata da exclusão definitiva', () => {",
+						"    pm.expect(r.dataDaExclusaoDefinitiva).to.be.a('string');",
+						"});",
+						"// Não é 204 sem corpo justamente porque a pessoa precisa ler isto."
+					] } }],
+					"request": {
+						"method": "DELETE",
+						"header": [{ "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }],
+						"url": { "raw": "{{baseUrl}}/profissionais/{{profissionalId}}/dados-pessoais/exclusao", "host": ["{{baseUrl}}"], "path": ["profissionais", "{{profissionalId}}", "dados-pessoais", "exclusao"] }
+					}
+				},
+				{
+					"name": "Bloqueio: sumiu da consulta (Art. 18, IV)",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('200', () => pm.response.to.have.status(200));",
+						"pm.test('Maria não aparece mais na busca por jurídica', () => {",
+						"    const nomes = pm.response.json().content.map(p => p.nome);",
+						"    pm.expect(nomes).to.not.include('Maria Silva');",
+						"});",
+						"// Durante a janela de arrependimento os dados ficam bloqueados:",
+						"// não basta guardar, tem que parar de usar."
+					] } }],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{baseUrl}}/profissionais?area=juridica", "host": ["{{baseUrl}}"], "path": ["profissionais"], "query": [{ "key": "area", "value": "juridica" }] }
+					}
+				},
+				{
+					"name": "Mas continua recuperável",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('200', () => pm.response.to.have.status(200));",
+						"pm.test('O pedido está registrado na ficha', () => {",
+						"    pm.expect(pm.response.json().dataExclusaoSolicitada).to.not.be.null;",
+						"    pm.expect(pm.response.json().ativo).to.be.false;",
+						"});"
+					] } }],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{baseUrl}}/profissionais/{{profissionalId}}", "host": ["{{baseUrl}}"], "path": ["profissionais", "{{profissionalId}}"] }
+					}
+				},
+				{
+					"name": "Arrependimento: cancelar a exclusão",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('200', () => pm.response.to.have.status(200));",
+						"pm.test('Confirma que os dados não serão apagados', () => {",
+						"    pm.expect(pm.response.json().mensagem).to.include('cancelado');",
+						"});"
+					] } }],
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }],
+						"url": { "raw": "{{baseUrl}}/profissionais/{{profissionalId}}/dados-pessoais/exclusao/cancelamento", "host": ["{{baseUrl}}"], "path": ["profissionais", "{{profissionalId}}", "dados-pessoais", "exclusao", "cancelamento"] }
+					}
+				},
+				{
+					"name": "E volta à consulta",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('200', () => pm.response.to.have.status(200));",
+						"pm.test('Maria está de volta', () => {",
+						"    const nomes = pm.response.json().content.map(p => p.nome);",
+						"    pm.expect(nomes).to.include('Maria Silva');",
+						"});"
+					] } }],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{baseUrl}}/profissionais?area=juridica", "host": ["{{baseUrl}}"], "path": ["profissionais"], "query": [{ "key": "area", "value": "juridica" }] }
+					}
+				}
+			]
+		},
+		{
+			"name": "7. Registro de acesso — RF11 (LGPD Art. 46)",
+			"item": [
+				{
+					"name": "Quem consultou ou alterou este cadastro",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('200', () => pm.response.to.have.status(200));",
+						"const registros = pm.response.json().content;",
+						"pm.test('Há histórico', () => pm.expect(registros.length).to.be.above(0));",
+						"pm.test('O autor é o usuário logado, não uma constante', () => {",
+						"    const login = pm.collectionVariables.get('login');",
+						"    pm.expect(registros.some(r => r.autor === login)).to.be.true;",
+						"});",
+						"pm.test('A exportação é registrada como evento próprio', () => {",
+						"    pm.expect(registros.some(r => r.acao === 'EXPORTACAO')).to.be.true;",
+						"});",
+						"// Entregar a ficha inteira de alguém não é o mesmo que abrir",
+						"// uma tela: a auditoria precisa distinguir."
+					] } }],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{baseUrl}}/profissionais/{{profissionalId}}/dados-pessoais/registro-de-acesso", "host": ["{{baseUrl}}"], "path": ["profissionais", "{{profissionalId}}", "dados-pessoais", "registro-de-acesso"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "8. Limpeza",
+			"description": "Remove o que a demonstração criou, para a coleção poder ser rodada de novo.",
+			"item": [
+				{
+					"name": "Remover Maria",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('409 — protegido pela chave estrangeira', () => pm.response.to.have.status(409));",
+						"pm.test('Explica que há dados vinculados', () => {",
+						"    pm.expect(pm.response.json().mensagem).to.include('vinculados');",
+						"});",
+						"// Não é erro 500: é conflito de estado. Apagar o profissional",
+						"// destruiria formações e certificados, que comprovam",
+						"// habilitação legal. Para sair de verdade, o caminho é o",
+						"// pedido de eliminação do RF10, que apaga tudo junto depois",
+						"// dos 30 dias."
+					] } }],
+					"request": {
+						"method": "DELETE",
+						"header": [{ "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }],
+						"url": { "raw": "{{baseUrl}}/profissionais/{{profissionalId}}", "host": ["{{baseUrl}}"], "path": ["profissionais", "{{profissionalId}}"] }
+					}
+				},
+				{
+					"name": "Remover João (sem dados vinculados além da área)",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('409 ou 204', () => pm.expect([204, 409]).to.include(pm.response.code));"
+					] } }],
+					"request": {
+						"method": "DELETE",
+						"header": [{ "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }],
+						"url": { "raw": "{{baseUrl}}/profissionais/{{outroProfissionalId}}", "host": ["{{baseUrl}}"], "path": ["profissionais", "{{outroProfissionalId}}"] }
+					}
+				},
+				{
+					"name": "Logout",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('200', () => pm.response.to.have.status(200));"
+					] } }],
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "X-XSRF-TOKEN", "value": "{{csrfToken}}" }],
+						"url": { "raw": "{{baseUrl}}/autenticacao/logout", "host": ["{{baseUrl}}"], "path": ["autenticacao", "logout"] }
+					}
+				},
+				{
+					"name": "Depois do logout, protegido de novo → 401",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('401 — a sessão foi realmente encerrada', () => pm.response.to.have.status(401));",
+						"// Logout com sessão invalida no servidor. Com JWT, seria",
+						"// preciso uma lista de revogação para conseguir o mesmo."
+					] } }],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{baseUrl}}/profissionais", "host": ["{{baseUrl}}"], "path": ["profissionais"] }
+					}
+				}
+			]
+		}
+	]
+}
