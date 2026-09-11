@@ -1,8 +1,8 @@
 package br.edu.ifac.astileac.backend.dto;
 
+import br.edu.ifac.astileac.backend.validation.Cpf;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
@@ -19,7 +19,7 @@ public record ProfissionalRequestDTO(
 		String nome,
 
 		@NotBlank(message = "cpf e obrigatorio")
-		@Pattern(regexp = "\\d{11}", message = "cpf deve conter exatamente 11 digitos numericos")
+		@Cpf(message = "cpf invalido: informe 11 digitos numericos com digitos verificadores corretos")
 		String cpf,
 
 		@NotNull(message = "data de nascimento e obrigatoria")

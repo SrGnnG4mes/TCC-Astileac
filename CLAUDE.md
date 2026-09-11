@@ -260,11 +260,42 @@ Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.propertie
 > do 3.x): `@WebMvcTest` agora é `org.springframework.boot.webmvc.test.autoconfigure`,
 > `@DataJpaTest` é `org.springframework.boot.data.jpa.test.autoconfigure`, e `@MockBean` foi
 > **removido** — usa-se `@MockitoBean` (`org.springframework.test.context.bean.override.mockito`).
+>
+> **Passo 3.5 — endurecimento** (branch `fix/endurecimento-cadastro`, 21 testes). Decisões que
+> valem explicar na banca:
+> - **`server.address=127.0.0.1`** no `application.properties`. O Tomcat escuta em todas as
+>   interfaces por padrão; com `permitAll` ainda em vigor, qualquer um na mesma rede lia e
+>   apagava o cadastro. Expor na rede passa a ser decisão explícita de quem faz o deploy.
+> - **`ProfissionalResumoDTO`** (listagem, CPF mascarado `***.***.777-35`) separado do
+>   `ProfissionalResponseDTO` (ficha, CPF completo), mais paginação. É o princípio da
+>   necessidade da LGPD (Art. 6º, III) aplicado na forma do DTO, não só no discurso.
+> - **Mensagem de CPF duplicado não repete o CPF.** Repetir tornava a diferença entre 201 e
+>   409 uma consulta de filiação à ASTILEAC.
+> - **`@Cpf`** próprio (`validation/`) com cálculo dos dígitos verificadores. O `@Pattern`
+>   anterior aceitava `00000000000`.
+> - **`GlobalExceptionHandler` herda de `ResponseEntityExceptionHandler`.** Um
+>   `@RestControllerAdvice` solto com handler de `Exception` captura também as exceções do
+>   Spring e transforma **404, 405 e 415 em 500** — confirmado rodando, não suposto. A classe
+>   pai trata cada uma com o status certo; aqui só se padroniza o corpo (`ErroRespostaDTO`).
+> - **`WebConfig` com `PageSerializationMode.VIA_DTO`.** Sem isso o Spring Data avisa que o
+>   JSON de `PageImpl` não tem estrutura estável — o que quebraria o Angular no Passo 7.
+> - **Migration `V3`**: índices nas FKs. O PostgreSQL não os cria sozinho, e a PK composta de
+>   `profissional_area` começa em `profissional_id`, então não serve para filtrar só por área
+>   — exatamente o RF08.
+> - `spring.profiles.active=local` virou **`spring.profiles.default=local`**: fallback em vez
+>   de valor fixo brigando com a variável de ambiente.
+>
+> **Ainda em aberto** (achados da revisão não fechados no 3.5): `DELETE` continua sendo
+> exclusão real — virar desativação depende da decisão excluir × desativar; Swagger segue
+> ligado, a desligar no perfil do ambiente quando houver deploy; sem `@Version`
+> (bloqueio otimista), decisão consciente.
 
 ### Próximos passos (nesta ordem)
 1. ~~Migrations Flyway `V1` — criar as 9 tabelas + carga inicial das áreas de atuação~~ ✅
 2. ~~Entidades JPA + repositories~~ ✅
 3. ~~CRUD de profissional (service, DTOs, controller) — o caminho completo de uma feature~~ ✅
+3.5. ~~Endurecimento: exposição de rede, CPF mascarado + paginação, validação de CPF,
+   tratamento de erros, índices~~ ✅
 4. Demais cadastros: endereço, contatos, áreas, formações, certificados, vínculos
 5. Consulta e filtro por área de atuação (RF08)
 6. Autenticação e perfis (RF09)
