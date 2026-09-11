@@ -71,8 +71,8 @@ astileac/
 │   ├── tcc/                    ← fonte LaTeX (tcc.tex, abntspiifac.cls, refs.bib)
 │   ├── ASTILEAC-BD.mmd         ← diagrama entidade-relacionamento (Mermaid)
 │   ├── ASTILEAC-BDimage.png    ← DER exportado como imagem
-│   ├── ASTILEAC_Projeto_TCC.pdf ← documento do TCC compilado
-│   └── ASTILEAC.postman_collection.json ← coleção de demonstração da API
+│   └── ASTILEAC_Projeto_TCC.pdf ← documento do TCC compilado
+├── Postman/      Coleção de demonstração da API (importar no Postman)
 ├── .gitignore
 ├── CLAUDE.md
 └── README.md
