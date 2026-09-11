@@ -313,6 +313,23 @@ Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.propertie
 > - Efeito colateral a saber: o `` carrega os `WebMvcConfigurer` (logo o interceptor)
 >   mas não ``, então toda fatia web precisa de ` LogAcessoService`.
 
+> **Passo 4 completo** (branch `feat/formacoes-certificados-vinculos`, migration `V5`, 60 testes).
+> - **`V5` tornou `certificado.arquivo_path` opcional.** O certificado é registrado antes de o
+>   documento digitalizado ser anexado (upload é o Passo 8); com `NOT NULL`, o cadastro só
+>   funcionaria com um caminho inventado — dado falso para satisfazer uma restrição.
+> - **`arquivoPath` não é campo do request.** Quem define o caminho de armazenamento é o
+>   servidor, no upload. Deixar o cliente escolher é por onde entra *path traversal*.
+> - **Certificado só vincula formação do mesmo profissional.** Sem essa checagem bastaria
+>   enviar o id da formação de outra pessoa; como formação e certificado comprovam
+>   habilitação legal (Lei 14.704/2023), isso corromperia o dado que o sistema existe para
+>   tornar confiável.
+> - **`atual` do vínculo é derivado, nunca recebido.** `data_fim` nula já significa "em
+>   andamento"; aceitar os dois deixaria o cliente gravar uma contradição no banco.
+> - Formação valida dois cruzamentos que o Bean Validation não alcança: ano não pode ser
+>   futuro nem anterior ao nascimento do profissional.
+> - A exportação do RF10 passou a trazer os três cadastros — os DTOs de resposta já tinham
+>   sido criados lá, justamente para a exportação não nascer incompleta.
+
 ### Próximos passos (nesta ordem)
 1. ~~Migrations Flyway `V1` — criar as 9 tabelas + carga inicial das áreas de atuação~~ ✅
 2. ~~Entidades JPA + repositories~~ ✅
@@ -321,7 +338,7 @@ Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.propertie
    tratamento de erros, índices~~ ✅
 3.7. ~~RF10 (direitos do titular) e RF11 (registro de acesso) — exigências da LGPD~~ ✅
 
-4. Demais cadastros: endereço, contatos, áreas, formações, certificados, vínculos
+4. ~~Demais cadastros: endereço, contatos, áreas, formações, certificados, vínculos~~ ✅
 5. Consulta e filtro por área de atuação (RF08)
 6. Autenticação e perfis (RF09)
 7. Front-end Angular: formulários e telas de consulta

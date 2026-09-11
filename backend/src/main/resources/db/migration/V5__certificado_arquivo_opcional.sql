@@ -1,0 +1,12 @@
+-- O certificado e cadastrado ANTES de o arquivo digitalizado ser
+-- enviado: primeiro se registra titulo, instituicao e carga horaria,
+-- depois se anexa o comprovante (upload e o Passo 8).
+--
+-- Com arquivo_path NOT NULL, o cadastro so seria possivel com um
+-- caminho inventado -- dado falso no banco para satisfazer uma
+-- restricao. A coluna passa a aceitar nulo, que e o que "ainda nao
+-- anexado" significa de verdade.
+--
+-- A V1 nao e editada (regra do projeto): schema se corrige com
+-- migration nova.
+ALTER TABLE certificado ALTER COLUMN arquivo_path DROP NOT NULL;
