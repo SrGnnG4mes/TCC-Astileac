@@ -42,8 +42,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		return resposta(HttpStatus.NOT_FOUND, ex.getMessage());
 	}
 
-	@ExceptionHandler(CpfJaCadastradoException.class)
-	public ResponseEntity<ErroRespostaDTO> tratarCpfDuplicado(CpfJaCadastradoException ex) {
+	/**
+	 * Cobre tambem CpfJaCadastradoException, que herda desta: um
+	 * handler so para todo conflito de estado.
+	 */
+	@ExceptionHandler(ConflitoException.class)
+	public ResponseEntity<ErroRespostaDTO> tratarConflito(ConflitoException ex) {
 		return resposta(HttpStatus.CONFLICT, ex.getMessage());
 	}
 

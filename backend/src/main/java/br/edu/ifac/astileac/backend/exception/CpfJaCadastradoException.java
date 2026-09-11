@@ -11,7 +11,7 @@ package br.edu.ifac.astileac.backend.exception;
  * filiacao a entidade profissional, nao so o numero. Quem chamou a API
  * ja sabe qual CPF enviou.
  */
-public class CpfJaCadastradoException extends RuntimeException {
+public class CpfJaCadastradoException extends ConflitoException {
 
 	public CpfJaCadastradoException() {
 		super("Ja existe um profissional cadastrado com este CPF");
