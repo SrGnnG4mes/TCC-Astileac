@@ -76,6 +76,21 @@ public class ProfissionalService {
 		profissionalRepository.delete(buscarEntidadePorId(id));
 	}
 
+	/**
+	 * Busca a entidade para uso de OUTROS services (endereco, contatos,
+	 * formacoes...), que precisam garantir que o profissional existe
+	 * antes de mexer nos dados filhos. Mantem a mensagem de "nao
+	 * encontrado" num lugar so, em vez de repetida em cada cadastro.
+	 *
+	 * Devolver a entidade aqui nao fere a regra do projeto: o que nao
+	 * pode e entidade JPA chegar ao controller. Entre services, e o
+	 * objeto de trabalho normal.
+	 */
+	@Transactional(readOnly = true)
+	public Profissional buscarEntidade(Long id) {
+		return buscarEntidadePorId(id);
+	}
+
 	private Profissional buscarEntidadePorId(Long id) {
 		return profissionalRepository.findById(id)
 				.orElseThrow(() -> new RecursoNaoEncontradoException("Profissional nao encontrado: id " + id));
