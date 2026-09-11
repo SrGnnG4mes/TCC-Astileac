@@ -4,6 +4,36 @@
 		"description": "Coleção de demonstração da API do sistema ASTILEAC.\n\nAs requisições estão na ordem dos requisitos funcionais e encadeiam entre si: rode com o Collection Runner, de cima para baixo, e cada pasta aproveita o que a anterior criou.\n\nANTES DE RODAR:\n1. Suba o backend: `cd backend && ./mvnw spring-boot:run`\n2. Preencha as variáveis `login` e `senha` da coleção com a conta administrativa criada pelo bootstrap (as mesmas de app.admin.* no application-local.properties).\n\nSOBRE O CSRF: a API usa sessão com cookie, protegida contra CSRF. A primeira requisição busca o token e o guarda numa variável; as requisições de escrita o enviam no cabeçalho X-XSRF-TOKEN. O cookie de sessão o próprio Postman gerencia.\n\nAs asserções não conferem só o status: verificam as decisões de projeto (CPF mascarado na listagem, erro que não vaza CPF, associado que não alcança cadastro alheio, prazo de 30 dias na exclusão).",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Roda ANTES de cada requisição da coleção.",
+					"//",
+					"// Se a requisição escreve, busca o token CSRF do momento. O",
+					"// Spring rotaciona o token ao autenticar, então um token",
+					"// guardado antes do login deixa de valer — e dependia da ordem",
+					"// de execução para ser renovado. Aqui a renovação acontece",
+					"// sempre, então funciona igual rodando a coleção inteira ou",
+					"// clicando numa requisição isolada.",
+					"//",
+					"// GET não precisa: CSRF só protege operações que alteram estado.",
+					"if (pm.request.method !== 'GET') {",
+					"    pm.sendRequest({",
+					"        url: pm.collectionVariables.get('baseUrl') + '/autenticacao/csrf',",
+					"        method: 'GET'",
+					"    }, function (erro, resposta) {",
+					"        if (!erro && resposta.code === 200) {",
+					"            pm.collectionVariables.set('csrfToken', resposta.json().token);",
+					"        }",
+					"    });",
+					"}"
+				]
+			}
+		}
+	],
 	"variable": [
 		{ "key": "baseUrl", "value": "http://localhost:8080" },
 		{ "key": "login", "value": "" },
