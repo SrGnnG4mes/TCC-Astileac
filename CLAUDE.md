@@ -330,6 +330,22 @@ Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.propertie
 > - A exportação do RF10 passou a trazer os três cadastros — os DTOs de resposta já tinham
 >   sido criados lá, justamente para a exportação não nascer incompleta.
 
+> **RF08 — a consulta que justifica o sistema** (branch `feat/consulta-por-area`).
+> `GET /profissionais?area=juridica&nome=maria&ativo=true`, com todos os filtros opcionais.
+> - **JPQL explícito, não `Specification`.** É uma consulta só: dá para ler de cima a baixo
+>   e defender numa banca. `Specification` seria mais flexível e bem menos legível.
+> - **`EXISTS` em vez de `JOIN` no filtro de área.** Com `JOIN`, quem atua em duas áreas
+>   apareceria duplicado e estragaria a contagem da paginação. Confirmado rodando.
+> - **`CAST(:param AS string)`** é necessário: sem ele o Hibernate não infere o tipo do
+>   parâmetro quando ele chega nulo.
+> - Filtro nulo ou em branco = "não filtre por isso", então a chamada sem parâmetros é a
+>   listagem geral — não existem dois caminhos de código.
+> - **O bloqueio da LGPD se propaga**: quem pediu exclusão não aparece na consulta.
+>   Verificado nos dois sentidos (some ao pedir, volta ao cancelar).
+> - **Pendente de medição:** o índice `idx_profissional_area_area` (V3) só é usado se o
+>   PostgreSQL escolher começar pela área; num `EXISTS` correlacionado ele pode preferir a
+>   PK composta. Confirmar com `EXPLAIN` sobre volume real antes de afirmar ganho no TCC.
+
 ### Próximos passos (nesta ordem)
 1. ~~Migrations Flyway `V1` — criar as 9 tabelas + carga inicial das áreas de atuação~~ ✅
 2. ~~Entidades JPA + repositories~~ ✅
@@ -339,7 +355,7 @@ Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.propertie
 3.7. ~~RF10 (direitos do titular) e RF11 (registro de acesso) — exigências da LGPD~~ ✅
 
 4. ~~Demais cadastros: endereço, contatos, áreas, formações, certificados, vínculos~~ ✅
-5. Consulta e filtro por área de atuação (RF08)
+5. ~~Consulta e filtro por área de atuação (RF08)~~ ✅
 6. Autenticação e perfis (RF09)
 7. Front-end Angular: formulários e telas de consulta
 8. Upload de certificados

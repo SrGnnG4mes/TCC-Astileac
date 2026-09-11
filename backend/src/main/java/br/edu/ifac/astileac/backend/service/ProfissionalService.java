@@ -40,15 +40,38 @@ public class ProfissionalService {
 	}
 
 	/**
-	 * Listagem paginada. Devolve o resumo (CPF mascarado), nunca a
-	 * ficha completa: uma tela de busca nao precisa do CPF inteiro de
-	 * todo mundo, e sem paginacao uma unica chamada traria a base toda.
+	 * Consulta paginada com filtros opcionais (RF08) -- o caso de uso
+	 * central: a associacao recebe uma demanda e precisa achar quem
+	 * atende aquela area.
+	 *
+	 * Devolve o resumo (CPF mascarado), nunca a ficha completa: quem
+	 * atende o telefone precisa localizar a pessoa certa e so depois
+	 * abrir o cadastro dela. Sao duas etapas, e a primeira expoe o
+	 * minimo.
+	 *
+	 * Filtro nulo significa "nao filtre por isso", entao chamar sem
+	 * parametro nenhum devolve a listagem geral -- nao existem dois
+	 * caminhos de codigo para manter.
 	 */
 	@Transactional(readOnly = true)
-	public Page<ProfissionalResumoDTO> listar(Pageable pageable) {
-		// Quem pediu exclusao fica bloqueado durante a janela de
-		// arrependimento: nao aparece nas consultas da associacao.
-		return profissionalRepository.findByDataExclusaoSolicitadaIsNull(pageable).map(this::toResumoDTO);
+	public Page<ProfissionalResumoDTO> consultar(
+			String nome, Boolean ativo, String area, Pageable pageable) {
+		return profissionalRepository
+				.consultar(normalizar(nome), ativo, normalizar(area), pageable)
+				.map(this::toResumoDTO);
+	}
+
+	/**
+	 * Texto em branco vale como filtro ausente: uma caixa de busca
+	 * vazia no front-end nao pode virar um LIKE por string vazia. O
+	 * nome da area desce para minusculas porque e assim que ela esta
+	 * guardada (ver AreaAtuacaoService).
+	 */
+	private String normalizar(String valor) {
+		if (valor == null || valor.isBlank()) {
+			return null;
+		}
+		return valor.trim().toLowerCase();
 	}
 
 	@Transactional(readOnly = true)

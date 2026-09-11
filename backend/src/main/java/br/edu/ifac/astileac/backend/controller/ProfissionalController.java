@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -39,14 +40,19 @@ public class ProfissionalController {
 	}
 
 	/**
-	 * Listagem paginada: /profissionais?page=0&amp;size=20&amp;sort=nome.
-	 * Devolve o resumo com CPF mascarado -- a ficha completa e o
-	 * buscarPorId.
+	 * Consulta com filtros opcionais (RF08):
+	 * /profissionais?area=juridica&amp;nome=maria&amp;ativo=true&amp;page=0&amp;size=20
+	 *
+	 * Sem nenhum parametro, e a listagem geral. Devolve o resumo com
+	 * CPF mascarado -- a ficha completa e o buscarPorId.
 	 */
 	@GetMapping
-	public Page<ProfissionalResumoDTO> listar(
+	public Page<ProfissionalResumoDTO> consultar(
+			@RequestParam(required = false) String area,
+			@RequestParam(required = false) String nome,
+			@RequestParam(required = false) Boolean ativo,
 			@PageableDefault(size = 20, sort = "nome", direction = Sort.Direction.ASC) Pageable pageable) {
-		return profissionalService.listar(pageable);
+		return profissionalService.consultar(nome, ativo, area, pageable);
 	}
 
 	@GetMapping("/{id}")
