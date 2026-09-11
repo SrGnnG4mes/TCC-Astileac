@@ -100,6 +100,27 @@
 					}
 				},
 				{
+					"name": "Renovar token CSRF (depois do login)",
+					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+						"pm.test('200', () => pm.response.to.have.status(200));",
+						"pm.collectionVariables.set('csrfToken', pm.response.json().token);",
+						"pm.test('Token renovado', () => {",
+						"    pm.expect(pm.collectionVariables.get('csrfToken')).to.not.be.empty;",
+						"});",
+						"// O Spring Security ROTACIONA o token CSRF ao autenticar, como",
+						"// proteção contra fixação de sessão: o token obtido antes de",
+						"// entrar deixa de valer. Buscar de novo aqui é mais confiável",
+						"// do que ler o cookie por script — pm.cookies nem sempre",
+						"// enxerga o cookie, e quando falha a primeira escrita depois",
+						"// do login recebe 403."
+					] } }],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{baseUrl}}/autenticacao/csrf", "host": ["{{baseUrl}}"], "path": ["autenticacao", "csrf"] }
+					}
+				},
+				{
 					"name": "Quem sou eu",
 					"event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
 						"pm.test('200', () => pm.response.to.have.status(200));",

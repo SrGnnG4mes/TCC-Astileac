@@ -259,12 +259,30 @@
 		csrfToken = corpo.token;
 	}
 
-	async function pedir(caminho, opcoes = {}) {
+	/**
+	 * Faz a requisição, mandando o token CSRF quando ela escreve.
+	 *
+	 * Se vier 403, renova o token e tenta UMA vez. O token pode ter
+	 * ficado para trás — o Spring o rotaciona ao autenticar, e a
+	 * sessão pode ter sido renovada em outra aba. Repetir uma vez
+	 * resolve o caso legítimo; repetir sempre esconderia um 403 que é
+	 * de verdade falta de permissão.
+	 */
+	async function pedir(caminho, opcoes = {}, jaRepetiu = false) {
+		const escrita = opcoes.method && opcoes.method !== 'GET';
 		const cabecalhos = Object.assign({}, opcoes.headers);
-		if (opcoes.method && opcoes.method !== 'GET') {
+		if (escrita) {
 			cabecalhos['X-XSRF-TOKEN'] = csrfToken;
 		}
-		return fetch(API + caminho, Object.assign({}, opcoes, { headers: cabecalhos }));
+
+		const resposta = await fetch(API + caminho, Object.assign({}, opcoes, { headers: cabecalhos }));
+
+		if (resposta.status === 403 && escrita && !jaRepetiu) {
+			await renovarCsrf();
+			return pedir(caminho, opcoes, true);
+		}
+
+		return resposta;
 	}
 
 	function mostrar(id, visivel) {
