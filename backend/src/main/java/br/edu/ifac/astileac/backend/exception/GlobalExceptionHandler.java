@@ -91,7 +91,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	 */
 	@ExceptionHandler(AccessDeniedException.class)
 	public ResponseEntity<ErroRespostaDTO> tratarAcessoNegado(AccessDeniedException ex) {
-		return resposta(HttpStatus.FORBIDDEN, "Acesso negado");
+		return resposta(HttpStatus.FORBIDDEN, "Acesso negado: seu perfil nao permite esta operacao");
 	}
 
 	/**
