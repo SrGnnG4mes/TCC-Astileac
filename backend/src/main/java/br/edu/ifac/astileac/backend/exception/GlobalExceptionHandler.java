@@ -3,6 +3,7 @@ package br.edu.ifac.astileac.backend.exception;
 import br.edu.ifac.astileac.backend.dto.ErroRespostaDTO;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -76,6 +77,21 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
 	public ResponseEntity<ErroRespostaDTO> tratarTipoInvalido(MethodArgumentTypeMismatchException ex) {
 		return resposta(HttpStatus.BAD_REQUEST, "Valor invalido para o parametro '" + ex.getName() + "'");
+	}
+
+	/**
+	/**
+	 * Acesso negado pelo method security (@PreAuthorize).
+	 *
+	 * Precisa vir ANTES do catch-all: sem este handler, a negacao
+	 * seria capturada como Exception qualquer e viraria 500 --
+	 * transformando uma recusa de seguranca em erro interno, e
+	 * escondendo do cliente que o problema era permissao.
+	 * Descoberto por teste, nao por leitura.
+	 */
+	@ExceptionHandler(AccessDeniedException.class)
+	public ResponseEntity<ErroRespostaDTO> tratarAcessoNegado(AccessDeniedException ex) {
+		return resposta(HttpStatus.FORBIDDEN, "Acesso negado");
 	}
 
 	/**

@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +25,10 @@ import org.springframework.web.bind.annotation.RestController;
  * a chave do registro e o par (profissional, area), entao
  * /profissionais/3/areas/2 ja identifica exatamente uma linha.
  */
+// O associado alcanca so os proprios dados; a diretoria alcanca
+// qualquer um. Como todo metodo desta classe recebe profissionalId,
+// uma anotacao de classe cobre todos eles (RF09).
+@PreAuthorize("hasRole('ADMIN') or @autorizacao.eOProprioProfissional(#profissionalId)")
 @RestController
 @RequestMapping("/profissionais/{profissionalId}/areas")
 @RequiredArgsConstructor

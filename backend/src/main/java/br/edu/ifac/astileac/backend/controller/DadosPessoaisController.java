@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +27,10 @@ import org.springframework.web.bind.annotation.RestController;
  * direito. Quando a autenticacao existir (Passo 6), estas rotas terao
  * regra de acesso propria -- o titular alcanca so os proprios dados.
  */
+// O associado alcanca so os proprios dados; a diretoria alcanca
+// qualquer um. Como todo metodo desta classe recebe profissionalId,
+// uma anotacao de classe cobre todos eles (RF09).
+@PreAuthorize("hasRole('ADMIN') or @autorizacao.eOProprioProfissional(#profissionalId)")
 @RestController
 @RequestMapping("/profissionais/{profissionalId}/dados-pessoais")
 @RequiredArgsConstructor
