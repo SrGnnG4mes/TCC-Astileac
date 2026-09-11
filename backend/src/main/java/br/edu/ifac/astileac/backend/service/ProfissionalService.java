@@ -2,12 +2,14 @@ package br.edu.ifac.astileac.backend.service;
 
 import br.edu.ifac.astileac.backend.dto.ProfissionalRequestDTO;
 import br.edu.ifac.astileac.backend.dto.ProfissionalResponseDTO;
+import br.edu.ifac.astileac.backend.dto.ProfissionalResumoDTO;
 import br.edu.ifac.astileac.backend.entity.Profissional;
 import br.edu.ifac.astileac.backend.exception.CpfJaCadastradoException;
 import br.edu.ifac.astileac.backend.exception.RecursoNaoEncontradoException;
 import br.edu.ifac.astileac.backend.repository.ProfissionalRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +26,7 @@ public class ProfissionalService {
 	@Transactional
 	public ProfissionalResponseDTO criar(ProfissionalRequestDTO dto) {
 		if (profissionalRepository.existsByCpf(dto.cpf())) {
-			throw new CpfJaCadastradoException(dto.cpf());
+			throw new CpfJaCadastradoException();
 		}
 
 		Profissional profissional = new Profissional();
@@ -37,11 +39,14 @@ public class ProfissionalService {
 		return toResponseDTO(profissionalRepository.save(profissional));
 	}
 
+	/**
+	 * Listagem paginada. Devolve o resumo (CPF mascarado), nunca a
+	 * ficha completa: uma tela de busca nao precisa do CPF inteiro de
+	 * todo mundo, e sem paginacao uma unica chamada traria a base toda.
+	 */
 	@Transactional(readOnly = true)
-	public List<ProfissionalResponseDTO> listar() {
-		return profissionalRepository.findAll().stream()
-				.map(this::toResponseDTO)
-				.toList();
+	public Page<ProfissionalResumoDTO> listar(Pageable pageable) {
+		return profissionalRepository.findAll(pageable).map(this::toResumoDTO);
 	}
 
 	@Transactional(readOnly = true)
@@ -55,7 +60,7 @@ public class ProfissionalService {
 
 		boolean cpfMudou = !profissional.getCpf().equals(dto.cpf());
 		if (cpfMudou && profissionalRepository.existsByCpf(dto.cpf())) {
-			throw new CpfJaCadastradoException(dto.cpf());
+			throw new CpfJaCadastradoException();
 		}
 
 		profissional.setNome(dto.nome());
@@ -74,6 +79,27 @@ public class ProfissionalService {
 	private Profissional buscarEntidadePorId(Long id) {
 		return profissionalRepository.findById(id)
 				.orElseThrow(() -> new RecursoNaoEncontradoException("Profissional nao encontrado: id " + id));
+	}
+
+	private ProfissionalResumoDTO toResumoDTO(Profissional profissional) {
+		return new ProfissionalResumoDTO(
+				profissional.getId(),
+				profissional.getNome(),
+				mascararCpf(profissional.getCpf()),
+				profissional.getAtivo()
+		);
+	}
+
+	/**
+	 * 12345678901 -> ***.***.789-01. Mantem os digitos finais, que
+	 * bastam para distinguir dois homonimos numa lista, e esconde o
+	 * restante.
+	 */
+	private String mascararCpf(String cpf) {
+		if (cpf == null || cpf.length() != 11) {
+			return "***.***.***-**";
+		}
+		return "***.***." + cpf.substring(6, 9) + "-" + cpf.substring(9);
 	}
 
 	private ProfissionalResponseDTO toResponseDTO(Profissional profissional) {
