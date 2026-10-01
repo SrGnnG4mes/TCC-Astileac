@@ -6,7 +6,10 @@ import {
 	AreaAtuacao,
 	FiltroProfissional,
 	Pagina,
+	ProfissionalArea,
+	ProfissionalAreaRequest,
 	ProfissionalFicha,
+	ProfissionalRequest,
 	ProfissionalResumo
 } from './modelos';
 
@@ -57,5 +60,36 @@ export class ProfissionalService {
 	/** Alimenta o seletor de areas da busca. */
 	listarAreas(): Observable<AreaAtuacao[]> {
 		return this.http.get<AreaAtuacao[]>(`${API}/areas-atuacao`);
+	}
+
+	/** Cadastra um profissional (RF01). Exige perfil ADMIN. */
+	criar(dados: ProfissionalRequest): Observable<ProfissionalFicha> {
+		return this.http.post<ProfissionalFicha>(`${API}/profissionais`, dados);
+	}
+
+	/** Corrige os dados de um profissional -- e o direito de correcao do Art. 18. */
+	atualizar(id: number, dados: ProfissionalRequest): Observable<ProfissionalFicha> {
+		return this.http.put<ProfissionalFicha>(`${API}/profissionais/${id}`, dados);
+	}
+
+	// --- areas de atuacao do profissional (RF04) ---
+
+	listarAreasDo(profissionalId: number): Observable<ProfissionalArea[]> {
+		return this.http.get<ProfissionalArea[]>(`${API}/profissionais/${profissionalId}/areas`);
+	}
+
+	associarArea(
+		profissionalId: number,
+		dados: ProfissionalAreaRequest
+	): Observable<ProfissionalArea> {
+		return this.http.post<ProfissionalArea>(
+			`${API}/profissionais/${profissionalId}/areas`, dados
+		);
+	}
+
+	desassociarArea(profissionalId: number, areaAtuacaoId: number): Observable<void> {
+		return this.http.delete<void>(
+			`${API}/profissionais/${profissionalId}/areas/${areaAtuacaoId}`
+		);
 	}
 }

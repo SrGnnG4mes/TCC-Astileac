@@ -29,9 +29,34 @@
 	padding: 24px 20px 48px;
 }
 
+.titulo {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 6px;
+}
+
 h1 {
-	margin: 0 0 6px;
+	margin: 0;
 	font-size: 1.25rem;
+}
+
+.botao {
+	margin-left: auto;
+	padding: 8px 14px;
+	border-radius: 6px;
+	background: #2c5aa0;
+	color: #fff;
+	font-size: 0.84rem;
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.acoes-linha {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
 }
 
 .ajuda {
@@ -170,6 +195,7 @@ tbody tr:hover {
 	font-size: 0.86rem;
 	text-decoration: underline;
 	cursor: pointer;
+	white-space: nowrap;
 }
 
 .oculto {

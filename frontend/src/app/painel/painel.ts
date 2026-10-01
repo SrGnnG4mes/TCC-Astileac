@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AutenticacaoService } from '../core/autenticacao.service';
 
 /**
@@ -15,6 +15,7 @@ import { AutenticacaoService } from '../core/autenticacao.service';
  */
 @Component({
 	selector: 'app-painel',
+	imports: [RouterLink],
 	templateUrl: './painel.html',
 	styleUrl: './painel.css'
 })

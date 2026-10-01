@@ -8,19 +8,26 @@
 
 <main class="conteudo">
 	@if (usuario(); as eu) {
-		<h1>Sessão ativa</h1>
-		<p>
-			A primeira fatia está funcionando: login por formulário, cookie de sessão,
-			token CSRF e uma consulta autenticada ao servidor.
-		</p>
-		<dl>
-			<dt>Login</dt>
-			<dd>{{ eu.login }}</dd>
-			<dt>Perfil</dt>
-			<dd>{{ eu.perfil }}</dd>
-			<dt>Profissional vinculado</dt>
-			<dd>{{ eu.profissionalId ?? 'nenhum' }}</dd>
-		</dl>
+		<h1>Olá, {{ eu.login }}</h1>
+
+		@if (eu.profissionalId) {
+			<p>
+				A Lei Geral de Proteção de Dados garante a você o direito de ver os dados que a
+				associação guarda a seu respeito, levá-los consigo e pedir que sejam eliminados.
+			</p>
+			<a class="botao" routerLink="/dados-pessoais">Meus dados pessoais</a>
+		} @else {
+			<p>
+				Este usuário não está vinculado a um cadastro de profissional, então não há
+				dados pessoais de associado para consultar por aqui.
+			</p>
+		}
+
+		@if (eu.perfil === 'ADMIN') {
+			<p class="secundaria">
+				<a routerLink="/profissionais">Ir para a consulta do quadro de associados &rarr;</a>
+			</p>
+		}
 	} @else {
 		<p>Carregando...</p>
 	}

@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AutenticacaoService } from '../core/autenticacao.service';
 import { ProfissionalService } from '../core/profissional.service';
@@ -20,7 +20,7 @@ import { AreaAtuacao, Pagina, ProfissionalFicha, ProfissionalResumo } from '../c
  */
 @Component({
 	selector: 'app-profissionais',
-	imports: [ReactiveFormsModule],
+	imports: [ReactiveFormsModule, RouterLink],
 	templateUrl: './profissionais.html',
 	styleUrl: './profissionais.css'
 })

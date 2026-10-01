@@ -1,0 +1,107 @@
+<header class="barra">
+	<strong>ASTILEAC</strong>
+	@if (usuario(); as eu) {
+		<span class="identidade">{{ eu.login }} &middot; {{ eu.perfil }}</span>
+	}
+	<button type="button" (click)="sair()">Sair</button>
+</header>
+
+<main class="conteudo">
+	<a class="voltar" routerLink="/profissionais">&larr; Voltar à consulta</a>
+
+	<h1>{{ id() ? 'Editar profissional' : 'Novo profissional' }}</h1>
+
+	@if (erro()) {
+		<p class="erro" role="alert">{{ erro() }}</p>
+	}
+	@if (aviso()) {
+		<p class="aviso" role="status">{{ aviso() }}</p>
+	}
+
+	<form [formGroup]="formulario" (ngSubmit)="salvar()">
+		<div class="campo">
+			<label for="nome">Nome</label>
+			<input id="nome" type="text" formControlName="nome" maxlength="150" />
+			@if (formulario.controls.nome.touched && formulario.controls.nome.invalid) {
+				<small class="falha">Informe o nome (até 150 caracteres).</small>
+			}
+		</div>
+
+		<div class="campo">
+			<label for="cpf">CPF</label>
+			<input id="cpf" type="text" formControlName="cpf" inputmode="numeric" maxlength="11" />
+			@if (formulario.controls.cpf.touched && formulario.controls.cpf.invalid) {
+				<small class="falha">
+					Informe 11 dígitos numéricos com dígitos verificadores corretos.
+				</small>
+			}
+		</div>
+
+		<div class="linha">
+			<div class="campo">
+				<label for="dataNascimento">Data de nascimento</label>
+				<input id="dataNascimento" type="date" formControlName="dataNascimento" />
+				@if (formulario.controls.dataNascimento.touched && formulario.controls.dataNascimento.invalid) {
+					<small class="falha">Informe uma data no passado.</small>
+				}
+			</div>
+
+			<div class="campo">
+				<label for="dataAssociacao">Data de associação</label>
+				<input id="dataAssociacao" type="date" formControlName="dataAssociacao" />
+				@if (formulario.controls.dataAssociacao.touched && formulario.controls.dataAssociacao.invalid) {
+					<small class="falha">Informe a data de associação.</small>
+				}
+			</div>
+		</div>
+
+		<button type="submit" [disabled]="salvando()">
+			{{ salvando() ? 'Salvando...' : (id() ? 'Salvar alterações' : 'Cadastrar') }}
+		</button>
+	</form>
+
+	@if (id(); as profissionalId) {
+		<section class="areas">
+			<h2>Áreas de atuação</h2>
+			<p class="ajuda">
+				Um profissional pode atuar em mais de uma área ao mesmo tempo. É por este
+				vínculo que a consulta por área encontra a pessoa.
+			</p>
+
+			@if (areasDoProfissional().length === 0) {
+				<p class="vazio">Nenhuma área vinculada. Sem vínculo, este profissional não aparece ao filtrar por área.</p>
+			} @else {
+				<ul class="vinculadas">
+					@for (area of areasDoProfissional(); track area.areaAtuacaoId) {
+						<li>
+							<span class="nome">{{ area.nome }}</span>
+							<span class="desde">desde {{ area.dataInicio }}</span>
+							<button type="button" class="link" (click)="desvincularArea(area.areaAtuacaoId)">
+								Remover
+							</button>
+						</li>
+					}
+				</ul>
+			}
+
+			<form class="vincular" [formGroup]="vinculo" (ngSubmit)="vincularArea()">
+				<div class="campo">
+					<label for="areaAtuacaoId">Área</label>
+					<select id="areaAtuacaoId" formControlName="areaAtuacaoId">
+						<option value="">selecione</option>
+						@for (area of areas(); track area.id) {
+							<option [value]="area.id">{{ area.nome }}</option>
+						}
+					</select>
+				</div>
+
+				<div class="campo">
+					<label for="dataInicio">Início da atuação</label>
+					<input id="dataInicio" type="date" formControlName="dataInicio" />
+				</div>
+
+				<button type="submit">Vincular</button>
+			</form>
+		</section>
+	}
+</main>

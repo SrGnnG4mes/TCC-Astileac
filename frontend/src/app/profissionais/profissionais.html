@@ -7,7 +7,10 @@
 </header>
 
 <main class="conteudo">
-	<h1>Consultar profissionais</h1>
+	<div class="titulo">
+		<h1>Consultar profissionais</h1>
+		<a class="botao" routerLink="/profissionais/novo">Novo profissional</a>
+	</div>
 	<p class="ajuda">
 		Todos os filtros são opcionais e combináveis. Sem nenhum filtro, a consulta
 		devolve o quadro completo de associados.
@@ -77,10 +80,16 @@
 									{{ profissional.ativo ? 'ativo' : 'inativo' }}
 								</span>
 							</td>
-							<td>
+							<td class="acoes-linha">
 								<button type="button" class="link" (click)="abrirFicha(profissional.id)">
 									Ver ficha
 								</button>
+								<a class="link" [routerLink]="['/profissionais', profissional.id, 'editar']">
+									Editar
+								</a>
+								<a class="link" [routerLink]="['/profissionais', profissional.id, 'dados-pessoais']">
+									Dados pessoais
+								</a>
 							</td>
 						</tr>
 					}

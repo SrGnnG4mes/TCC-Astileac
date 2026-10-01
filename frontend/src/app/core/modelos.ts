@@ -54,6 +54,90 @@ export interface AreaAtuacao {
 }
 
 /**
+ * Entrada de cadastro (RF01).
+ *
+ * `ativo` NAO entra aqui, e isso e deliberado no back-end: profissional
+ * novo nasce ativo, e desativar e acao propria -- nao campo livre do
+ * formulario.
+ */
+export interface ProfissionalRequest {
+	nome: string;
+	cpf: string;
+	dataNascimento: string;
+	dataAssociacao: string;
+}
+
+/** Vinculo entre profissional e area (RF04), com data de inicio. */
+export interface ProfissionalArea {
+	areaAtuacaoId: number;
+	nome: string;
+	dataInicio: string;
+}
+
+export interface ProfissionalAreaRequest {
+	areaAtuacaoId: number;
+	dataInicio: string;
+}
+
+/**
+ * Exportacao completa dos dados do titular (RF10, Art. 18 da LGPD).
+ *
+ * Traz o CPF inteiro: o destinatario e a propria pessoa, e mascarar
+ * para ela mesma nao protegeria ninguem.
+ */
+export interface DadosPessoais {
+	dataDaExportacao: string;
+	identificacao: {
+		id: number;
+		nome: string;
+		cpf: string;
+		dataNascimento: string;
+		dataAssociacao: string;
+		ativo: boolean;
+	};
+	endereco: unknown | null;
+	contatos: unknown[];
+	areasDeAtuacao: ProfissionalArea[];
+	formacoes: unknown[];
+	certificados: unknown[];
+	vinculosEmpregaticios: unknown[];
+}
+
+/**
+ * Resposta do pedido de eliminacao.
+ *
+ * Nao e 204 sem corpo de proposito: a pessoa precisa saber que os dados
+ * ficam por 30 dias, ate quando, e como desfazer.
+ */
+export interface ExclusaoResposta {
+	mensagem: string;
+	dataDoPedido: string;
+	dataDaExclusaoDefinitiva: string;
+	diasParaArrependimento: number;
+	comoCancelar: string;
+}
+
+/**
+ * Conferido contra o enum AcaoLog do back-end. EXPORTACAO e uma acao
+ * propria, distinta de CONSULTA: exportar nao e so ler, e entregar o
+ * conjunto inteiro ao titular (Art. 18).
+ */
+export type AcaoLog = 'CONSULTA' | 'CRIACAO' | 'ALTERACAO' | 'EXCLUSAO' | 'EXPORTACAO';
+
+/** Registro de acesso a dado pessoal (RF11, Art. 46). */
+export interface LogAcesso {
+	id: number;
+	dataHora: string;
+	autor: string;
+	/** Nulo quando a acao nao veio de uma requisicao HTTP. */
+	origem: string | null;
+	acao: AcaoLog;
+	entidade: string;
+	registroId: number | null;
+	detalhe: string;
+}
+
+/**
  * Resposta paginada do Spring Data.
  *
  * ATENCAO ao formato: os metadados vem ANINHADOS em `page`, nao no topo

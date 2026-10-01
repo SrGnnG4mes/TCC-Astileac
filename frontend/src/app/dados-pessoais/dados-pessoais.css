@@ -1,0 +1,243 @@
+.barra {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 12px 20px;
+	background: #2c5aa0;
+	color: #fff;
+}
+
+.identidade {
+	margin-left: auto;
+	font-size: 0.82rem;
+	opacity: 0.9;
+}
+
+.barra button {
+	padding: 6px 12px;
+	border: 1px solid rgb(255 255 255 / 55%);
+	border-radius: 5px;
+	background: transparent;
+	color: #fff;
+	font: inherit;
+	font-size: 0.82rem;
+	cursor: pointer;
+}
+
+.conteudo {
+	max-width: 720px;
+	padding: 24px 20px 48px;
+}
+
+.voltar {
+	display: inline-block;
+	margin-bottom: 14px;
+	color: #2c5aa0;
+	font-size: 0.85rem;
+	text-decoration: none;
+}
+
+h1 {
+	margin: 0 0 8px;
+	font-size: 1.25rem;
+}
+
+h2 {
+	margin: 0;
+	font-size: 1.02rem;
+}
+
+.ajuda {
+	margin: 0 0 20px;
+	font-size: 0.85rem;
+	color: #5c6470;
+	line-height: 1.6;
+}
+
+/* --- blocos --- */
+
+.bloco {
+	margin-bottom: 22px;
+	padding: 18px;
+	border: 1px solid #e3e6ea;
+	border-radius: 8px;
+}
+
+.bloco header {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 14px;
+}
+
+.bloco header button {
+	margin-left: auto;
+	padding: 8px 14px;
+	border: 0;
+	border-radius: 6px;
+	background: #2c5aa0;
+	color: #fff;
+	font: inherit;
+	font-size: 0.82rem;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+dl {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	gap: 6px 18px;
+	margin: 0;
+	font-size: 0.9rem;
+}
+
+dt {
+	font-weight: 600;
+	color: #5c6470;
+}
+
+dd {
+	margin: 0;
+}
+
+.mono {
+	font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+
+.resumo {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+	gap: 8px;
+}
+
+.resumo li {
+	display: flex;
+	justify-content: space-between;
+	gap: 10px;
+	padding: 8px 10px;
+	border-radius: 6px;
+	background: #f4f5f7;
+	font-size: 0.85rem;
+}
+
+/* --- tabela de acessos --- */
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.84rem;
+}
+
+th,
+td {
+	padding: 7px 9px;
+	text-align: left;
+	border-bottom: 1px solid #e3e6ea;
+}
+
+th {
+	font-size: 0.74rem;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: #5c6470;
+}
+
+/* --- exclusao --- */
+
+.exclusao {
+	margin-bottom: 22px;
+	padding: 18px;
+	border: 1px solid #e0c48a;
+	border-radius: 8px;
+	background: #fdf4e3;
+}
+
+.exclusao h2 {
+	margin-bottom: 12px;
+	color: #7a5106;
+	line-height: 1.5;
+}
+
+.exclusao .como {
+	margin: 14px 0;
+	font-size: 0.85rem;
+	color: #7a5106;
+	line-height: 1.5;
+}
+
+.bloco.perigo {
+	border-color: #e3b3ae;
+}
+
+.bloco.perigo h2 {
+	margin-bottom: 10px;
+	color: #8f2018;
+}
+
+.bloco.perigo p {
+	margin: 0 0 16px;
+	font-size: 0.86rem;
+	line-height: 1.6;
+	color: #39404a;
+}
+
+.confirma {
+	font-weight: 600;
+}
+
+.acoes {
+	display: flex;
+	gap: 8px;
+}
+
+.perigoso {
+	padding: 9px 16px;
+	border: 0;
+	border-radius: 6px;
+	background: #9d2a20;
+	color: #fff;
+	font: inherit;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.secundario {
+	padding: 9px 16px;
+	border: 1px solid #c8ccd4;
+	border-radius: 6px;
+	background: #fff;
+	color: #39404a;
+	font: inherit;
+	cursor: pointer;
+}
+
+/* --- mensagens --- */
+
+.nota {
+	margin: 14px 0 0;
+	font-size: 0.78rem;
+	color: #5c6470;
+	line-height: 1.5;
+}
+
+.erro {
+	margin: 0 0 18px;
+	padding: 9px 10px;
+	border-radius: 6px;
+	background: #fdecea;
+	color: #8f2018;
+	font-size: 0.85rem;
+}
+
+.vazio {
+	margin: 0;
+	padding: 16px;
+	border-radius: 6px;
+	background: #f8f9fb;
+	color: #5c6470;
+	font-size: 0.86rem;
+	text-align: center;
+}

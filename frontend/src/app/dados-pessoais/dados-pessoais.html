@@ -1,0 +1,152 @@
+<header class="barra">
+	<strong>ASTILEAC</strong>
+	@if (usuario(); as eu) {
+		<span class="identidade">{{ eu.login }} &middot; {{ eu.perfil }}</span>
+	}
+	<button type="button" (click)="sair()">Sair</button>
+</header>
+
+<main class="conteudo">
+	@if (usuario()?.perfil === 'ADMIN') {
+		<a class="voltar" routerLink="/profissionais">&larr; Voltar à consulta</a>
+	}
+
+	<h1>Meus dados pessoais</h1>
+	<p class="ajuda">
+		A Lei Geral de Proteção de Dados (Lei 13.709/2018, art. 18) garante a você
+		o direito de acessar os dados que a associação guarda a seu respeito, levá-los
+		consigo, corrigi-los e pedir que sejam eliminados.
+	</p>
+
+	@if (erro()) {
+		<p class="erro" role="alert">{{ erro() }}</p>
+	}
+
+	@if (exclusao(); as e) {
+		<section class="exclusao" role="status">
+			<h2>{{ e.mensagem }}</h2>
+			<dl>
+				<dt>Pedido registrado em</dt>
+				<dd>{{ e.dataDoPedido }}</dd>
+				<dt>Exclusão definitiva em</dt>
+				<dd><strong>{{ e.dataDaExclusaoDefinitiva }}</strong></dd>
+				<dt>Prazo para desistir</dt>
+				<dd>{{ e.diasParaArrependimento }} dias</dd>
+			</dl>
+			<p class="como">{{ e.comoCancelar }}</p>
+			<button type="button" class="secundario" (click)="cancelarExclusao()">
+				Cancelar o pedido de exclusão
+			</button>
+		</section>
+	}
+
+	@if (dados(); as d) {
+		<section class="bloco">
+			<header>
+				<h2>Identificação</h2>
+				<button type="button" (click)="baixar()">Baixar meus dados (JSON)</button>
+			</header>
+
+			<dl>
+				<dt>Nome</dt>
+				<dd>{{ d.identificacao.nome }}</dd>
+				<dt>CPF</dt>
+				<dd class="mono">{{ d.identificacao.cpf }}</dd>
+				<dt>Nascimento</dt>
+				<dd>{{ d.identificacao.dataNascimento }}</dd>
+				<dt>Associação</dt>
+				<dd>{{ d.identificacao.dataAssociacao }}</dd>
+				<dt>Situação</dt>
+				<dd>{{ d.identificacao.ativo ? 'ativo' : 'inativo' }}</dd>
+			</dl>
+
+			<p class="nota">
+				O CPF aparece inteiro porque quem recebe esta página é o próprio titular —
+				mascará-lo aqui não protegeria ninguém. Na listagem da diretoria ele vem mascarado.
+			</p>
+		</section>
+
+		<section class="bloco">
+			<h2>O que mais está guardado</h2>
+			<ul class="resumo">
+				<li><span>Áreas de atuação</span><strong>{{ d.areasDeAtuacao.length }}</strong></li>
+				<li><span>Contatos</span><strong>{{ d.contatos.length }}</strong></li>
+				<li><span>Formações</span><strong>{{ d.formacoes.length }}</strong></li>
+				<li><span>Certificados</span><strong>{{ d.certificados.length }}</strong></li>
+				<li><span>Vínculos empregatícios</span><strong>{{ d.vinculosEmpregaticios.length }}</strong></li>
+				<li><span>Endereço</span><strong>{{ d.endereco ? 'registrado' : 'nenhum' }}</strong></li>
+			</ul>
+			<p class="nota">
+				O arquivo baixado traz o conteúdo completo de cada um desses itens, exportado
+				em {{ d.dataDaExportacao }}.
+			</p>
+		</section>
+	}
+
+	@if (registro(); as r) {
+		<section class="bloco">
+			<h2>Quem acessou os seus dados</h2>
+			<p class="ajuda">
+				Toda operação bem-sucedida sobre os seus dados fica registrada, com autor,
+				data e ação (art. 46).
+			</p>
+
+			@if (r.content.length === 0) {
+				<p class="vazio">Nenhum acesso registrado até agora.</p>
+			} @else {
+				<table>
+					<thead>
+						<tr>
+							<th scope="col">Data e hora</th>
+							<th scope="col">Autor</th>
+							<th scope="col">Ação</th>
+							<th scope="col">Registro</th>
+						</tr>
+					</thead>
+					<tbody>
+						@for (acesso of r.content; track acesso.id) {
+							<tr>
+								<td>{{ acesso.dataHora }}</td>
+								<td>{{ acesso.autor }}</td>
+								<td>{{ acesso.acao }}</td>
+								<td>{{ acesso.entidade }}</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+				<p class="nota">{{ r.page.totalElements }} registro(s) no total.</p>
+			}
+		</section>
+	}
+
+	@if (dados() && !exclusao()) {
+		<section class="bloco perigo">
+			<h2>Pedir a eliminação dos meus dados</h2>
+
+			@if (!confirmando()) {
+				<p>
+					O pedido não apaga nada de imediato: o cadastro é bloqueado e deixa de
+					aparecer nas consultas, e os dados ficam guardados por 30 dias, caso você
+					mude de ideia ou a associação precise fazer alguma consulta nesse período.
+					Depois desse prazo a exclusão é definitiva e não há como desfazer.
+				</p>
+				<button type="button" class="perigoso" (click)="pedirConfirmacao()">
+					Quero pedir a eliminação
+				</button>
+			} @else {
+				<p class="confirma">
+					Confirma o pedido de eliminação? O cadastro será bloqueado imediatamente.
+					Você ainda poderá cancelar durante os 30 dias.
+				</p>
+				<div class="acoes">
+					<button type="button" class="perigoso" (click)="solicitarExclusao()">
+						Confirmar pedido
+					</button>
+					<button type="button" class="secundario" (click)="cancelarConfirmacao()">
+						Voltar atrás
+					</button>
+				</div>
+			}
+		</section>
+	}
+</main>
