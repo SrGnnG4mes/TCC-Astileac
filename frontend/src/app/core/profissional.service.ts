@@ -4,7 +4,12 @@ import { Observable } from 'rxjs';
 import { API } from './api';
 import {
 	AreaAtuacao,
+	AreaAtuacaoRequest,
+	Certificado,
+	CertificadoRequest,
 	FiltroProfissional,
+	Formacao,
+	FormacaoRequest,
 	Pagina,
 	ProfissionalArea,
 	ProfissionalAreaRequest,
@@ -91,5 +96,60 @@ export class ProfissionalService {
 		return this.http.delete<void>(
 			`${API}/profissionais/${profissionalId}/areas/${areaAtuacaoId}`
 		);
+	}
+
+	// --- formacoes (RF05) ---
+
+	listarFormacoes(profissionalId: number): Observable<Formacao[]> {
+		return this.http.get<Formacao[]>(`${API}/profissionais/${profissionalId}/formacoes`);
+	}
+
+	criarFormacao(profissionalId: number, dados: FormacaoRequest): Observable<Formacao> {
+		return this.http.post<Formacao>(`${API}/profissionais/${profissionalId}/formacoes`, dados);
+	}
+
+	removerFormacao(profissionalId: number, formacaoId: number): Observable<void> {
+		return this.http.delete<void>(
+			`${API}/profissionais/${profissionalId}/formacoes/${formacaoId}`
+		);
+	}
+
+	// --- certificados (RF06) ---
+
+	listarCertificados(profissionalId: number): Observable<Certificado[]> {
+		return this.http.get<Certificado[]>(`${API}/profissionais/${profissionalId}/certificados`);
+	}
+
+	criarCertificado(profissionalId: number, dados: CertificadoRequest): Observable<Certificado> {
+		return this.http.post<Certificado>(
+			`${API}/profissionais/${profissionalId}/certificados`, dados
+		);
+	}
+
+	removerCertificado(profissionalId: number, certificadoId: number): Observable<void> {
+		return this.http.delete<void>(
+			`${API}/profissionais/${profissionalId}/certificados/${certificadoId}`
+		);
+	}
+
+	// --- manutencao da tabela de dominio de areas ---
+
+	criarArea(dados: AreaAtuacaoRequest): Observable<AreaAtuacao> {
+		return this.http.post<AreaAtuacao>(`${API}/areas-atuacao`, dados);
+	}
+
+	atualizarArea(id: number, dados: AreaAtuacaoRequest): Observable<AreaAtuacao> {
+		return this.http.put<AreaAtuacao>(`${API}/areas-atuacao/${id}`, dados);
+	}
+
+	/**
+	 * Remove uma area do dominio.
+	 *
+	 * Se houver profissional vinculado, o banco recusa pela chave
+	 * estrangeira e o back-end devolve 409 -- comportamento certo: a
+	 * area nao some levando vinculos junto.
+	 */
+	removerArea(id: number): Observable<void> {
+		return this.http.delete<void>(`${API}/areas-atuacao/${id}`);
 	}
 }

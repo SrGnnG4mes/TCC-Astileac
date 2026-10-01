@@ -79,6 +79,61 @@ export interface ProfissionalAreaRequest {
 	dataInicio: string;
 }
 
+/** Entrada da tabela de dominio de areas (RF04, manutencao pela diretoria). */
+export interface AreaAtuacaoRequest {
+	nome: string;
+	descricao: string;
+}
+
+/**
+ * Formacao academica (RF05).
+ *
+ * Junto com o certificado, e o que comprova a habilitacao legal exigida
+ * pela Lei 14.704/2023 -- nucleo do sistema, nao cadastro acessorio.
+ */
+export interface Formacao {
+	id: number;
+	nivel: string;
+	curso: string;
+	instituicao: string;
+	anoConclusao: number;
+}
+
+export interface FormacaoRequest {
+	nivel: string;
+	curso: string;
+	instituicao: string;
+	anoConclusao: number;
+}
+
+/**
+ * Certificado (RF06).
+ *
+ * `formacaoId` e opcional, e quando preenchido so pode apontar para
+ * formacao DO MESMO profissional -- o back-end recusa o contrario.
+ *
+ * `arquivoPath` nao entra no request: quem define o caminho de
+ * armazenamento e o servidor, no upload (Passo 8). Deixar o cliente
+ * escolher e por onde entra path traversal.
+ */
+export interface Certificado {
+	id: number;
+	formacaoId: number | null;
+	titulo: string;
+	instituicaoEmissora: string;
+	cargaHoraria: number;
+	dataEmissao: string;
+	arquivoPath: string | null;
+}
+
+export interface CertificadoRequest {
+	formacaoId: number | null;
+	titulo: string;
+	instituicaoEmissora: string;
+	cargaHoraria: number;
+	dataEmissao: string;
+}
+
 /**
  * Exportacao completa dos dados do titular (RF10, Art. 18 da LGPD).
  *

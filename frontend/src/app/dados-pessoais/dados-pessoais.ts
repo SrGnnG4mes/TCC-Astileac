@@ -133,9 +133,9 @@ export class DadosPessoaisTela {
 		if (falha.status === 0) {
 			return 'Nao foi possivel falar com o servidor.';
 		}
-		if (falha.status === 403) {
-			return 'Voce so pode acessar os proprios dados.';
-		}
+		// O 403 nao ganha mensagem propria: o back-end distingue falta
+		// de permissao de falha de token CSRF, e trocar as duas por um
+		// texto generico torna o erro indiagnosticavel.
 		return falha.error?.mensagem ?? 'Nao foi possivel completar a operacao.';
 	}
 }
