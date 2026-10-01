@@ -370,6 +370,47 @@ Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.propertie
 >   padrão em migration iria para o Git. Sem a propriedade, não cria nada e avisa.
 > - `/hello` removido: era temporário e cumpriu o papel.
 
+> **Passo 7 — front-end Angular, primeira fatia** (Angular 22.2.0, Node 24.19.0 LTS).
+> Projeto criado em `frontend/` com componentes standalone (sem `app.module.ts`), sem SSR,
+> CSS puro e rotas por `loadComponent`.
+> - **`proxy.conf.json` é a decisão central.** O `ng serve` fica em `:4200` e a API em
+>   `:8080`; o proxy faz o navegador ver as duas na **mesma origem**. Sem isso, o
+>   interceptor de CSRF do Angular **não age**: ele só anexa `X-XSRF-TOKEN` em URL
+>   relativa, e origem cruzada daria 403 sem explicação aparente. Com o proxy também não
+>   é preciso `withCredentials` (o cookie viaja sozinho em mesma origem) e o CORS sai da
+>   conversa. Por isso toda chamada usa caminho relativo, nunca `http://localhost:8080/...`.
+> - **O alvo do proxy é `127.0.0.1:8080`, não `localhost:8080`.** O back-end tem
+>   `server.address=127.0.0.1` (só IPv4) e o Node resolve `localhost` preferindo IPv6:
+>   `localhost` daria `ECONNREFUSED` em `::1`.
+> - **O front-end chama `/api/...`, com o proxy removendo o prefixo (`pathRewrite`).**
+>   A primeira versão mapeava os caminhos reais (`/profissionais`, `/autenticacao`,
+>   `/areas-atuacao`) e **quebrava link direto**: o proxy repassa ao back-end *toda*
+>   requisição naquele caminho, inclusive a navegação do navegador pedindo o HTML, então
+>   abrir `localhost:4200/profissionais` devolvia o JSON cru da API em vez da aplicação —
+>   recarregar a página na tela de busca, favoritar ou digitar a URL ficava inviável.
+>   O prefixo separa os espaços de nome; o back-end **não muda**, continua publicando
+>   `/profissionais` sem prefixo. O valor está em `core/api.ts` para virar string vazia
+>   quando a aplicação for servida pelo próprio back-end.
+>   **Descoberto rodando, não lendo** — compila e funciona em toda navegação interna.
+> - **`Pagina<T>` traz os metadados aninhados em `page`**, não no topo:
+>   `{"content":[...],"page":{"size","number","totalElements","totalPages"}}`. É o formato
+>   do `PageSerializationMode.VIA_DTO` configurado no `WebConfig`. Declarar os campos no
+>   topo compila sem erro e falha em silêncio — a tela mostra `NaN`.
+> - **`AutenticacaoService.entrar()` renova o CSRF dentro da própria operação**, em vez de
+>   depender de alguém ter chamado antes. É a mesma dependência de ordem que quebrou a
+>   coleção do Postman três vezes.
+> - **Login vai como `application/x-www-form-urlencoded`**, não JSON: o `formLogin` do
+>   Spring lê parâmetros de requisição (`login` e `senha`, nomeados no `SecurityConfig`).
+> - **Nenhum token é guardado no cliente.** O estado local (`signal`) é só cópia de quem
+>   está logado, para a interface decidir o que mostrar; a fonte da verdade é
+>   `GET /autenticacao/eu`. Recarregar a página não desloga.
+> - A fatia é login + painel mínimo que faz **uma consulta autenticada** — o menor caminho
+>   que exercita proxy, cookie, CSRF e form login juntos. As telas do RF08 entram depois
+>   que isso estiver verificado contra o back-end rodando.
+> - **`java` não está no PATH do Windows** (só o JDK interno do IntelliJ), então o
+>   back-end sobe pela IDE e o Claude não consegue rodar `./mvnw` nem verificar
+>   comportamento por conta própria.
+
 ### Próximos passos (nesta ordem)
 1. ~~Migrations Flyway `V1` — criar as 9 tabelas + carga inicial das áreas de atuação~~ ✅
 2. ~~Entidades JPA + repositories~~ ✅
@@ -381,7 +422,9 @@ Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.propertie
 4. ~~Demais cadastros: endereço, contatos, áreas, formações, certificados, vínculos~~ ✅
 5. ~~Consulta e filtro por área de atuação (RF08)~~ ✅
 6. ~~Autenticação e perfis (RF09)~~ ✅ (falta verificar as regras de perfil com um admin real)
-7. Front-end Angular: formulários e telas de consulta
+7. Front-end Angular — **em andamento**: projeto criado, login e consulta autenticada
+   prontos (a verificar contra o back-end rodando). Falta a busca do RF08, a ficha, os
+   formulários de cadastro e as telas da LGPD.
 8. Upload de certificados
 9. Testes e validação com a ASTILEAC
 
