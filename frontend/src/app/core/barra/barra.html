@@ -1,0 +1,18 @@
+<header class="barra">
+	<strong class="marca">ASTILEAC</strong>
+
+	@if (usuario(); as eu) {
+		<nav>
+			@if (eu.perfil === 'ADMIN') {
+				<a routerLink="/profissionais" routerLinkActive="ativo">Profissionais</a>
+			}
+			@if (eu.profissionalId) {
+				<a routerLink="/dados-pessoais" routerLinkActive="ativo">Meus dados</a>
+			}
+		</nav>
+
+		<span class="identidade">{{ eu.login }} &middot; {{ eu.perfil }}</span>
+	}
+
+	<button type="button" (click)="sair()">Sair</button>
+</header>

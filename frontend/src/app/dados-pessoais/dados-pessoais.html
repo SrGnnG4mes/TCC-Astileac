@@ -1,10 +1,5 @@
-<header class="barra">
-	<strong>ASTILEAC</strong>
-	@if (usuario(); as eu) {
-		<span class="identidade">{{ eu.login }} &middot; {{ eu.perfil }}</span>
-	}
-	<button type="button" (click)="sair()">Sair</button>
-</header>
+<app-barra />
+
 
 <main class="conteudo">
 	@if (usuario()?.perfil === 'ADMIN') {

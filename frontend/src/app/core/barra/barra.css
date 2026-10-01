@@ -1,0 +1,58 @@
+.barra {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 10px 16px;
+	padding: 12px 20px;
+	background: #2c5aa0;
+	color: #fff;
+}
+
+.marca {
+	letter-spacing: 0.04em;
+}
+
+nav {
+	display: flex;
+	gap: 14px;
+}
+
+nav a {
+	padding: 4px 2px;
+	border-bottom: 2px solid transparent;
+	color: #fff;
+	font-size: 0.86rem;
+	text-decoration: none;
+	opacity: 0.85;
+}
+
+nav a:hover {
+	opacity: 1;
+}
+
+nav a.ativo {
+	border-bottom-color: #fff;
+	opacity: 1;
+	font-weight: 600;
+}
+
+.identidade {
+	margin-left: auto;
+	font-size: 0.82rem;
+	opacity: 0.9;
+}
+
+button {
+	padding: 6px 12px;
+	border: 1px solid rgb(255 255 255 / 55%);
+	border-radius: 5px;
+	background: transparent;
+	color: #fff;
+	font: inherit;
+	font-size: 0.82rem;
+	cursor: pointer;
+}
+
+button:hover {
+	background: rgb(255 255 255 / 12%);
+}

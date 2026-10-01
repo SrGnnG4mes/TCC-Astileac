@@ -1,10 +1,4 @@
-<header class="barra">
-	<strong>ASTILEAC</strong>
-	@if (usuario(); as eu) {
-		<span class="identidade">{{ eu.login }} &middot; {{ eu.perfil }}</span>
-	}
-	<button type="button" (click)="sair()">Sair</button>
-</header>
+<app-barra />
 
 <main class="conteudo">
 	@if (usuario(); as eu) {
@@ -20,12 +14,6 @@
 			<p>
 				Este usuário não está vinculado a um cadastro de profissional, então não há
 				dados pessoais de associado para consultar por aqui.
-			</p>
-		}
-
-		@if (eu.perfil === 'ADMIN') {
-			<p class="secundaria">
-				<a routerLink="/profissionais">Ir para a consulta do quadro de associados &rarr;</a>
 			</p>
 		}
 	} @else {

@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AutenticacaoService } from '../core/autenticacao.service';
+import { Barra } from '../core/barra/barra';
 
 /**
  * Tela minima pos-login.
@@ -15,7 +16,7 @@ import { AutenticacaoService } from '../core/autenticacao.service';
  */
 @Component({
 	selector: 'app-painel',
-	imports: [RouterLink],
+	imports: [RouterLink, Barra],
 	templateUrl: './painel.html',
 	styleUrl: './painel.css'
 })
@@ -38,10 +39,4 @@ export class Painel {
 		}
 	}
 
-	sair(): void {
-		this.autenticacao.sair().subscribe({
-			next: () => this.router.navigate(['/login']),
-			error: () => this.erro.set('Nao foi possivel encerrar a sessao.')
-		});
-	}
 }

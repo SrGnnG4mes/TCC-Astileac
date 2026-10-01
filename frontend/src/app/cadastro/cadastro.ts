@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import { AutenticacaoService } from '../core/autenticacao.service';
+import { Barra } from '../core/barra/barra';
 import { ProfissionalService } from '../core/profissional.service';
 import { AreaAtuacao, ProfissionalArea } from '../core/modelos';
 import { cpfValido, naoFutura } from '../core/validadores';
@@ -16,7 +16,7 @@ import { cpfValido, naoFutura } from '../core/validadores';
  */
 @Component({
 	selector: 'app-cadastro',
-	imports: [ReactiveFormsModule, RouterLink],
+	imports: [ReactiveFormsModule, RouterLink, Barra],
 	templateUrl: './cadastro.html',
 	styleUrl: './cadastro.css'
 })
@@ -24,11 +24,8 @@ export class Cadastro {
 
 	private readonly formBuilder = inject(FormBuilder);
 	private readonly profissionais = inject(ProfissionalService);
-	private readonly autenticacao = inject(AutenticacaoService);
 	private readonly rota = inject(ActivatedRoute);
 	private readonly router = inject(Router);
-
-	readonly usuario = this.autenticacao.usuario;
 
 	readonly id = signal<number | null>(null);
 	readonly salvando = signal(false);
@@ -148,12 +145,6 @@ export class Cadastro {
 		this.profissionais.desassociarArea(id, areaAtuacaoId).subscribe({
 			next: () => this.carregarAreas(id),
 			error: (falha: HttpErrorResponse) => this.erro.set(this.mensagemDe(falha))
-		});
-	}
-
-	sair(): void {
-		this.autenticacao.sair().subscribe({
-			next: () => this.router.navigate(['/login'])
 		});
 	}
 

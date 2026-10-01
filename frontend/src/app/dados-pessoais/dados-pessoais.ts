@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AutenticacaoService } from '../core/autenticacao.service';
+import { Barra } from '../core/barra/barra';
 import { DadosPessoaisService } from '../core/dados-pessoais.service';
 import { DadosPessoais, ExclusaoResposta, LogAcesso, Pagina } from '../core/modelos';
 
@@ -18,7 +19,7 @@ import { DadosPessoais, ExclusaoResposta, LogAcesso, Pagina } from '../core/mode
  */
 @Component({
 	selector: 'app-dados-pessoais',
-	imports: [RouterLink],
+	imports: [RouterLink, Barra],
 	templateUrl: './dados-pessoais.html',
 	styleUrl: './dados-pessoais.css'
 })
@@ -125,12 +126,6 @@ export class DadosPessoaisTela {
 				this.carregar(id);
 			},
 			error: (falha: HttpErrorResponse) => this.erro.set(this.mensagemDe(falha))
-		});
-	}
-
-	sair(): void {
-		this.autenticacao.sair().subscribe({
-			next: () => this.router.navigate(['/login'])
 		});
 	}
 

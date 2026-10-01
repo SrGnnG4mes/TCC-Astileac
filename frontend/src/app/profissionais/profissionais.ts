@@ -1,8 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import { AutenticacaoService } from '../core/autenticacao.service';
+import { Barra } from '../core/barra/barra';
 import { ProfissionalService } from '../core/profissional.service';
 import { AreaAtuacao, Pagina, ProfissionalFicha, ProfissionalResumo } from '../core/modelos';
 
@@ -20,7 +20,7 @@ import { AreaAtuacao, Pagina, ProfissionalFicha, ProfissionalResumo } from '../c
  */
 @Component({
 	selector: 'app-profissionais',
-	imports: [ReactiveFormsModule, RouterLink],
+	imports: [ReactiveFormsModule, RouterLink, Barra],
 	templateUrl: './profissionais.html',
 	styleUrl: './profissionais.css'
 })
@@ -28,10 +28,6 @@ export class Profissionais {
 
 	private readonly formBuilder = inject(FormBuilder);
 	private readonly profissionais = inject(ProfissionalService);
-	private readonly autenticacao = inject(AutenticacaoService);
-	private readonly router = inject(Router);
-
-	readonly usuario = this.autenticacao.usuario;
 
 	readonly filtros = this.formBuilder.nonNullable.group({
 		nome: '',
@@ -107,12 +103,6 @@ export class Profissionais {
 	limpar(): void {
 		this.filtros.reset({ nome: '', area: '', ativo: '' });
 		this.buscar();
-	}
-
-	sair(): void {
-		this.autenticacao.sair().subscribe({
-			next: () => this.router.navigate(['/login'])
-		});
 	}
 
 	private mensagemDe(falha: HttpErrorResponse): string {
