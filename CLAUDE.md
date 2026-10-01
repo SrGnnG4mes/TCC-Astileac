@@ -158,7 +158,7 @@ Chave primária **composta**: `profissional_id` + `area_atuacao_id`. Mais `data_
 | RF09 | Autenticar usuários e controlar acesso por perfil |
 | RF10 | Atender aos direitos do titular: exportar os próprios dados e pedir a eliminação deles |
 | RF11 | Registrar quem consultou ou alterou dado pessoal |
-| RF12 | Gerenciar contas de acesso: criar conta de associado, conceder e retirar o perfil administrativo, trocar a própria senha — **a implementar** |
+| RF12 | Gerenciar contas de acesso: cadastro do associado por convite, conceder e retirar o perfil administrativo, trocar a própria senha |
 
 RF08 é o caso de uso mais importante na prática: é como a associação atende a uma demanda
 ("preciso de um intérprete para audiência judicial").
@@ -458,6 +458,37 @@ Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.propertie
 > - Dois tipos corrigidos pelo teste contra a API: o enum `AcaoLog` tem **`EXPORTACAO`**
 >   (exportar é ação distinta de consultar), e `origem` vem **nula** quando a ação não
 >   veio de requisição HTTP.
+
+> **RF12 — contas de acesso por convite** (branch `feat/contas-de-acesso-por-convite`,
+> migration `V6`, 84 testes). Back-end pronto; falta a interface.
+> - **Fluxo definido pela entidade:** a pessoa paga para se associar, a diretoria confirma
+>   e emite um convite, o convite chega por e-mail e serve uma vez só. Todo o
+>   preenchimento fica com quem se associa — a diretoria só emite.
+> - **O convite é a prova de identidade.** Autocadastro puro deixaria qualquer um que
+>   soubesse um CPF abrir conta em nome de outra pessoa e alcançar os dados dela.
+> - **Token de 256 bits guardado como SHA-256**, nunca em texto. SHA-256 e **não** BCrypt:
+>   o BCrypt é lento para proteger segredo fraco escolhido por humano, e o sal por registro
+>   obrigaria a varrer a tabela para achar um convite. O token aparece **uma vez**, na
+>   emissão; a listagem não o expõe e não há como recuperá-lo.
+> - **As duas rotas públicas são POST, inclusive a validação** (que logicamente seria GET):
+>   assim o token não vai na URL, que aparece no log do servidor, em proxy e no `Referer`.
+> - Convite inválido é **indistinguível** de convite já usado — dizer "já foi usado"
+>   confirmaria a um estranho que aquele código existe. Tentativa falhada **não** queima o
+>   convite.
+> - `dataAssociacao` é definida pelo servidor, e `perfil` nunca vem do formulário.
+> - **Nenhuma operação deixa zero administradores** (409 explícito).
+> - **Defeito latente corrigido junto:** o expurgo não apagava `USUARIO` nem `CONVITE`, e a
+>   FK não tem `ON DELETE CASCADE`. A primeira conta de associado transformaria a rotina das
+>   3h em erro; como o laço roda numa transação só, reverteria o expurgo de **todos** os
+>   cadastros vencidos — o Art. 18 deixaria de ser cumprido em silêncio.
+> - **Defeito encontrado rodando:** o convite de uso único valia para sempre. O código
+>   carregava a entidade, fazia o `UPDATE` em massa (que altera o banco e **não** a
+>   entidade) e no fim chamava `save()`, gravando o estado obsoleto por cima e zerando o
+>   consumo. Os 11 testes de unidade passavam e **não podiam** pegar: com repositório
+>   simulado não existe contexto de persistência para ficar obsoleto.
+> - **Registro de acesso da criação fica como `nao-autenticado`**, e está certo: quem se
+>   cadastra ainda não tem sessão. A atribuição se faz pela cadeia — o registro aponta o
+>   convite, e o convite guarda quem o emitiu.
 
 ### Próximos passos (nesta ordem)
 1. ~~Migrations Flyway `V1` — criar as 9 tabelas + carga inicial das áreas de atuação~~ ✅

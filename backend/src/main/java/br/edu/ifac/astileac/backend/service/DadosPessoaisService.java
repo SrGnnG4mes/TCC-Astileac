@@ -16,8 +16,10 @@ import br.edu.ifac.astileac.backend.repository.CertificadoRepository;
 import br.edu.ifac.astileac.backend.repository.ContatoRepository;
 import br.edu.ifac.astileac.backend.repository.EnderecoRepository;
 import br.edu.ifac.astileac.backend.repository.FormacaoRepository;
+import br.edu.ifac.astileac.backend.repository.ConviteRepository;
 import br.edu.ifac.astileac.backend.repository.ProfissionalAreaRepository;
 import br.edu.ifac.astileac.backend.repository.ProfissionalRepository;
+import br.edu.ifac.astileac.backend.repository.UsuarioRepository;
 import br.edu.ifac.astileac.backend.repository.VinculoEmpregaticioRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -52,6 +54,8 @@ public class DadosPessoaisService {
 	private final FormacaoRepository formacaoRepository;
 	private final CertificadoRepository certificadoRepository;
 	private final VinculoEmpregaticioRepository vinculoEmpregaticioRepository;
+	private final UsuarioRepository usuarioRepository;
+	private final ConviteRepository conviteRepository;
 	private final ProfissionalService profissionalService;
 	private final LogAcessoService logAcessoService;
 
@@ -208,6 +212,24 @@ public class DadosPessoaisService {
 			profissionalAreaRepository.deleteAll(profissionalAreaRepository.findByIdProfissionalId(id));
 			contatoRepository.deleteAll(contatoRepository.findByProfissionalId(id));
 			enderecoRepository.findByProfissionalId(id).ifPresent(enderecoRepository::delete);
+
+			// A conta de acesso e o convite que a originou tambem
+			// apontam para o profissional, e as chaves estrangeiras nao
+			// tem ON DELETE CASCADE: sem apagar os dois antes, o delete
+			// abaixo viola a restricao.
+			//
+			// Nao e detalhe de implementacao. O laco inteiro roda numa
+			// transacao so, as 3h da manha: uma violacao reverteria o
+			// expurgo de TODOS os cadastros vencidos, e a unica pista
+			// seria uma linha de log. O sistema deixaria de cumprir a
+			// eliminacao prometida pelo Art. 18 em silencio.
+			//
+			// Apagar a conta tambem e o comportamento certo em si:
+			// eliminar os dados da pessoa e manter o acesso dela seria
+			// contraditorio.
+			conviteRepository.findByProfissionalId(id).ifPresent(conviteRepository::delete);
+			usuarioRepository.findByProfissionalId(id).ifPresent(usuarioRepository::delete);
+
 			profissionalRepository.delete(profissional);
 
 			// Sem CPF nem nome: o log registra que a eliminacao
