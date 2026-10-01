@@ -490,6 +490,35 @@ Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.propertie
 >   cadastra ainda não tem sessão. A atribuição se faz pela cadeia — o registro aponta o
 >   convite, e o convite guarda quem o emitiu.
 
+> **Formações, certificados e manutenção das áreas** (front-end).
+> - **Formações e certificados entram na própria ficha do profissional**, junto com as
+>   áreas, e não em telas separadas: é o registro completo do associado num lugar só, que
+>   é o que a diretoria quer ver.
+> - **O seletor "formação relacionada" do certificado lista apenas as formações daquele
+>   profissional.** Torna visível na tela a regra que o back-end já impunha. Confirmado
+>   rodando: certificado apontando para formação de outra pessoa devolve **404**, e não
+>   403 — a mensagem não confirma que aquela formação existe pertencendo a terceiro.
+> - **Nível da formação usa `datalist`**, não `select`: sugere os níveis comuns sem
+>   impedir um valor novo. Fechar a lista repetiria, em miniatura, o erro das colunas
+>   booleanas por área.
+> - **Tela de manutenção das áreas (`/areas-atuacao`, ADMIN).** É o que torna real a
+>   decisão da tabela associativa: sem ela, a vantagem de "área nova não exige alterar o
+>   schema" continuaria dependendo de alguém rodando SQL. Remover área vinculada devolve
+>   409, com mensagem que diz o que fazer.
+>
+> **Dois defeitos encontrados rodando, ambos de CSRF:**
+> - **A primeira escrita após qualquer login falhava com 403.** O Spring troca o token CSRF
+>   ao autenticar (proteção contra fixação de sessão) e descarta o anterior; como a
+>   resolução é preguiçosa, o cookie só é reescrito quando alguém **lê** o token. O
+>   `entrar()` renovava o CSRF **antes** do login, e nada renovava depois — então o cookie
+>   ficava com o valor pré-login. A própria falha fazia o servidor reescrever o cookie, e
+>   por isso a segunda tentativa funcionava, o que mascarava o problema. Corrigido
+>   renovando o token também **depois** do POST de login.
+> - **As telas trocavam a mensagem do 403 por um texto genérico de permissão**, jogando
+>   fora a distinção entre falta de permissão e falha de CSRF que o `SecurityConfig` faz de
+>   propósito. Foi o que me fez ler a falha acima como problema de perfil. O 403 agora
+>   repassa a mensagem do servidor.
+
 ### Próximos passos (nesta ordem)
 1. ~~Migrations Flyway `V1` — criar as 9 tabelas + carga inicial das áreas de atuação~~ ✅
 2. ~~Entidades JPA + repositories~~ ✅
@@ -501,11 +530,13 @@ Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.propertie
 4. ~~Demais cadastros: endereço, contatos, áreas, formações, certificados, vínculos~~ ✅
 5. ~~Consulta e filtro por área de atuação (RF08)~~ ✅
 6. ~~Autenticação e perfis (RF09)~~ ✅ (falta verificar as regras de perfil com um admin real)
-7. Front-end Angular — **em andamento**: projeto criado, login e consulta autenticada
-   prontos (a verificar contra o back-end rodando). Falta a busca do RF08, a ficha, os
-   formulários de cadastro e as telas da LGPD.
-8. Upload de certificados
-9. Testes e validação com a ASTILEAC
+7. Front-end Angular — **em andamento**. Prontos: login, consulta do RF08, ficha, cadastro
+   de profissional com áreas, formações e certificados, telas da LGPD (RF10/RF11) e
+   manutenção da tabela de áreas. **Faltam:** a interface do RF12 (emitir convite, tela
+   pública de cadastro, gestão de contas) e as telas de endereço, contatos e vínculos.
+8. Upload de certificados (os certificados já são cadastrados sem documento anexado)
+9. Testes e validação com a ASTILEAC — **a primeira conversa aconteceu** (ver seção 5);
+   faltam os três pontos ainda em aberto e o registro formal para citar no TCC
 
 ---
 
