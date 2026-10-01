@@ -407,9 +407,28 @@ Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.propertie
 > - A fatia é login + painel mínimo que faz **uma consulta autenticada** — o menor caminho
 >   que exercita proxy, cookie, CSRF e form login juntos. As telas do RF08 entram depois
 >   que isso estiver verificado contra o back-end rodando.
-> - **`java` não está no PATH do Windows** (só o JDK interno do IntelliJ), então o
->   back-end sobe pela IDE e o Claude não consegue rodar `./mvnw` nem verificar
->   comportamento por conta própria.
+> - **`java` não está no PATH do Windows**, mas há JDKs em `~/.jdks` (o `jbr-21.0.11`
+>   serve, é Java 21). Com `JAVA_HOME` apontado para lá, `./mvnw spring-boot:run`
+>   funciona pelo terminal — foi assim que os dois defeitos acima apareceram.
+
+> **Cadastro e direitos do titular na interface** (mesma branch).
+> - **`ativo` não entra no formulário de cadastro**, espelhando o `ProfissionalRequestDTO`:
+>   profissional novo nasce ativo e desativar é ação própria, não campo livre.
+> - **A seção de áreas só aparece na edição.** Associar área exige profissional já
+>   criado; por isso, ao cadastrar, a tela passa sozinha para o modo edição.
+> - **Validação de CPF replicada no cliente** (`core/validadores.ts`), espelhando a
+>   anotação `@Cpf`. É resposta imediata a quem digita, **não** substitui a do servidor.
+> - **Achado 13 fechado de ponta a ponta.** O back-end já atendia ao Art. 18 desde a
+>   branch `feat/direitos-titular-log-acesso`, mas nenhuma tela dava acesso — e um
+>   direito que só o titular pode exercer não se cumpre se ele não alcança. A tela
+>   `/dados-pessoais` expõe exportação (com download do JSON **sem recorte**: filtrar ali
+>   transformaria "todos os seus dados" no que a tela achou conveniente), o registro de
+>   quem acessou, e o pedido de eliminação com confirmação em dois passos exibindo a
+>   resposta inteira do servidor — prazo, data da exclusão definitiva e como cancelar.
+>   É por isso que aquele endpoint devolve corpo e não 204.
+> - Dois tipos corrigidos pelo teste contra a API: o enum `AcaoLog` tem **`EXPORTACAO`**
+>   (exportar é ação distinta de consultar), e `origem` vem **nula** quando a ação não
+>   veio de requisição HTTP.
 
 ### Próximos passos (nesta ordem)
 1. ~~Migrations Flyway `V1` — criar as 9 tabelas + carga inicial das áreas de atuação~~ ✅
