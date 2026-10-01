@@ -158,9 +158,38 @@ Chave primária **composta**: `profissional_id` + `area_atuacao_id`. Mais `data_
 | RF09 | Autenticar usuários e controlar acesso por perfil |
 | RF10 | Atender aos direitos do titular: exportar os próprios dados e pedir a eliminação deles |
 | RF11 | Registrar quem consultou ou alterou dado pessoal |
+| RF12 | Gerenciar contas de acesso: criar conta de associado, conceder e retirar o perfil administrativo, trocar a própria senha — **a implementar** |
 
 RF08 é o caso de uso mais importante na prática: é como a associação atende a uma demanda
 ("preciso de um intérprete para audiência judicial").
+
+### Validação com a diretoria da ASTILEAC (out/2026)
+Primeira conversa de validação. O que ficou confirmado:
+
+- **O contato entre contratante e profissional acontece fora do sistema.** Confirmado pela
+  diretoria, não mais premissa assumida. O RF08 entrega a localização do profissional; a
+  negociação se dá por fora. Isso sustenta o desenho atual e deve ser dito no texto como
+  premissa **validada**, não suposta.
+- **Cada membro da diretoria terá login próprio**, e não um `admin` compartilhado. Isso é o
+  que preserva o sentido do RF11: com login compartilhado o campo `autor` diria sempre a
+  mesma coisa e a atribuição do Art. 46 ficaria vazia na prática.
+- **Diretor é associado com perfil elevado.** A diretoria descreveu o perfil como "status
+  da conta, que dependendo libera ou tira recursos". O modelo **já suporta isso sem
+  alteração**: `USUARIO` tem `profissional_id` (1:1 opcional) e `perfil`, então um diretor
+  é um `USUARIO` com `perfil = ADMIN` **e** `profissional_id` preenchido apontando para o
+  próprio cadastro. Nenhuma migration necessária.
+- **Lacuna descoberta na conversa → RF12.** Não existe nenhuma forma de criar ou alterar
+  conta: não há `UsuarioController`, e a única conta que o sistema cria é a do
+  `BootstrapAdmin`, uma vez, por propriedade local, e só quando não existe usuário algum.
+  Sem RF12 a associação não consegue dar acesso a ninguém, ninguém entra ou sai da
+  diretoria e ninguém troca a própria senha.
+- **Consequência no front-end, ainda aberta:** o login manda `ADMIN` para `/profissionais`,
+  e de lá não há caminho para `/dados-pessoais`. Como o diretor agora também é titular, ele
+  fica sem acesso aos próprios direitos do Art. 18.
+
+Ainda em aberto com a diretoria: prazo dos 30 dias, excluir × desativar quando é a
+diretoria que remove alguém, e se as cinco áreas de atuação da migration `V2` são as
+corretas (saíram da literatura, não da prática da entidade).
 
 ---
 
