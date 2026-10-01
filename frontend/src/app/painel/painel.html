@@ -1,0 +1,31 @@
+<header class="barra">
+	<strong>ASTILEAC</strong>
+	@if (usuario(); as eu) {
+		<span class="identidade">{{ eu.login }} &middot; {{ eu.perfil }}</span>
+	}
+	<button type="button" (click)="sair()">Sair</button>
+</header>
+
+<main class="conteudo">
+	@if (usuario(); as eu) {
+		<h1>Sessão ativa</h1>
+		<p>
+			A primeira fatia está funcionando: login por formulário, cookie de sessão,
+			token CSRF e uma consulta autenticada ao servidor.
+		</p>
+		<dl>
+			<dt>Login</dt>
+			<dd>{{ eu.login }}</dd>
+			<dt>Perfil</dt>
+			<dd>{{ eu.perfil }}</dd>
+			<dt>Profissional vinculado</dt>
+			<dd>{{ eu.profissionalId ?? 'nenhum' }}</dd>
+		</dl>
+	} @else {
+		<p>Carregando...</p>
+	}
+
+	@if (erro()) {
+		<p class="erro" role="alert">{{ erro() }}</p>
+	}
+</main>

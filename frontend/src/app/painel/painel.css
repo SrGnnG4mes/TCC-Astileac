@@ -1,0 +1,67 @@
+.barra {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 12px 20px;
+	background: #2c5aa0;
+	color: #fff;
+}
+
+.identidade {
+	margin-left: auto;
+	font-size: 0.82rem;
+	opacity: 0.9;
+}
+
+.barra button {
+	padding: 6px 12px;
+	border: 1px solid rgb(255 255 255 / 55%);
+	border-radius: 5px;
+	background: transparent;
+	color: #fff;
+	font: inherit;
+	font-size: 0.82rem;
+	cursor: pointer;
+}
+
+.conteudo {
+	max-width: 640px;
+	padding: 24px 20px;
+}
+
+h1 {
+	margin: 0 0 10px;
+	font-size: 1.25rem;
+}
+
+p {
+	margin: 0 0 18px;
+	line-height: 1.5;
+	color: #39404a;
+}
+
+dl {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	gap: 6px 18px;
+	margin: 0;
+	font-size: 0.9rem;
+}
+
+dt {
+	font-weight: 600;
+	color: #5c6470;
+}
+
+dd {
+	margin: 0;
+}
+
+.erro {
+	margin-top: 18px;
+	padding: 9px 10px;
+	border-radius: 6px;
+	background: #fdecea;
+	color: #8f2018;
+	font-size: 0.82rem;
+}
