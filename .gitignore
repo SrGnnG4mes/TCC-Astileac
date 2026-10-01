@@ -34,3 +34,7 @@ docs/tcc/*.fdb_latexmk
 docs/tcc/*.synctex.gz
 docs/tcc/*.run.xml
 docs/tcc/*.xml
+
+# --- Rascunhos do capitulo de desenvolvimento (N1) ---
+docs/tcc/desenvolvimento.tex
+docs/tcc/GUIA-ESCRITA-CAPITULO.md

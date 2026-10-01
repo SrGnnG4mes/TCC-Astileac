@@ -1,0 +1,20 @@
+<main class="tela">
+	<form class="cartao" [formGroup]="formulario" (ngSubmit)="entrar()">
+		<h1>ASTILEAC</h1>
+		<p class="subtitulo">Cadastro de profissionais tradutores e intérpretes de Libras</p>
+
+		<label for="login">Login</label>
+		<input id="login" type="text" formControlName="login" autocomplete="username" />
+
+		<label for="senha">Senha</label>
+		<input id="senha" type="password" formControlName="senha" autocomplete="current-password" />
+
+		@if (erro()) {
+			<p class="erro" role="alert">{{ erro() }}</p>
+		}
+
+		<button type="submit" [disabled]="enviando()">
+			{{ enviando() ? 'Entrando...' : 'Entrar' }}
+		</button>
+	</form>
+</main>

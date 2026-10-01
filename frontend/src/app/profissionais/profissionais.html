@@ -1,0 +1,145 @@
+<header class="barra">
+	<strong>ASTILEAC</strong>
+	@if (usuario(); as eu) {
+		<span class="identidade">{{ eu.login }} &middot; {{ eu.perfil }}</span>
+	}
+	<button type="button" (click)="sair()">Sair</button>
+</header>
+
+<main class="conteudo">
+	<div class="titulo">
+		<h1>Consultar profissionais</h1>
+		<a class="botao" routerLink="/profissionais/novo">Novo profissional</a>
+	</div>
+	<p class="ajuda">
+		Todos os filtros são opcionais e combináveis. Sem nenhum filtro, a consulta
+		devolve o quadro completo de associados.
+	</p>
+
+	<form class="filtros" [formGroup]="filtros" (ngSubmit)="buscar()">
+		<div class="campo">
+			<label for="nome">Nome</label>
+			<input id="nome" type="text" formControlName="nome" placeholder="parte do nome" />
+		</div>
+
+		<div class="campo">
+			<label for="area">Área de atuação</label>
+			<select id="area" formControlName="area">
+				<option value="">todas</option>
+				@for (area of areas(); track area.id) {
+					<option [value]="area.nome">{{ area.nome }}</option>
+				}
+			</select>
+		</div>
+
+		<div class="campo">
+			<label for="ativo">Situação</label>
+			<select id="ativo" formControlName="ativo">
+				<option value="">todas</option>
+				<option value="true">ativos</option>
+				<option value="false">inativos</option>
+			</select>
+		</div>
+
+		<div class="acoes">
+			<button type="submit" [disabled]="buscando()">
+				{{ buscando() ? 'Buscando...' : 'Buscar' }}
+			</button>
+			<button type="button" class="secundario" (click)="limpar()">Limpar</button>
+		</div>
+	</form>
+
+	@if (erro()) {
+		<p class="erro" role="alert">{{ erro() }}</p>
+	}
+
+	@if (pagina(); as p) {
+		@if (p.content.length === 0) {
+			<p class="vazio">Nenhum profissional encontrado com esses filtros.</p>
+		} @else {
+			<table>
+				<caption>
+					{{ p.page.totalElements }} profissional(is) encontrado(s) &middot;
+					página {{ p.page.number + 1 }} de {{ p.page.totalPages }}
+				</caption>
+				<thead>
+					<tr>
+						<th scope="col">Nome</th>
+						<th scope="col">CPF</th>
+						<th scope="col">Situação</th>
+						<th scope="col"><span class="oculto">Ações</span></th>
+					</tr>
+				</thead>
+				<tbody>
+					@for (profissional of p.content; track profissional.id) {
+						<tr>
+							<td>{{ profissional.nome }}</td>
+							<td class="mono">{{ profissional.cpfMascarado }}</td>
+							<td>
+								<span class="situacao" [class.inativo]="!profissional.ativo">
+									{{ profissional.ativo ? 'ativo' : 'inativo' }}
+								</span>
+							</td>
+							<td class="acoes-linha">
+								<button type="button" class="link" (click)="abrirFicha(profissional.id)">
+									Ver ficha
+								</button>
+								<a class="link" [routerLink]="['/profissionais', profissional.id, 'editar']">
+									Editar
+								</a>
+								<a class="link" [routerLink]="['/profissionais', profissional.id, 'dados-pessoais']">
+									Dados pessoais
+								</a>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+
+			<nav class="paginacao" aria-label="Paginação">
+				<button type="button" [disabled]="p.page.number === 0" (click)="irPara(p.page.number - 1)">
+					Anterior
+				</button>
+				<span>{{ p.page.number + 1 }} / {{ p.page.totalPages }}</span>
+				<button
+					type="button"
+					[disabled]="p.page.number + 1 >= p.page.totalPages"
+					(click)="irPara(p.page.number + 1)">
+					Próxima
+				</button>
+			</nav>
+		}
+	}
+
+	@if (ficha(); as f) {
+		<section class="ficha">
+			<header>
+				<h2>{{ f.nome }}</h2>
+				<button type="button" class="link" (click)="fecharFicha()">Fechar</button>
+			</header>
+
+			@if (f.dataExclusaoSolicitada) {
+				<p class="aviso">
+					Este cadastro tem pedido de eliminação registrado em
+					{{ f.dataExclusaoSolicitada }} e está bloqueado.
+				</p>
+			}
+
+			<dl>
+				<dt>CPF</dt>
+				<dd class="mono">{{ f.cpf }}</dd>
+				<dt>Nascimento</dt>
+				<dd>{{ f.dataNascimento }}</dd>
+				<dt>Associação</dt>
+				<dd>{{ f.dataAssociacao }}</dd>
+				<dt>Situação</dt>
+				<dd>{{ f.ativo ? 'ativo' : 'inativo' }}</dd>
+			</dl>
+
+			<p class="nota">
+				O CPF aparece completo aqui, e mascarado na listagem: a consulta individual
+				tem finalidade que justifica o dado inteiro, a listagem não.
+			</p>
+		</section>
+	}
+</main>
