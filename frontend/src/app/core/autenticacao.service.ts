@@ -63,6 +63,20 @@ export class AutenticacaoService {
 				headers: cabecalhos,
 				responseType: 'text'
 			})),
+			// Renova de NOVO, agora depois do login.
+			//
+			// O Spring troca o token CSRF ao autenticar, como protecao
+			// contra fixacao de sessao, e descarta o anterior. Como a
+			// resolucao e preguicosa, o cookie so e reescrito quando
+			// alguem LE o token -- e nenhuma tela faz isso sozinha.
+			//
+			// Sem esta segunda chamada, o cookie fica com o valor
+			// pre-login e a PRIMEIRA escrita apos entrar no sistema
+			// falha com 403; a seguinte funciona, porque a propria
+			// falha faz o servidor reescrever o cookie. Confirmado
+			// rodando: criar area dava 403 e a mesma chamada repetida
+			// dava 201.
+			switchMap(() => this.renovarCsrf()),
 			switchMap(() => this.carregarUsuario())
 		);
 	}

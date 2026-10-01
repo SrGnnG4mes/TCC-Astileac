@@ -5,6 +5,7 @@
 		<nav>
 			@if (eu.perfil === 'ADMIN') {
 				<a routerLink="/profissionais" routerLinkActive="ativo">Profissionais</a>
+				<a routerLink="/areas-atuacao" routerLinkActive="ativo">Áreas</a>
 			}
 			@if (eu.profissionalId) {
 				<a routerLink="/dados-pessoais" routerLinkActive="ativo">Meus dados</a>

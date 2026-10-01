@@ -4,7 +4,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Barra } from '../core/barra/barra';
 import { ProfissionalService } from '../core/profissional.service';
-import { AreaAtuacao, ProfissionalArea } from '../core/modelos';
+import { AreaAtuacao, Certificado, Formacao, ProfissionalArea } from '../core/modelos';
 import { cpfValido, naoFutura } from '../core/validadores';
 
 /**
@@ -34,6 +34,8 @@ export class Cadastro {
 
 	readonly areas = signal<AreaAtuacao[]>([]);
 	readonly areasDoProfissional = signal<ProfissionalArea[]>([]);
+	readonly formacoes = signal<Formacao[]>([]);
+	readonly certificados = signal<Certificado[]>([]);
 
 	readonly formulario = this.formBuilder.nonNullable.group({
 		nome: ['', [Validators.required, Validators.maxLength(150)]],
@@ -47,6 +49,23 @@ export class Cadastro {
 		dataInicio: ['', [Validators.required, naoFutura]]
 	});
 
+	readonly novaFormacao = this.formBuilder.nonNullable.group({
+		nivel: ['', [Validators.required, Validators.maxLength(50)]],
+		curso: ['', [Validators.required, Validators.maxLength(150)]],
+		instituicao: ['', [Validators.required, Validators.maxLength(150)]],
+		anoConclusao: ['', Validators.required]
+	});
+
+	readonly novoCertificado = this.formBuilder.nonNullable.group({
+		// Vazio = certificado solto, sem formacao associada. E valido:
+		// nem todo certificado decorre de um curso registrado aqui.
+		formacaoId: '',
+		titulo: ['', [Validators.required, Validators.maxLength(150)]],
+		instituicaoEmissora: ['', [Validators.required, Validators.maxLength(150)]],
+		cargaHoraria: ['', Validators.required],
+		dataEmissao: ['', [Validators.required, naoFutura]]
+	});
+
 	constructor() {
 		const parametro = this.rota.snapshot.paramMap.get('id');
 
@@ -54,7 +73,7 @@ export class Cadastro {
 			const id = Number(parametro);
 			this.id.set(id);
 			this.carregar(id);
-			this.carregarAreas(id);
+			this.carregarVinculados(id);
 		}
 
 		this.profissionais.listarAreas().subscribe({
@@ -74,10 +93,25 @@ export class Cadastro {
 		});
 	}
 
-	private carregarAreas(id: number): void {
+	/** Recarrega os tres cadastros que pendem do profissional. */
+	private carregarVinculados(id: number): void {
 		this.profissionais.listarAreasDo(id).subscribe({
 			next: lista => this.areasDoProfissional.set(lista)
 		});
+		this.profissionais.listarFormacoes(id).subscribe({
+			next: lista => this.formacoes.set(lista)
+		});
+		this.profissionais.listarCertificados(id).subscribe({
+			next: lista => this.certificados.set(lista)
+		});
+	}
+
+	/** Nome da formacao para exibir junto ao certificado que a referencia. */
+	nomeDaFormacao(formacaoId: number | null): string | null {
+		if (!formacaoId) {
+			return null;
+		}
+		return this.formacoes().find(f => f.id === formacaoId)?.curso ?? null;
 	}
 
 	salvar(): void {
@@ -106,7 +140,7 @@ export class Cadastro {
 					// Entra no modo edicao para liberar o vinculo de
 					// areas, que precisa do profissional ja criado.
 					this.id.set(ficha.id);
-					this.carregarAreas(ficha.id);
+					this.carregarVinculados(ficha.id);
 					this.aviso.set('Profissional cadastrado. Agora e possivel vincular areas de atuacao.');
 					this.router.navigate(['/profissionais', ficha.id, 'editar'], { replaceUrl: true });
 				}
@@ -131,7 +165,7 @@ export class Cadastro {
 			.subscribe({
 				next: () => {
 					this.vinculo.reset({ areaAtuacaoId: '', dataInicio: '' });
-					this.carregarAreas(id);
+					this.carregarVinculados(id);
 				},
 				error: (falha: HttpErrorResponse) => this.erro.set(this.mensagemDe(falha))
 			});
@@ -143,7 +177,85 @@ export class Cadastro {
 			return;
 		}
 		this.profissionais.desassociarArea(id, areaAtuacaoId).subscribe({
-			next: () => this.carregarAreas(id),
+			next: () => this.carregarVinculados(id),
+			error: (falha: HttpErrorResponse) => this.erro.set(this.mensagemDe(falha))
+		});
+	}
+
+	// ---------- formacoes (RF05) ----------
+
+	adicionarFormacao(): void {
+		const id = this.id();
+		if (!id || this.novaFormacao.invalid) {
+			this.novaFormacao.markAllAsTouched();
+			return;
+		}
+
+		const dados = this.novaFormacao.getRawValue();
+
+		this.profissionais.criarFormacao(id, {
+			nivel: dados.nivel.trim(),
+			curso: dados.curso.trim(),
+			instituicao: dados.instituicao.trim(),
+			anoConclusao: Number(dados.anoConclusao)
+		}).subscribe({
+			next: () => {
+				this.novaFormacao.reset({ nivel: '', curso: '', instituicao: '', anoConclusao: '' });
+				this.carregarVinculados(id);
+			},
+			error: (falha: HttpErrorResponse) => this.erro.set(this.mensagemDe(falha))
+		});
+	}
+
+	removerFormacao(formacaoId: number): void {
+		const id = this.id();
+		if (!id) {
+			return;
+		}
+		this.profissionais.removerFormacao(id, formacaoId).subscribe({
+			next: () => this.carregarVinculados(id),
+			error: (falha: HttpErrorResponse) => this.erro.set(this.mensagemDe(falha))
+		});
+	}
+
+	// ---------- certificados (RF06) ----------
+
+	adicionarCertificado(): void {
+		const id = this.id();
+		if (!id || this.novoCertificado.invalid) {
+			this.novoCertificado.markAllAsTouched();
+			return;
+		}
+
+		const dados = this.novoCertificado.getRawValue();
+
+		this.profissionais.criarCertificado(id, {
+			// Vazio vira nulo, nao zero: o back-end so aceita nulo ou um
+			// id de formacao do proprio profissional.
+			formacaoId: dados.formacaoId ? Number(dados.formacaoId) : null,
+			titulo: dados.titulo.trim(),
+			instituicaoEmissora: dados.instituicaoEmissora.trim(),
+			cargaHoraria: Number(dados.cargaHoraria),
+			dataEmissao: dados.dataEmissao
+		}).subscribe({
+			next: () => {
+				this.novoCertificado.reset({
+					formacaoId: '', titulo: '', instituicaoEmissora: '',
+					cargaHoraria: '', dataEmissao: ''
+				});
+				this.carregarVinculados(id);
+			},
+			error: (falha: HttpErrorResponse) => this.erro.set(this.mensagemDe(falha))
+		});
+	}
+
+	removerCertificado(certificadoId: number): void {
+		const id = this.id();
+		if (!id) {
+			return;
+		}
+		this.profissionais.removerCertificado(id, certificadoId).subscribe({
+			next: () => this.carregarVinculados(id),
 			error: (falha: HttpErrorResponse) => this.erro.set(this.mensagemDe(falha))
 		});
 	}
@@ -157,9 +269,9 @@ export class Cadastro {
 		if (falha.status === 0) {
 			return 'Nao foi possivel falar com o servidor.';
 		}
-		if (falha.status === 403) {
-			return 'Seu perfil nao permite esta operacao.';
-		}
+		// O 403 nao ganha mensagem propria: o back-end distingue falta
+		// de permissao de falha de token CSRF, e trocar as duas por um
+		// texto generico torna o erro indiagnosticavel.
 		return falha.error?.mensagem ?? 'Nao foi possivel salvar.';
 	}
 }

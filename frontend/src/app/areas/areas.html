@@ -1,0 +1,65 @@
+<app-barra />
+
+<main class="conteudo">
+	<h1>Áreas de atuação</h1>
+	<p class="ajuda">
+		São as áreas pelas quais a diretoria busca profissionais. Acrescentar uma área nova
+		não exige alterar o banco: a relação entre profissional e área é feita por tabela
+		associativa justamente para isso.
+	</p>
+
+	@if (erro()) {
+		<p class="erro" role="alert">{{ erro() }}</p>
+	}
+	@if (aviso()) {
+		<p class="aviso" role="status">{{ aviso() }}</p>
+	}
+
+	<table>
+		<thead>
+			<tr>
+				<th scope="col">Nome</th>
+				<th scope="col">Descrição</th>
+				<th scope="col"><span class="oculto">Ações</span></th>
+			</tr>
+		</thead>
+		<tbody>
+			@for (area of areas(); track area.id) {
+				<tr [class.emedicao]="editando() === area.id">
+					<td class="nome">{{ area.nome }}</td>
+					<td class="descricao">{{ area.descricao || '—' }}</td>
+					<td class="acoes-linha">
+						<button type="button" class="link" (click)="editar(area)">Editar</button>
+						<button type="button" class="link perigo" (click)="remover(area)">Remover</button>
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+
+	<section class="formulario">
+		<h2>{{ editando() ? 'Editar área' : 'Nova área' }}</h2>
+
+		<form [formGroup]="formulario" (ngSubmit)="salvar()">
+			<div class="campo">
+				<label for="nome">Nome</label>
+				<input id="nome" type="text" formControlName="nome" maxlength="50" />
+				@if (formulario.controls.nome.touched && formulario.controls.nome.invalid) {
+					<small class="falha">Informe o nome (até 50 caracteres).</small>
+				}
+			</div>
+
+			<div class="campo largo">
+				<label for="descricao">Descrição</label>
+				<input id="descricao" type="text" formControlName="descricao" maxlength="255" />
+			</div>
+
+			<div class="acoes">
+				<button type="submit">{{ editando() ? 'Salvar' : 'Criar' }}</button>
+				@if (editando()) {
+					<button type="button" class="secundario" (click)="cancelarEdicao()">Cancelar</button>
+				}
+			</div>
+		</form>
+	</section>
+</main>

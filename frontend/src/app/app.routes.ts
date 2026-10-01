@@ -24,6 +24,11 @@ export const routes: Routes = [
 		loadComponent: () => import('./profissionais/profissionais').then(m => m.Profissionais)
 	},
 	{
+		path: 'areas-atuacao',
+		canActivate: [autenticadoGuard, adminGuard],
+		loadComponent: () => import('./areas/areas').then(m => m.Areas)
+	},
+	{
 		path: 'profissionais/novo',
 		canActivate: [autenticadoGuard, adminGuard],
 		loadComponent: () => import('./cadastro/cadastro').then(m => m.Cadastro)

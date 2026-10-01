@@ -159,6 +159,14 @@ button[type="submit"]:disabled {
 	flex: 1 1 160px;
 }
 
+.vincular .campo.estreito {
+	flex: 0 1 110px;
+}
+
+.vinculadas .desde {
+	flex: 1 1 auto;
+}
+
 .vincular button {
 	padding: 9px 16px;
 }
