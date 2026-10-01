@@ -10,6 +10,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -17,15 +18,19 @@ import static org.mockito.Mockito.when;
 import br.edu.ifac.astileac.backend.dto.DadosPessoaisDTO;
 import br.edu.ifac.astileac.backend.dto.ExclusaoRespostaDTO;
 import br.edu.ifac.astileac.backend.entity.AcaoLog;
+import br.edu.ifac.astileac.backend.entity.Convite;
 import br.edu.ifac.astileac.backend.entity.Profissional;
+import br.edu.ifac.astileac.backend.entity.Usuario;
 import br.edu.ifac.astileac.backend.exception.ConflitoException;
 import br.edu.ifac.astileac.backend.exception.RecursoNaoEncontradoException;
 import br.edu.ifac.astileac.backend.repository.CertificadoRepository;
 import br.edu.ifac.astileac.backend.repository.ContatoRepository;
+import br.edu.ifac.astileac.backend.repository.ConviteRepository;
 import br.edu.ifac.astileac.backend.repository.EnderecoRepository;
 import br.edu.ifac.astileac.backend.repository.FormacaoRepository;
 import br.edu.ifac.astileac.backend.repository.ProfissionalAreaRepository;
 import br.edu.ifac.astileac.backend.repository.ProfissionalRepository;
+import br.edu.ifac.astileac.backend.repository.UsuarioRepository;
 import br.edu.ifac.astileac.backend.repository.VinculoEmpregaticioRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -33,6 +38,7 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -61,6 +67,10 @@ class DadosPessoaisServiceTest {
 	private CertificadoRepository certificadoRepository;
 	@Mock
 	private VinculoEmpregaticioRepository vinculoEmpregaticioRepository;
+	@Mock
+	private UsuarioRepository usuarioRepository;
+	@Mock
+	private ConviteRepository conviteRepository;
 	@Mock
 	private ProfissionalService profissionalService;
 	@Mock
@@ -159,6 +169,48 @@ class DadosPessoaisServiceTest {
 		verify(profissionalRepository).delete(vencido);
 		// A eliminacao fica registrada, sem identificar a pessoa.
 		verify(logAcessoService).registrar(eq(AcaoLog.EXCLUSAO), anyString(), eq(1L), any(), anyString());
+	}
+
+	/**
+	 * Desde o RF12 um profissional pode ter conta de acesso, e a chave
+	 * estrangeira de USUARIO nao tem ON DELETE CASCADE: apagar o
+	 * profissional sem apagar a conta antes viola a restricao.
+	 *
+	 * Nao seria falha pequena. O laco do expurgo inteiro roda numa
+	 * transacao so, as 3h da manha: a violacao reverteria a eliminacao
+	 * de TODOS os cadastros vencidos, deixando uma linha de log como
+	 * unica pista. O sistema pararia de cumprir o Art. 18 em silencio.
+	 */
+	@Test
+	void expurgoDeveApagarAContaDeAcessoAntesDoProfissional() {
+		Profissional vencido = profissional();
+		vencido.setDataExclusaoSolicitada(LocalDateTime.now().minusDays(31));
+
+		Usuario conta = new Usuario();
+		conta.setId(9L);
+		conta.setLogin("maria");
+
+		Convite convite = new Convite();
+		convite.setId(3L);
+
+		when(profissionalRepository.findByDataExclusaoSolicitadaBefore(any(LocalDateTime.class)))
+				.thenReturn(List.of(vencido));
+		when(certificadoRepository.findByProfissionalId(1L)).thenReturn(List.of());
+		when(formacaoRepository.findByProfissionalId(1L)).thenReturn(List.of());
+		when(vinculoEmpregaticioRepository.findByProfissionalId(1L)).thenReturn(List.of());
+		when(profissionalAreaRepository.findByIdProfissionalId(1L)).thenReturn(List.of());
+		when(contatoRepository.findByProfissionalId(1L)).thenReturn(List.of());
+		when(enderecoRepository.findByProfissionalId(1L)).thenReturn(Optional.empty());
+		when(usuarioRepository.findByProfissionalId(1L)).thenReturn(Optional.of(conta));
+		when(conviteRepository.findByProfissionalId(1L)).thenReturn(Optional.of(convite));
+
+		dadosPessoaisService.expurgarPrazoVencido();
+
+		// A ordem e o que importa: conta e convite antes do profissional.
+		InOrder ordem = inOrder(conviteRepository, usuarioRepository, profissionalRepository);
+		ordem.verify(conviteRepository).delete(convite);
+		ordem.verify(usuarioRepository).delete(conta);
+		ordem.verify(profissionalRepository).delete(vencido);
 	}
 
 	@Test

@@ -73,6 +73,13 @@ public class SecurityConfig {
 						// manda o cookie de sessao sem configuracao extra.
 						.requestMatchers(HttpMethod.GET, "/", "/index.html").permitAll()
 						.requestMatchers(HttpMethod.POST, "/autenticacao/login").permitAll()
+						// Cadastro por convite (RF12). Publico por
+						// necessidade: quem usa o convite ainda nao tem
+						// conta. O que faz as vezes de autenticacao e o
+						// proprio token -- emitido pela diretoria depois do
+						// pagamento, de uso unico e com prazo. Sem token
+						// valido, nenhum dos dois caminhos cria nada.
+						.requestMatchers(HttpMethod.POST, "/cadastro", "/cadastro/validacao").permitAll()
 						// Documentacao da API. Desligar no ambiente de destino
 						// (ver application.properties).
 						.requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
