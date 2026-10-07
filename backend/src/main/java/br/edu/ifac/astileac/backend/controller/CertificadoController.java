@@ -2,11 +2,18 @@ package br.edu.ifac.astileac.backend.controller;
 
 import br.edu.ifac.astileac.backend.dto.CertificadoRequestDTO;
 import br.edu.ifac.astileac.backend.dto.CertificadoResponseDTO;
+import br.edu.ifac.astileac.backend.security.UsuarioLogado;
 import br.edu.ifac.astileac.backend.service.CertificadoService;
 import jakarta.validation.Valid;
+import java.nio.file.Path;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,9 +21,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Certificados do profissional (RF06).
@@ -34,6 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CertificadoController {
 
 	private final CertificadoService certificadoService;
+	private final UsuarioLogado usuarioLogado;
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
@@ -59,6 +69,76 @@ public class CertificadoController {
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void remover(@PathVariable Long profissionalId, @PathVariable Long certificadoId) {
 		certificadoService.remover(profissionalId, certificadoId);
+	}
+
+	// ---------- documento digitalizado (Passo 8) ----------
+
+	/**
+	 * Anexa ou substitui o PDF do certificado.
+	 *
+	 * O associado envia os proprios -- foi o que a diretoria definiu.
+	 * A anotacao de classe ja cobre isso: ADMIN ou o proprio titular.
+	 *
+	 * Substituir o arquivo derruba o reconhecimento da diretoria, se
+	 * houver; a regra esta no service.
+	 */
+	@PostMapping("/{certificadoId}/arquivo")
+	public CertificadoResponseDTO anexarDocumento(
+			@PathVariable Long profissionalId,
+			@PathVariable Long certificadoId,
+			@RequestParam("arquivo") MultipartFile arquivo) {
+		return certificadoService.anexarDocumento(profissionalId, certificadoId, arquivo);
+	}
+
+	/**
+	 * Baixa o documento.
+	 *
+	 * Alcancavel pela diretoria e pelo proprio titular, mais ninguem --
+	 * diploma e certificado trazem dado pessoal alem do que o cadastro
+	 * ja tem.
+	 *
+	 * O arquivo e servido por este endpoint, e nao por URL estatica, por
+	 * isso mesmo: endereco estatico seria alcancavel por quem adivinhasse
+	 * o caminho, sem passar por autorizacao alguma.
+	 *
+	 * Content-Disposition inline permite abrir no navegador; o nome
+	 * oferecido e derivado do titulo, nao do nome interno do arquivo.
+	 */
+	@GetMapping("/{certificadoId}/arquivo")
+	public ResponseEntity<Resource> baixarDocumento(
+			@PathVariable Long profissionalId, @PathVariable Long certificadoId) {
+
+		Path caminho = certificadoService.caminhoDoDocumento(profissionalId, certificadoId);
+
+		return ResponseEntity.ok()
+				.contentType(MediaType.APPLICATION_PDF)
+				.header(HttpHeaders.CONTENT_DISPOSITION,
+						"inline; filename=\"certificado-" + certificadoId + ".pdf\"")
+				.body(new FileSystemResource(caminho));
+	}
+
+	// ---------- reconhecimento pela diretoria (RF13) ----------
+
+	/**
+	 * Reconhece o documento.
+	 *
+	 * SOMENTE a diretoria: a anotacao de classe permitiria tambem o
+	 * titular, e deixar alguem validar o proprio documento esvaziaria o
+	 * reconhecimento. O @PreAuthorize de metodo substitui o da classe.
+	 */
+	@PreAuthorize("hasRole('ADMIN')")
+	@PostMapping("/{certificadoId}/validacao")
+	public CertificadoResponseDTO validar(
+			@PathVariable Long profissionalId, @PathVariable Long certificadoId) {
+		return certificadoService.validar(profissionalId, certificadoId, usuarioLogado.loginAtual());
+	}
+
+	/** Desfaz o reconhecimento feito por engano. Tambem so a diretoria. */
+	@PreAuthorize("hasRole('ADMIN')")
+	@DeleteMapping("/{certificadoId}/validacao")
+	public CertificadoResponseDTO invalidar(
+			@PathVariable Long profissionalId, @PathVariable Long certificadoId) {
+		return certificadoService.invalidar(profissionalId, certificadoId);
 	}
 
 }

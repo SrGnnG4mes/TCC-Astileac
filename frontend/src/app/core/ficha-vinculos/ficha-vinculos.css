@@ -64,6 +64,69 @@ h2 {
 	white-space: nowrap;
 }
 
+/* --- certificado com documento e reconhecimento --- */
+
+.itens li.certificado {
+	flex-direction: column;
+	align-items: stretch;
+	gap: 6px;
+}
+
+.cabecalho {
+	display: flex;
+	align-items: baseline;
+	flex-wrap: wrap;
+	gap: 10px;
+}
+
+.cabecalho .link {
+	margin-left: auto;
+}
+
+.selo {
+	padding: 2px 8px;
+	border-radius: 10px;
+	font-size: 0.72rem;
+	white-space: nowrap;
+}
+
+.selo.declarado {
+	background: #eceef1;
+	color: #5c6470;
+}
+
+.selo.enviado {
+	background: #fdf4e3;
+	color: #7a5106;
+}
+
+.selo.reconhecido {
+	background: #e4f1e4;
+	color: #22642a;
+}
+
+.acoes-documento {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 14px;
+	margin-top: 2px;
+}
+
+.enviar {
+	font-weight: normal;
+}
+
+.link.destaque {
+	font-weight: 600;
+}
+
+.nota {
+	margin: 2px 0 0;
+	font-size: 0.74rem;
+	color: #5c6470;
+	line-height: 1.4;
+}
+
 /* --- formulario de inclusao --- */
 
 .adicionar {

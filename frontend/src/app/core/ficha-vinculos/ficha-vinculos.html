@@ -118,8 +118,27 @@
 	} @else {
 		<ul class="itens">
 			@for (certificado of certificados(); track certificado.id) {
-				<li>
-					<span class="nome">{{ certificado.titulo }}</span>
+				<li class="certificado">
+					<div class="cabecalho">
+						<span class="nome">{{ certificado.titulo }}</span>
+
+						@switch (situacao(certificado)) {
+							@case ('declarado') {
+								<span class="selo declarado">declarado, sem documento</span>
+							}
+							@case ('enviado') {
+								<span class="selo enviado">aguardando reconhecimento</span>
+							}
+							@case ('reconhecido') {
+								<span class="selo reconhecido">reconhecido</span>
+							}
+						}
+
+						<button type="button" class="link" (click)="removerCertificado(certificado.id)">
+							Remover
+						</button>
+					</div>
+
 					<span class="detalhe">
 						{{ certificado.instituicaoEmissora }} &middot;
 						{{ certificado.cargaHoraria }}h &middot;
@@ -127,13 +146,56 @@
 						@if (nomeDaFormacao(certificado.formacaoId); as curso) {
 							&middot; comprova {{ curso }}
 						}
-						@if (!certificado.arquivoPath) {
-							&middot; <em>sem documento anexado</em>
+						@if (certificado.validadoEm) {
+							&middot; reconhecido por {{ certificado.validadoPor }} em
+							{{ certificado.validadoEm }}
 						}
 					</span>
-					<button type="button" class="link" (click)="removerCertificado(certificado.id)">
-						Remover
-					</button>
+
+					<div class="acoes-documento">
+						@if (certificado.temDocumento) {
+							<a
+								class="link"
+								[href]="urlDoDocumento(certificado.id)"
+								target="_blank"
+								rel="noopener">
+								Ver documento
+							</a>
+						}
+
+						<label class="link enviar">
+							{{ enviando() === certificado.id
+								? 'Enviando...'
+								: (certificado.temDocumento ? 'Substituir documento' : 'Anexar documento') }}
+							<input
+								type="file"
+								accept="application/pdf"
+								hidden
+								[disabled]="enviando() === certificado.id"
+								(change)="anexarDocumento(certificado.id, $event)" />
+						</label>
+
+						@if (eAdmin() && certificado.temDocumento && !certificado.validadoEm) {
+							<button type="button" class="link destaque" (click)="reconhecer(certificado.id)">
+								Reconhecer documento
+							</button>
+						}
+						@if (eAdmin() && certificado.validadoEm) {
+							<button
+								type="button"
+								class="link"
+								(click)="desfazerReconhecimento(certificado.id)">
+								Desfazer reconhecimento
+							</button>
+						}
+					</div>
+
+					@if (certificado.temDocumento && !certificado.validadoEm) {
+						<p class="nota">
+							Substituir o documento desfaz o reconhecimento: o selo só vale para o
+							arquivo que a diretoria viu.
+						</p>
+					}
 				</li>
 			}
 		</ul>

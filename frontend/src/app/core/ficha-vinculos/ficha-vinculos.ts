@@ -1,6 +1,7 @@
-import { Component, OnInit, inject, input, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, input, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
+import { AutenticacaoService } from '../autenticacao.service';
 import { ProfissionalService } from '../profissional.service';
 import { AreaAtuacao, Certificado, Formacao, ProfissionalArea } from '../modelos';
 import { naoFutura } from '../validadores';
@@ -36,12 +37,15 @@ export class FichaVinculos implements OnInit {
 
 	private readonly formBuilder = inject(FormBuilder);
 	private readonly profissionais = inject(ProfissionalService);
+	private readonly autenticacao = inject(AutenticacaoService);
 
 	readonly areas = signal<AreaAtuacao[]>([]);
 	readonly areasDoProfissional = signal<ProfissionalArea[]>([]);
 	readonly formacoes = signal<Formacao[]>([]);
 	readonly certificados = signal<Certificado[]>([]);
 	readonly erro = signal<string | null>(null);
+	/** Id do certificado cujo upload esta em curso, para desabilitar o botao. */
+	readonly enviando = signal<number | null>(null);
 
 	readonly vinculo = this.formBuilder.nonNullable.group({
 		areaAtuacaoId: ['', Validators.required],
@@ -184,6 +188,70 @@ export class FichaVinculos implements OnInit {
 
 	removerCertificado(certificadoId: number): void {
 		this.profissionais.removerCertificado(this.profissionalId(), certificadoId).subscribe({
+			next: () => this.recarregar(),
+			error: (falha: HttpErrorResponse) => this.erro.set(this.mensagemDe(falha))
+		});
+	}
+
+	// ---------- documento e reconhecimento (Passo 8 / RF13) ----------
+
+	/** Só a diretoria reconhece; o titular anexa e baixa o próprio. */
+	readonly eAdmin = computed(() => this.autenticacao.usuario()?.perfil === 'ADMIN');
+
+	urlDoDocumento(certificadoId: number): string {
+		return this.profissionais.urlDoDocumento(this.profissionalId(), certificadoId);
+	}
+
+	/**
+	 * Estado do certificado, derivado -- nao ha campo de situacao no
+	 * back-end, e nao deveria haver: seria estado duplicado, podendo
+	 * divergir de `temDocumento` e `validadoEm`.
+	 */
+	situacao(certificado: Certificado): 'declarado' | 'enviado' | 'reconhecido' {
+		if (!certificado.temDocumento) {
+			return 'declarado';
+		}
+		return certificado.validadoEm ? 'reconhecido' : 'enviado';
+	}
+
+	anexarDocumento(certificadoId: number, evento: Event): void {
+		const entrada = evento.target as HTMLInputElement;
+		const arquivo = entrada.files?.[0];
+		if (!arquivo) {
+			return;
+		}
+
+		this.erro.set(null);
+		this.enviando.set(certificadoId);
+
+		this.profissionais.anexarDocumento(this.profissionalId(), certificadoId, arquivo).subscribe({
+			next: () => {
+				this.enviando.set(null);
+				// Limpa a selecao: sem isso, escolher o MESMO arquivo de
+				// novo nao dispara o evento change e parece que o botao
+				// quebrou.
+				entrada.value = '';
+				this.recarregar();
+			},
+			error: (falha: HttpErrorResponse) => {
+				this.enviando.set(null);
+				entrada.value = '';
+				this.erro.set(this.mensagemDe(falha));
+			}
+		});
+	}
+
+	reconhecer(certificadoId: number): void {
+		this.erro.set(null);
+		this.profissionais.validarCertificado(this.profissionalId(), certificadoId).subscribe({
+			next: () => this.recarregar(),
+			error: (falha: HttpErrorResponse) => this.erro.set(this.mensagemDe(falha))
+		});
+	}
+
+	desfazerReconhecimento(certificadoId: number): void {
+		this.erro.set(null);
+		this.profissionais.invalidarCertificado(this.profissionalId(), certificadoId).subscribe({
 			next: () => this.recarregar(),
 			error: (falha: HttpErrorResponse) => this.erro.set(this.mensagemDe(falha))
 		});

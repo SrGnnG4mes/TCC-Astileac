@@ -132,6 +132,55 @@ export class ProfissionalService {
 		);
 	}
 
+	// --- documento do certificado (Passo 8) ---
+
+	/**
+	 * Anexa ou substitui o PDF.
+	 *
+	 * Vai como FormData, sem Content-Type definido a mao: o navegador
+	 * precisa montar o cabecalho multipart com o boundary, e defini-lo
+	 * aqui quebraria o parsing no servidor.
+	 *
+	 * Substituir o arquivo derruba o reconhecimento da diretoria -- a
+	 * regra esta no back-end, e a resposta ja volta com os campos de
+	 * validacao limpos.
+	 */
+	anexarDocumento(
+		profissionalId: number, certificadoId: number, arquivo: File
+	): Observable<Certificado> {
+		const corpo = new FormData();
+		corpo.append('arquivo', arquivo);
+		return this.http.post<Certificado>(
+			`${API}/profissionais/${profissionalId}/certificados/${certificadoId}/arquivo`, corpo
+		);
+	}
+
+	/**
+	 * Endereco do download.
+	 *
+	 * Serve como href direto: e mesma origem, entao o navegador manda o
+	 * cookie de sessao sozinho, e o back-end autoriza. Nao ha URL
+	 * estatica para o arquivo justamente por isso -- endereco estatico
+	 * seria alcancavel por quem adivinhasse o caminho.
+	 */
+	urlDoDocumento(profissionalId: number, certificadoId: number): string {
+		return `${API}/profissionais/${profissionalId}/certificados/${certificadoId}/arquivo`;
+	}
+
+	// --- reconhecimento pela diretoria (RF13) ---
+
+	validarCertificado(profissionalId: number, certificadoId: number): Observable<Certificado> {
+		return this.http.post<Certificado>(
+			`${API}/profissionais/${profissionalId}/certificados/${certificadoId}/validacao`, null
+		);
+	}
+
+	invalidarCertificado(profissionalId: number, certificadoId: number): Observable<Certificado> {
+		return this.http.delete<Certificado>(
+			`${API}/profissionais/${profissionalId}/certificados/${certificadoId}/validacao`
+		);
+	}
+
 	// --- manutencao da tabela de dominio de areas ---
 
 	criarArea(dados: AreaAtuacaoRequest): Observable<AreaAtuacao> {
