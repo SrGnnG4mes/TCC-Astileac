@@ -109,7 +109,14 @@ public class DadosPessoaisService {
 								certificado.getFormacao() != null ? certificado.getFormacao().getId() : null,
 								certificado.getTitulo(), certificado.getInstituicaoEmissora(),
 								certificado.getCargaHoraria(), certificado.getDataEmissao(),
-								certificado.getArquivoPath()))
+								// A exportacao diz se ha documento e se ele foi
+								// reconhecido, nao onde o servidor o guardou: o
+								// caminho interno nao e dado do titular, e
+								// quem exporta tem direito aos proprios dados,
+								// nao a estrutura de pastas da aplicacao.
+								certificado.temDocumento(),
+								certificado.getValidadoEm(),
+								certificado.getValidadoPor()))
 						.toList(),
 				vinculoEmpregaticioRepository.findByProfissionalId(profissionalId).stream()
 						.map(vinculo -> new VinculoEmpregaticioResponseDTO(

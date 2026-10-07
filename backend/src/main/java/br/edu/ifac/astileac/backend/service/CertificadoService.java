@@ -5,12 +5,17 @@ import br.edu.ifac.astileac.backend.dto.CertificadoResponseDTO;
 import br.edu.ifac.astileac.backend.entity.Certificado;
 import br.edu.ifac.astileac.backend.entity.Formacao;
 import br.edu.ifac.astileac.backend.entity.Profissional;
+import br.edu.ifac.astileac.backend.exception.ConflitoException;
 import br.edu.ifac.astileac.backend.exception.RecursoNaoEncontradoException;
+import br.edu.ifac.astileac.backend.exception.RegraDeNegocioException;
 import br.edu.ifac.astileac.backend.repository.CertificadoRepository;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Certificados do profissional (RF06). Relacao 1:N, com ligacao
@@ -28,6 +33,7 @@ public class CertificadoService {
 	private final CertificadoRepository certificadoRepository;
 	private final ProfissionalService profissionalService;
 	private final FormacaoService formacaoService;
+	private final ArquivoCertificadoService arquivoCertificadoService;
 
 	@Transactional
 	public CertificadoResponseDTO criar(Long profissionalId, CertificadoRequestDTO dto) {
@@ -96,6 +102,95 @@ public class CertificadoService {
 						"Certificado nao encontrado para este profissional: id " + certificadoId));
 	}
 
+	// ---------- documento e reconhecimento (Passo 8 / RF13) ----------
+
+	/**
+	 * Anexa ou substitui o documento digitalizado.
+	 *
+	 * SUBSTITUIR O ARQUIVO DERRUBA A VALIDACAO. Sem isso abre-se um
+	 * buraco simples: anexa-se o documento A, espera-se o reconhecimento
+	 * da diretoria, e troca-se pelo documento B -- que ficaria validado
+	 * sem nunca ter sido visto. Como o sistema existe para tornar o dado
+	 * de habilitacao confiavel, e justamente aqui que o selo precisa
+	 * significar alguma coisa.
+	 */
+	@Transactional
+	public CertificadoResponseDTO anexarDocumento(
+			Long profissionalId, Long certificadoId, MultipartFile arquivo) {
+
+		profissionalService.buscarEntidade(profissionalId);
+		Certificado certificado = buscarEntidade(profissionalId, certificadoId);
+
+		String anterior = certificado.getArquivoPath();
+		certificado.setArquivoPath(arquivoCertificadoService.guardar(arquivo));
+		certificado.setValidadoEm(null);
+		certificado.setValidadoPor(null);
+
+		Certificado salvo = certificadoRepository.save(certificado);
+
+		// So depois de a troca estar gravada: se apagassemos antes e a
+		// gravacao falhasse, o certificado ficaria apontando para um
+		// arquivo que nao existe mais.
+		arquivoCertificadoService.apagar(anterior);
+
+		return toResponseDTO(salvo);
+	}
+
+	/** Caminho em disco para o download, ja conferido. */
+	@Transactional(readOnly = true)
+	public Path caminhoDoDocumento(Long profissionalId, Long certificadoId) {
+		profissionalService.buscarEntidade(profissionalId);
+		Certificado certificado = buscarEntidade(profissionalId, certificadoId);
+
+		if (!certificado.temDocumento()) {
+			throw new RecursoNaoEncontradoException("Este certificado nao tem documento anexado");
+		}
+
+		return arquivoCertificadoService.resolver(certificado.getArquivoPath());
+	}
+
+	/**
+	 * Reconhecimento do documento pela diretoria (RF13).
+	 *
+	 * Fica no proprio registro, e nao apenas no log de acesso, porque e
+	 * propriedade duravel do certificado: quem consulta a ficha precisa
+	 * saber se aquele documento ja foi visto, sem ter de cruzar
+	 * auditoria.
+	 */
+	@Transactional
+	public CertificadoResponseDTO validar(Long profissionalId, Long certificadoId, String login) {
+		profissionalService.buscarEntidade(profissionalId);
+		Certificado certificado = buscarEntidade(profissionalId, certificadoId);
+
+		if (!certificado.temDocumento()) {
+			throw new RegraDeNegocioException(
+					"Nao ha documento anexado para reconhecer. "
+							+ "Peca ao associado que envie o certificado em PDF.");
+		}
+
+		if (certificado.estaValidado()) {
+			throw new ConflitoException("Este certificado ja foi reconhecido em "
+					+ certificado.getValidadoEm().toLocalDate());
+		}
+
+		certificado.setValidadoEm(LocalDateTime.now());
+		certificado.setValidadoPor(login);
+
+		return toResponseDTO(certificadoRepository.save(certificado));
+	}
+
+	/** Desfaz o reconhecimento -- para o caso de ter sido feito por engano. */
+	@Transactional
+	public CertificadoResponseDTO invalidar(Long profissionalId, Long certificadoId) {
+		profissionalService.buscarEntidade(profissionalId);
+		Certificado certificado = buscarEntidade(profissionalId, certificadoId);
+
+		certificado.setValidadoEm(null);
+		certificado.setValidadoPor(null);
+
+		return toResponseDTO(certificadoRepository.save(certificado));
+	}
+
 	private CertificadoResponseDTO toResponseDTO(Certificado certificado) {
 		return new CertificadoResponseDTO(
 				certificado.getId(),
@@ -104,7 +199,9 @@ public class CertificadoService {
 				certificado.getInstituicaoEmissora(),
 				certificado.getCargaHoraria(),
 				certificado.getDataEmissao(),
-				certificado.getArquivoPath()
+				certificado.temDocumento(),
+				certificado.getValidadoEm(),
+				certificado.getValidadoPor()
 		);
 	}
 

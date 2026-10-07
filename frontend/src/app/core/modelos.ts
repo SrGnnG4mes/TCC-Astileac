@@ -123,7 +123,24 @@ export interface Certificado {
 	instituicaoEmissora: string;
 	cargaHoraria: number;
 	dataEmissao: string;
-	arquivoPath: string | null;
+
+	/**
+	 * Presenca do documento. O caminho de armazenamento NAO vem da API:
+	 * e detalhe interno do servidor, e o download tem endpoint proprio,
+	 * autorizado ao ADMIN e ao titular.
+	 */
+	temDocumento: boolean;
+
+	/**
+	 * Reconhecimento do documento pela diretoria (RF13). Nulos enquanto
+	 * ninguem reconheceu.
+	 *
+	 * Com `temDocumento`, formam os tres estados do certificado:
+	 * declarado (sem documento), enviado (com documento, sem
+	 * reconhecimento) e reconhecido.
+	 */
+	validadoEm: string | null;
+	validadoPor: string | null;
 }
 
 export interface CertificadoRequest {
