@@ -159,6 +159,7 @@ Chave primária **composta**: `profissional_id` + `area_atuacao_id`. Mais `data_
 | RF10 | Atender aos direitos do titular: exportar os próprios dados e pedir a eliminação deles |
 | RF11 | Registrar quem consultou ou alterou dado pessoal |
 | RF12 | Gerenciar contas de acesso: cadastro do associado por convite, conceder e retirar o perfil administrativo, trocar a própria senha |
+| RF13 | Anexar o documento digitalizado do certificado e permitir que a diretoria reconheça o documento |
 
 RF08 é o caso de uso mais importante na prática: é como a associação atende a uma demanda
 ("preciso de um intérprete para audiência judicial").
@@ -563,6 +564,38 @@ Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.propertie
 >   recebe **403** em tudo que é de outra pessoa ou da diretoria — formações alheias, ficha
 >   alheia, listagem do quadro e manutenção do domínio de áreas.
 
+> **Passo 8 e RF13 — documento do certificado e reconhecimento** (migration `V7`, 89 testes).
+>
+> Terceira decisão vinda da validação com a entidade, depois do RF12. A diretoria definiu:
+> quem envia o documento é o associado; ninguém confere de forma rotineira; e **quando a
+> diretoria procura quem pode atender uma demanda, reconhece ali o documento ainda não
+> visto**. Isso evita uma fila de conferência que talvez nunca fosse trabalhada e amarra o
+> esforço ao momento em que ele tem consequência.
+> - **Três estados, sem campo de situação:** declarado (`arquivo_path` nulo), enviado
+>   (com arquivo, `validado_em` nulo) e reconhecido. A situação é **derivada** na tela; um
+>   campo a mais seria estado duplicado podendo divergir.
+> - **Substituir o arquivo derruba o reconhecimento.** Sem isso: anexa-se o documento A,
+>   espera-se o reconhecimento e troca-se pelo B, que ficaria validado sem nunca ter sido
+>   visto. É a regra central do RF13 e tem teste próprio.
+> - **O nome do arquivo é gerado (UUID), nunca aproveitado do cliente.** Nome vindo do
+>   cliente é o vetor clássico de *path traversal*. Verificado rodando: upload com
+>   `filename=../../../invadido.pdf` gravou um UUID na pasta certa e nada fora dela.
+> - **Aceita só PDF, conferindo a assinatura `%PDF-` do conteúdo** — content-type e extensão
+>   vêm do cliente e são declaração, não prova. Limite de 5 MB no Tomcat e no service.
+> - **O caminho do arquivo não sai da API.** O DTO devolve `temDocumento`, e o download tem
+>   endpoint próprio: URL estática seria alcançável por quem adivinhasse o caminho, sem
+>   passar por autorização.
+> - **Reconhecer é só da diretoria.** A anotação de classe permitiria também o titular, e
+>   deixar alguém validar o próprio documento esvaziaria o reconhecimento — um
+>   `@PreAuthorize` de método sobrepõe o da classe. Verificado: associado anexa e baixa o
+>   próprio documento (200) e recebe **403** ao tentar reconhecê-lo.
+> - Quem reconheceu e quando ficam **no próprio certificado**, não só no log: é propriedade
+>   durável do registro, não linha de auditoria.
+> - **Defeito de anotação corrigido junto:** `Certificado.arquivoPath` ainda declarava
+>   `nullable = false` depois da `V5`. Não quebrava — com Bean Validation presente o
+>   Hibernate desliga a própria checagem de nulidade, e `ddl-auto=validate` não confere
+>   nulidade de coluna — mas era anotação mentindo sobre o banco.
+
 ### Próximos passos (nesta ordem)
 1. ~~Migrations Flyway `V1` — criar as 9 tabelas + carga inicial das áreas de atuação~~ ✅
 2. ~~Entidades JPA + repositories~~ ✅
@@ -579,7 +612,7 @@ Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.propertie
    manutenção da tabela de áreas e o autoatendimento do associado (`/meu-cadastro`).
    **Faltam:** a interface do RF12 (emitir convite, tela pública de cadastro, gestão de
    contas) e as telas de endereço, contatos e vínculos.
-8. Upload de certificados (os certificados já são cadastrados sem documento anexado)
+8. ~~Upload de certificados~~ ✅ — com o reconhecimento pela diretoria (RF13)
 9. Testes e validação com a ASTILEAC — **a primeira conversa aconteceu** (ver seção 5);
    faltam os três pontos ainda em aberto e o registro formal para citar no TCC
 
