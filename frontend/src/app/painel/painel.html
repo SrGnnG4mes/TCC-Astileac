@@ -6,10 +6,16 @@
 
 		@if (eu.profissionalId) {
 			<p>
-				A Lei Geral de Proteção de Dados garante a você o direito de ver os dados que a
-				associação guarda a seu respeito, levá-los consigo e pedir que sejam eliminados.
+				Mantenha suas formações e certificados em dia: é essa informação que permite à
+				associação indicar você quando chega uma demanda de interpretação.
 			</p>
-			<a class="botao" routerLink="/dados-pessoais">Meus dados pessoais</a>
+			<a class="botao" routerLink="/meu-cadastro">Meu cadastro</a>
+
+			<p class="secundaria">
+				A Lei Geral de Proteção de Dados garante a você o direito de ver tudo o que a
+				associação guarda a seu respeito, levar uma cópia consigo e pedir que seja
+				eliminado — em <a routerLink="/dados-pessoais">Meus dados pessoais</a>.
+			</p>
 		} @else {
 			<p>
 				Este usuário não está vinculado a um cadastro de profissional, então não há

@@ -535,6 +535,34 @@ Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.propertie
 >   propósito. Foi o que me fez ler a falha acima como problema de perfil. O 403 agora
 >   repassa a mensagem do servidor.
 
+> **Autoatendimento do associado** (`/meu-cadastro`).
+> - **A diretoria confirmou que quem envia a documentação é o associado.** Isso exigia uma
+>   tela que não existia: a rota de edição está atrás do `adminGuard`, porque é a da
+>   diretoria administrando qualquer cadastro, e as únicas telas do associado eram o painel
+>   e `/dados-pessoais`, só de leitura.
+> - **O back-end já autorizava desde o RF09.** Os controllers de profissional, áreas,
+>   formações e certificados são
+>   `hasRole('ADMIN') or @autorizacao.eOProprioProfissional(...)`. Faltava só o caminho —
+>   mesma forma do achado 13: a permissão existia, a tela não. **Nenhuma mudança no
+>   back-end.**
+> - **A rota não recebe id.** O profissional é o que a sessão diz, nunca o que a URL pede;
+>   assim não existe a forma de digitar o id de outra pessoa nesta tela.
+> - **CPF e data de associação não são editáveis no autoatendimento.** O CPF é a âncora de
+>   identidade, conferida pela entidade no pagamento e usada para impedir cadastro
+>   duplicado; a data de associação é definida pela entidade ao reconhecer o pagamento.
+>   Correção de CPF errado continua sendo direito do titular (Art. 18, III) e se faz pela
+>   diretoria. **É restrição de interface**: a API permite ao titular, e quem autoriza
+>   continua sendo o servidor.
+> - **`FichaVinculos` é compartilhado** entre a ficha da diretoria e o autoatendimento — as
+>   três seções são as mesmas, muda só quem chega nelas. As três ficam juntas num
+>   componente, e não em três, porque compartilham estado: o seletor de formação do
+>   certificado depende da lista de formações, que muda quando uma é adicionada ou
+>   removida.
+> - Verificado rodando com uma conta `PROFISSIONAL` real, criada pelo fluxo de convite: ela
+>   cria formação, área e certificado próprios e altera o próprio cadastro (201/200), e
+>   recebe **403** em tudo que é de outra pessoa ou da diretoria — formações alheias, ficha
+>   alheia, listagem do quadro e manutenção do domínio de áreas.
+
 ### Próximos passos (nesta ordem)
 1. ~~Migrations Flyway `V1` — criar as 9 tabelas + carga inicial das áreas de atuação~~ ✅
 2. ~~Entidades JPA + repositories~~ ✅
@@ -548,8 +576,9 @@ Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.propertie
 6. ~~Autenticação e perfis (RF09)~~ ✅ (falta verificar as regras de perfil com um admin real)
 7. Front-end Angular — **em andamento**. Prontos: login, consulta do RF08, ficha, cadastro
    de profissional com áreas, formações e certificados, telas da LGPD (RF10/RF11) e
-   manutenção da tabela de áreas. **Faltam:** a interface do RF12 (emitir convite, tela
-   pública de cadastro, gestão de contas) e as telas de endereço, contatos e vínculos.
+   manutenção da tabela de áreas e o autoatendimento do associado (`/meu-cadastro`).
+   **Faltam:** a interface do RF12 (emitir convite, tela pública de cadastro, gestão de
+   contas) e as telas de endereço, contatos e vínculos.
 8. Upload de certificados (os certificados já são cadastrados sem documento anexado)
 9. Testes e validação com a ASTILEAC — **a primeira conversa aconteceu** (ver seção 5);
    faltam os três pontos ainda em aberto e o registro formal para citar no TCC
