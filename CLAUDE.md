@@ -187,9 +187,25 @@ Primeira conversa de validação. O que ficou confirmado:
   e de lá não há caminho para `/dados-pessoais`. Como o diretor agora também é titular, ele
   fica sem acesso aos próprios direitos do Art. 18.
 
-Ainda em aberto com a diretoria: prazo dos 30 dias, excluir × desativar quando é a
-diretoria que remove alguém, e se as cinco áreas de atuação da migration `V2` são as
-corretas (saíram da literatura, não da prática da entidade).
+### Segunda conversa (out/2026) — fluxo de exclusão confirmado
+
+- **O arranjo de exclusão de dados foi validado como está.** Pedido registrado → cadastro
+  bloqueado e fora das consultas → trinta dias de arrependimento → expurgo definitivo, com
+  cancelamento possível a qualquer momento dentro do prazo. A diretoria confirmou que é o
+  comportamento esperado; **nenhuma alteração foi necessária**.
+- Vale registrar a natureza dessa confirmação no texto: não foi requisito que a entidade
+  trouxe, foi **decisão de projeto submetida a ela e aprovada**. Os trinta dias, a opção
+  por apagar em vez de anonimizar e a mensagem explícita de prazo saíram da análise do
+  Art. 18 durante a implementação (RF10) e só depois foram levados à diretoria. No
+  capítulo isso se escreve como premissa **validada**, não suposta — do mesmo modo que o
+  contato fora do sistema.
+
+Ainda em aberto com a diretoria: excluir × desativar quando é a diretoria que remove
+alguém; se as cinco áreas de atuação da migration `V2` são as corretas (saíram da
+literatura, não da prática da entidade); e as do documento do certificado — se é
+obrigatório para o certificado valer (caso em que a saída é um **status**, não um
+`NOT NULL`, que traria de volta o problema que a `V5` resolveu), quem envia, e se alguém
+confere antes de valer.
 
 ---
 
