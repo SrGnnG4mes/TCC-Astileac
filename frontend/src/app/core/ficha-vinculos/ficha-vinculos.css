@@ -1,0 +1,138 @@
+.secao {
+	margin-top: 32px;
+	padding-top: 22px;
+	border-top: 1px solid #e3e6ea;
+}
+
+h2 {
+	margin: 0 0 6px;
+	font-size: 1.05rem;
+}
+
+.ajuda {
+	margin: 0 0 16px;
+	font-size: 0.85rem;
+	color: #5c6470;
+	line-height: 1.5;
+}
+
+/* --- lista de itens --- */
+
+.itens {
+	margin: 0 0 20px;
+	padding: 0;
+	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.itens li {
+	display: flex;
+	align-items: baseline;
+	flex-wrap: wrap;
+	gap: 4px 10px;
+	padding: 9px 11px;
+	border-radius: 6px;
+	background: #f4f5f7;
+	font-size: 0.88rem;
+}
+
+.itens .nome {
+	font-weight: 600;
+}
+
+.itens .detalhe {
+	flex: 1 1 auto;
+	color: #5c6470;
+	font-size: 0.78rem;
+}
+
+.itens .link {
+	margin-left: auto;
+}
+
+.link {
+	padding: 0;
+	border: 0;
+	background: none;
+	color: #2c5aa0;
+	font: inherit;
+	font-size: 0.82rem;
+	text-decoration: underline;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+/* --- formulario de inclusao --- */
+
+.adicionar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	gap: 12px;
+}
+
+.campo {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	flex: 1 1 160px;
+}
+
+.campo.estreito {
+	flex: 0 1 110px;
+}
+
+label {
+	font-size: 0.78rem;
+	font-weight: 600;
+	color: #39404a;
+}
+
+input,
+select {
+	padding: 8px 9px;
+	border: 1px solid #c8ccd4;
+	border-radius: 6px;
+	font: inherit;
+	background: #fff;
+}
+
+input:focus-visible,
+select:focus-visible {
+	outline: 2px solid #2c5aa0;
+	outline-offset: 1px;
+}
+
+.adicionar button {
+	padding: 9px 16px;
+	border: 0;
+	border-radius: 6px;
+	background: #2c5aa0;
+	color: #fff;
+	font: inherit;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+/* --- mensagens --- */
+
+.vazio,
+.erro {
+	margin: 0 0 16px;
+	padding: 9px 10px;
+	border-radius: 6px;
+	font-size: 0.85rem;
+	line-height: 1.5;
+}
+
+.vazio {
+	background: #f8f9fb;
+	color: #5c6470;
+}
+
+.erro {
+	background: #fdecea;
+	color: #8f2018;
+}

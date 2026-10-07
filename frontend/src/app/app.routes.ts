@@ -39,6 +39,13 @@ export const routes: Routes = [
 		loadComponent: () => import('./cadastro/cadastro').then(m => m.Cadastro)
 	},
 	{
+		// Autoatendimento. Sem id na rota: o profissional e o que a
+		// sessao diz, nunca o que a URL pede.
+		path: 'meu-cadastro',
+		canActivate: [autenticadoGuard],
+		loadComponent: () => import('./meu-cadastro/meu-cadastro').then(m => m.MeuCadastro)
+	},
+	{
 		// Sem id: usa o profissional vinculado a quem esta logado.
 		path: 'dados-pessoais',
 		canActivate: [autenticadoGuard],

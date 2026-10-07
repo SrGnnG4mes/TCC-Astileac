@@ -1,0 +1,58 @@
+<app-barra />
+
+<main class="conteudo">
+	<h1>Meu cadastro</h1>
+	<p class="ajuda">
+		Mantenha aqui as suas formações e os certificados que as comprovam. É esta informação
+		que permite à associação indicar você quando chega uma demanda de interpretação.
+	</p>
+
+	@if (erro()) {
+		<p class="erro" role="alert">{{ erro() }}</p>
+	}
+	@if (aviso()) {
+		<p class="aviso" role="status">{{ aviso() }}</p>
+	}
+
+	@if (profissionalId(); as id) {
+		<form [formGroup]="formulario" (ngSubmit)="salvar()">
+			<div class="campo">
+				<label for="nome">Nome</label>
+				<input id="nome" type="text" formControlName="nome" maxlength="150" />
+				@if (formulario.controls.nome.touched && formulario.controls.nome.invalid) {
+					<small class="falha">Informe o nome (até 150 caracteres).</small>
+				}
+			</div>
+
+			<div class="linha">
+				<div class="campo">
+					<label for="dataNascimento">Data de nascimento</label>
+					<input id="dataNascimento" type="date" formControlName="dataNascimento" />
+					@if (formulario.controls.dataNascimento.touched && formulario.controls.dataNascimento.invalid) {
+						<small class="falha">Informe uma data no passado.</small>
+					}
+				</div>
+
+				<div class="campo">
+					<label for="cpf">CPF</label>
+					<input id="cpf" type="text" [value]="cpf() ?? ''" readonly disabled />
+					<small class="nota">
+						Para corrigir o CPF, fale com a diretoria: é o dado que identifica você
+						no quadro de associados.
+					</small>
+				</div>
+			</div>
+
+			<button type="submit" [disabled]="salvando()">
+				{{ salvando() ? 'Salvando...' : 'Salvar meus dados' }}
+			</button>
+		</form>
+
+		<app-ficha-vinculos [profissionalId]="id" />
+
+		<p class="rodape">
+			Para ver tudo o que a associação guarda a seu respeito, baixar uma cópia ou pedir
+			a eliminação, vá em <a routerLink="/dados-pessoais">Meus dados pessoais</a>.
+		</p>
+	}
+</main>
