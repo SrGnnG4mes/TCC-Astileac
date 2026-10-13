@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -129,14 +130,16 @@ class ProfissionalControllerTest {
 	}
 
 	@Test
-	void deveRetornar409AoRemoverProfissionalComDadosVinculados() throws Exception {
-		// O banco recusa apagar um profissional que ainda tem contato,
-		// formacao, certificado ou vinculo apontando para ele. Isso e
-		// conflito de estado, nao erro interno.
-		org.mockito.Mockito.doThrow(new org.springframework.dao.DataIntegrityViolationException("fk"))
-				.when(profissionalService).remover(1L);
+	void violacaoDeIntegridadeDeveVirar409ENao500() throws Exception {
+		// Conflito de estado no banco e 409, nao erro interno. O caso
+		// original era a exclusao administrativa, que deixou de existir;
+		// a regra do handler continua valendo para qualquer operacao.
+		when(profissionalService.atualizar(anyLong(), any()))
+				.thenThrow(new org.springframework.dao.DataIntegrityViolationException("fk"));
 
-		mockMvc.perform(delete("/profissionais/1"))
+		mockMvc.perform(put("/profissionais/1")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(corpoValido()))
 				.andExpect(status().isConflict());
 	}
 
@@ -170,12 +173,27 @@ class ProfissionalControllerTest {
 				.andExpect(jsonPath("$.content[0].cpfMascarado").value("***.***.777-35"));
 	}
 
+	/**
+	 * Nao ha mais DELETE de profissional: tirar alguem do quadro e
+	 * desativar. Se o endpoint voltar a existir, este teste quebra.
+	 */
 	@Test
-	void deveRemoverERetornar204() throws Exception {
+	void naoDeveExistirExclusaoAdministrativa() throws Exception {
 		mockMvc.perform(delete("/profissionais/1"))
-				.andExpect(status().isNoContent());
+				.andExpect(status().isMethodNotAllowed());
+	}
 
-		verify(profissionalService).remover(anyLong());
+	@Test
+	void deveDesativarProfissional() throws Exception {
+		when(profissionalService.alterarSituacao(1L, false)).thenReturn(
+				new ProfissionalResponseDTO(1L, "Maria Silva", CPF_VALIDO,
+						LocalDate.of(1990, 5, 10), LocalDate.of(2024, 1, 15), false, null));
+
+		mockMvc.perform(put("/profissionais/1/situacao")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("{\"ativo\":false}"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.ativo").value(false));
 	}
 
 }

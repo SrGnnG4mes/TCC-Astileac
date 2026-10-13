@@ -201,12 +201,38 @@ Primeira conversa de validação. O que ficou confirmado:
   capítulo isso se escreve como premissa **validada**, não suposta — do mesmo modo que o
   contato fora do sistema.
 
-Ainda em aberto com a diretoria: excluir × desativar quando é a diretoria que remove
-alguém; se as cinco áreas de atuação da migration `V2` são as corretas (saíram da
-literatura, não da prática da entidade); e as do documento do certificado — se é
-obrigatório para o certificado valer (caso em que a saída é um **status**, não um
-`NOT NULL`, que traria de volta o problema que a `V5` resolveu), quem envia, e se alguém
-confere antes de valer.
+### Terceira conversa (out/2026)
+
+- **Excluir × desativar: a diretoria DESATIVA, nunca apaga.** Eram duas coisas confundidas
+  numa só. O titular que pede eliminação exerce o Art. 18, e aí apaga mesmo (RF10, com
+  janela de arrependimento). A diretoria que tira alguém do quadro — saiu, parou de pagar,
+  faleceu — está administrando a associação, não atendendo a um direito; apagar destruiria
+  o registro de que a pessoa **foi** associada, que é o que a entidade precisa guardar.
+  A exclusão administrativa foi **removida**: `DELETE /profissionais/{id}` deixou de
+  existir (405) e deu lugar a `PUT /profissionais/{id}/situacao`.
+- **O "reconhecimento" do documento é só um visto.** A diretoria confirmou que quem olha
+  reconhece que o documento **confere com o declarado**, e não tem como atestar
+  autenticidade junto à instituição emissora. A interface dizia "reconhecido", que se lê
+  como atestado — passou a dizer **"documento visto"**, com a ressalva explícita na tela.
+  Um sistema que existe para tornar o dado de habilitação confiável não pode afirmar mais
+  do que de fato verificou.
+- **Toda a diretoria usará o sistema**, cada um com conta própria — sem efeito no código,
+  o RF12 já concede perfil a quantas contas forem necessárias.
+- **Pagamento (Sicredi) fica FORA do escopo do TCC.** A associação tem conta no Sicredi,
+  mas usar API de banco exige contrato, credenciais e homologação — processo de terceiros,
+  e integração de pagamento não está em nenhum objetivo específico. O desenho do RF12 já
+  separou o gatilho da emissão do convite justamente para isso entrar depois sem
+  reescrever nada. Hoje a diretoria confirma o pagamento como já confirma e emite o convite.
+- **Hospedagem em aberto, e não bloqueia a defesa.** Nenhum objetivo específico pede
+  implantação; a validação pode ser feita na máquina do autor ou pela rede local. Se a
+  entidade quiser no ar depois, entram TLS, gestão de credenciais e alguém responsável por
+  manter — compromisso contínuo da associação. Vale perguntar ao orientador se o IFAC
+  hospeda projeto de aluno.
+
+Ainda em aberto com a diretoria: se as cinco áreas de atuação da migration `V2` são as
+corretas (saíram da literatura, não da prática da entidade); e **o que fazer com os
+cadastros que hoje estão em planilhas e papel** — se ninguém migrar o que já existe, o
+sistema entra em operação vazio e a associação continua consultando a planilha.
 
 ---
 

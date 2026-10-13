@@ -83,6 +83,42 @@ button[type="submit"]:disabled {
 	cursor: default;
 }
 
+/* --- situacao no quadro --- */
+
+.situacao {
+	margin-top: 28px;
+	padding: 16px 18px;
+	border: 1px solid #d6dae0;
+	border-radius: 8px;
+}
+
+.situacao.inativo {
+	border-color: #e0c48a;
+	background: #fdf4e3;
+}
+
+.situacao h2 {
+	margin: 0 0 8px;
+	font-size: 1rem;
+}
+
+.situacao p {
+	margin: 0 0 14px;
+	font-size: 0.85rem;
+	line-height: 1.6;
+	color: #39404a;
+}
+
+.secundario {
+	padding: 9px 16px;
+	border: 1px solid #c8ccd4;
+	border-radius: 6px;
+	background: #fff;
+	color: #39404a;
+	font: inherit;
+	cursor: pointer;
+}
+
 .erro,
 .aviso {
 	margin: 0 0 16px;

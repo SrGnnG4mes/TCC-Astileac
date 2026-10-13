@@ -2,6 +2,7 @@ package br.edu.ifac.astileac.backend.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -155,21 +156,42 @@ class ProfissionalServiceTest {
 		assertThrows(CpfJaCadastradoException.class, () -> profissionalService.atualizar(1L, dto));
 	}
 
+	/**
+	 * A diretoria tira alguem do quadro DESATIVANDO, nunca apagando.
+	 *
+	 * Apagar destruiria o registro de que a pessoa foi associada, que e
+	 * o que a entidade precisa guardar. Exclusao definitiva so existe
+	 * pelo pedido do titular (RF10). Se alguem reintroduzir um delete
+	 * administrativo, este teste quebra.
+	 */
 	@Test
-	void deveRemoverProfissionalExistente() {
+	void desativarNaoDeveApagarOCadastro() {
 		Profissional existente = entidadeExistente();
 		when(profissionalRepository.findById(1L)).thenReturn(Optional.of(existente));
+		when(profissionalRepository.save(any(Profissional.class))).thenAnswer(c -> c.getArgument(0));
 
-		profissionalService.remover(1L);
+		ProfissionalResponseDTO resultado = profissionalService.alterarSituacao(1L, false);
 
-		verify(profissionalRepository).delete(existente);
+		assertFalse(resultado.ativo());
+		verify(profissionalRepository, never()).delete(any());
 	}
 
 	@Test
-	void deveLancarExcecaoAoRemoverIdInexistente() {
+	void deveReativarProfissional() {
+		Profissional existente = entidadeExistente();
+		existente.setAtivo(false);
+		when(profissionalRepository.findById(1L)).thenReturn(Optional.of(existente));
+		when(profissionalRepository.save(any(Profissional.class))).thenAnswer(c -> c.getArgument(0));
+
+		assertTrue(profissionalService.alterarSituacao(1L, true).ativo());
+	}
+
+	@Test
+	void deveLancarExcecaoAoAlterarSituacaoDeIdInexistente() {
 		when(profissionalRepository.findById(999L)).thenReturn(Optional.empty());
 
-		assertThrows(RecursoNaoEncontradoException.class, () -> profissionalService.remover(999L));
+		assertThrows(RecursoNaoEncontradoException.class,
+				() -> profissionalService.alterarSituacao(999L, false));
 	}
 
 }
