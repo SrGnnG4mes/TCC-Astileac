@@ -1,0 +1,76 @@
+<main class="tela">
+	<section class="cartao">
+		<h1>ASTILEAC</h1>
+		<p class="subtitulo">Cadastro de associado</p>
+
+		@if (conferindo()) {
+			<p class="aguarde">Conferindo o convite...</p>
+		} @else if (motivoInvalido(); as motivo) {
+			<p class="erro" role="alert">{{ motivo }}</p>
+			<p class="rodape">
+				Já tem cadastro? <a routerLink="/login">Entre no sistema</a>.
+			</p>
+		} @else if (concluido()) {
+			<p class="sucesso" role="status">
+				Cadastro criado. Agora entre no sistema com o login e a senha que você escolheu.
+			</p>
+			<button type="button" (click)="irParaLogin()">Ir para o login</button>
+		} @else {
+			<p class="convidado">
+				Convite para <strong>{{ emailConvidado() }}</strong>.
+				Se este não é o seu e-mail, fale com a diretoria antes de continuar.
+			</p>
+
+			<form [formGroup]="formulario" (ngSubmit)="cadastrar()">
+				<label for="nome">Nome completo</label>
+				<input id="nome" type="text" formControlName="nome" maxlength="150" />
+				@if (formulario.controls.nome.touched && formulario.controls.nome.invalid) {
+					<small class="falha">Informe o seu nome.</small>
+				}
+
+				<label for="cpf">CPF</label>
+				<input id="cpf" type="text" formControlName="cpf" inputmode="numeric" maxlength="11" />
+				@if (formulario.controls.cpf.touched && formulario.controls.cpf.invalid) {
+					<small class="falha">Informe 11 dígitos numéricos, só os números.</small>
+				}
+
+				<label for="dataNascimento">Data de nascimento</label>
+				<input id="dataNascimento" type="date" formControlName="dataNascimento" />
+				@if (formulario.controls.dataNascimento.touched && formulario.controls.dataNascimento.invalid) {
+					<small class="falha">Informe uma data no passado.</small>
+				}
+
+				<label for="login">Login que você vai usar</label>
+				<input id="login" type="text" formControlName="login" autocomplete="username" maxlength="100" />
+				@if (formulario.controls.login.touched && formulario.controls.login.invalid) {
+					<small class="falha">Pelo menos 4 caracteres.</small>
+				}
+
+				<label for="senha">Senha</label>
+				<input
+					id="senha"
+					type="password"
+					formControlName="senha"
+					autocomplete="new-password"
+					maxlength="100" />
+				@if (formulario.controls.senha.touched && formulario.controls.senha.invalid) {
+					<small class="falha">Pelo menos 8 caracteres.</small>
+				}
+
+				@if (erro()) {
+					<p class="erro" role="alert">{{ erro() }}</p>
+				}
+
+				<button type="submit" [disabled]="enviando()">
+					{{ enviando() ? 'Criando...' : 'Criar meu cadastro' }}
+				</button>
+			</form>
+
+			<p class="rodape">
+				Seus dados ficam sob a Lei Geral de Proteção de Dados. Depois de entrar, você
+				pode ver tudo o que a associação guarda a seu respeito, baixar uma cópia e
+				pedir a eliminação.
+			</p>
+		}
+	</section>
+</main>

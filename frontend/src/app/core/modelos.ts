@@ -194,6 +194,70 @@ export interface ExclusaoResposta {
  * propria, distinta de CONSULTA: exportar nao e so ler, e entregar o
  * conjunto inteiro ao titular (Art. 18).
  */
+// ---------- contas de acesso e convites (RF12) ----------
+
+/**
+ * Resposta da emissao -- a UNICA vez que o token aparece em texto.
+ *
+ * O banco guarda so o hash, entao nao ha como recupera-lo depois. Se a
+ * diretoria perder o codigo, o caminho e emitir outro convite.
+ */
+export interface ConviteEmitido {
+	id: number;
+	email: string;
+	token: string;
+	dataExpiracao: string;
+	comoEntregar: string;
+}
+
+/** Convite na listagem da diretoria. Sem token, por isso mesmo. */
+export interface Convite {
+	id: number;
+	email: string;
+	dataEmissao: string;
+	dataExpiracao: string;
+	dataConsumo: string | null;
+	situacao: 'pendente' | 'utilizado' | 'expirado';
+	profissionalId: number | null;
+}
+
+/**
+ * Consulta publica do convite, antes de mostrar o formulario.
+ *
+ * Convite invalido nao revela se chegou a existir: a resposta e a mesma
+ * para token inventado e para token ja usado.
+ */
+export interface ConviteValidacao {
+	valido: boolean;
+	email: string | null;
+	motivo: string | null;
+}
+
+/**
+ * Cadastro feito pelo proprio associado, com o convite em maos.
+ *
+ * Nao ha `dataAssociacao` nem `perfil`: a data quem define e a
+ * associacao ao reconhecer o pagamento, e ninguem se promove a
+ * administrador preenchendo formulario.
+ */
+export interface CadastroPorConvite {
+	token: string;
+	nome: string;
+	cpf: string;
+	dataNascimento: string;
+	login: string;
+	senha: string;
+}
+
+/** Conta de acesso na visao da diretoria. Nunca traz hash de senha. */
+export interface Conta {
+	id: number;
+	login: string;
+	perfil: Perfil;
+	profissionalId: number | null;
+	nomeProfissional: string | null;
+}
+
 export type AcaoLog = 'CONSULTA' | 'CRIACAO' | 'ALTERACAO' | 'EXCLUSAO' | 'EXPORTACAO';
 
 /** Registro de acesso a dado pessoal (RF11, Art. 46). */

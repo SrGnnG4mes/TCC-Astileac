@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AutenticacaoService } from '../core/autenticacao.service';
 import { Barra } from '../core/barra/barra';
+import { ContaService } from '../core/conta.service';
 import { FichaVinculos } from '../core/ficha-vinculos/ficha-vinculos';
 import { ProfissionalService } from '../core/profissional.service';
 import { naoFutura } from '../core/validadores';
@@ -36,6 +37,7 @@ export class MeuCadastro {
 	private readonly formBuilder = inject(FormBuilder);
 	private readonly profissionais = inject(ProfissionalService);
 	private readonly autenticacao = inject(AutenticacaoService);
+	private readonly contas = inject(ContaService);
 
 	readonly profissionalId = signal<number | null>(null);
 	/** Guardados do carregamento para reenviar inalterados -- ver salvar(). */
@@ -49,6 +51,21 @@ export class MeuCadastro {
 		nome: ['', [Validators.required, Validators.maxLength(150)]],
 		dataNascimento: ['', [Validators.required, naoFutura]]
 	});
+
+	/**
+	 * Troca de senha (RF12).
+	 *
+	 * Exige a senha atual: sem isso, uma sessao sequestrada trocaria a
+	 * senha e trancaria o dono para fora da propria conta.
+	 */
+	readonly formSenha = this.formBuilder.nonNullable.group({
+		senhaAtual: ['', Validators.required],
+		senhaNova: ['', [Validators.required, Validators.minLength(8)]]
+	});
+
+	readonly trocandoSenha = signal(false);
+	readonly erroSenha = signal<string | null>(null);
+	readonly avisoSenha = signal<string | null>(null);
 
 	constructor() {
 		const id = this.autenticacao.usuario()?.profissionalId ?? null;
@@ -125,6 +142,31 @@ export class MeuCadastro {
 			error: (falha: HttpErrorResponse) => {
 				this.salvando.set(false);
 				this.erro.set(this.mensagemDe(falha));
+			}
+		});
+	}
+
+	trocarSenha(): void {
+		if (this.formSenha.invalid) {
+			this.formSenha.markAllAsTouched();
+			return;
+		}
+
+		this.trocandoSenha.set(true);
+		this.erroSenha.set(null);
+		this.avisoSenha.set(null);
+
+		const { senhaAtual, senhaNova } = this.formSenha.getRawValue();
+
+		this.contas.trocarPropriaSenha(senhaAtual, senhaNova).subscribe({
+			next: () => {
+				this.trocandoSenha.set(false);
+				this.formSenha.reset({ senhaAtual: '', senhaNova: '' });
+				this.avisoSenha.set('Senha trocada.');
+			},
+			error: (falha: HttpErrorResponse) => {
+				this.trocandoSenha.set(false);
+				this.erroSenha.set(this.mensagemDe(falha));
 			}
 		});
 	}

@@ -89,6 +89,24 @@ button[type="submit"]:disabled {
 	cursor: default;
 }
 
+.senha {
+	margin-top: 32px;
+	padding-top: 22px;
+	border-top: 1px solid #e3e6ea;
+}
+
+.senha h2 {
+	margin: 0 0 6px;
+	font-size: 1.05rem;
+}
+
+.ajuda-senha {
+	margin: 0 0 16px;
+	font-size: 0.82rem;
+	color: #5c6470;
+	line-height: 1.5;
+}
+
 .rodape {
 	margin-top: 32px;
 	padding-top: 18px;

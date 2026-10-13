@@ -50,6 +50,50 @@
 
 		<app-ficha-vinculos [profissionalId]="id" />
 
+		<section class="senha">
+			<h2>Trocar minha senha</h2>
+			<p class="ajuda-senha">
+				A senha atual é exigida: sem ela, bastaria alguém pegar sua sessão aberta para
+				trocar a senha e trancar você fora da própria conta.
+			</p>
+
+			@if (erroSenha()) {
+				<p class="erro" role="alert">{{ erroSenha() }}</p>
+			}
+			@if (avisoSenha()) {
+				<p class="aviso" role="status">{{ avisoSenha() }}</p>
+			}
+
+			<form [formGroup]="formSenha" (ngSubmit)="trocarSenha()">
+				<div class="linha">
+					<div class="campo">
+						<label for="senhaAtual">Senha atual</label>
+						<input
+							id="senhaAtual"
+							type="password"
+							formControlName="senhaAtual"
+							autocomplete="current-password" />
+					</div>
+
+					<div class="campo">
+						<label for="senhaNova">Senha nova</label>
+						<input
+							id="senhaNova"
+							type="password"
+							formControlName="senhaNova"
+							autocomplete="new-password" />
+						@if (formSenha.controls.senhaNova.touched && formSenha.controls.senhaNova.invalid) {
+							<small class="falha">Pelo menos 8 caracteres.</small>
+						}
+					</div>
+				</div>
+
+				<button type="submit" [disabled]="trocandoSenha()">
+					{{ trocandoSenha() ? 'Trocando...' : 'Trocar senha' }}
+				</button>
+			</form>
+		</section>
+
 		<p class="rodape">
 			Para ver tudo o que a associação guarda a seu respeito, baixar uma cópia ou pedir
 			a eliminação, vá em <a routerLink="/dados-pessoais">Meus dados pessoais</a>.

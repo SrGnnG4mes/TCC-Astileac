@@ -1,0 +1,85 @@
+<app-barra />
+
+<main class="conteudo">
+	<h1>Convites</h1>
+	<p class="ajuda">
+		Depois de confirmar o pagamento da associação, emita um convite para o e-mail da
+		pessoa. Ela se cadastra sozinha, escolhe a própria senha, e o convite serve uma
+		única vez.
+	</p>
+
+	@if (erro()) {
+		<p class="erro" role="alert">{{ erro() }}</p>
+	}
+
+	<form [formGroup]="formulario" (ngSubmit)="emitir()">
+		<div class="campo">
+			<label for="email">E-mail de quem vai se associar</label>
+			<input id="email" type="email" formControlName="email" maxlength="150" />
+			@if (formulario.controls.email.touched && formulario.controls.email.invalid) {
+				<small class="falha">Informe um e-mail válido.</small>
+			}
+		</div>
+
+		<button type="submit" [disabled]="emitindo()">
+			{{ emitindo() ? 'Emitindo...' : 'Emitir convite' }}
+		</button>
+	</form>
+
+	@if (emitido(); as convite) {
+		<section class="emitido" role="status">
+			<h2>Convite para {{ convite.email }}</h2>
+
+			<p class="aviso-token">
+				<strong>Copie agora.</strong> {{ convite.comoEntregar }}
+			</p>
+
+			<div class="link">
+				<code>{{ linkDoConvite(convite.token) }}</code>
+				<button type="button" (click)="copiarLink(convite.token)">
+					{{ copiado() ? 'Copiado' : 'Copiar' }}
+				</button>
+			</div>
+
+			<p class="validade">Válido até {{ convite.dataExpiracao }}.</p>
+		</section>
+	}
+
+	<h2 class="titulo-lista">Convites emitidos</h2>
+
+	@if (convites().length === 0) {
+		<p class="vazio">Nenhum convite emitido até agora.</p>
+	} @else {
+		<table>
+			<thead>
+				<tr>
+					<th scope="col">E-mail</th>
+					<th scope="col">Emitido em</th>
+					<th scope="col">Situação</th>
+				</tr>
+			</thead>
+			<tbody>
+				@for (convite of convites(); track convite.id) {
+					<tr>
+						<td>{{ convite.email }}</td>
+						<td class="data">{{ convite.dataEmissao }}</td>
+						<td>
+							<span class="selo" [class]="'selo ' + convite.situacao">
+								{{ convite.situacao }}
+							</span>
+							@if (convite.situacao === 'pendente') {
+								<small class="ate">até {{ convite.dataExpiracao }}</small>
+							}
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+
+		<p class="nota">
+			O código do convite não aparece aqui: ele existe em texto apenas no instante da
+			emissão, e o sistema guarda só um resumo criptográfico. Se o código se perder,
+			emita um convite novo.
+		</p>
+	}
+</main>

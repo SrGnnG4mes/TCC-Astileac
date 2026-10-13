@@ -1,0 +1,60 @@
+<app-barra />
+
+<main class="conteudo">
+	<h1>Contas de acesso</h1>
+	<p class="ajuda">
+		Contas nascem pelo convite — não se cria conta aqui. Esta tela concede e retira o
+		perfil administrativo, que é o que libera a consulta do quadro, os convites e a
+		manutenção das áreas.
+	</p>
+
+	@if (erro()) {
+		<p class="erro" role="alert">{{ erro() }}</p>
+	}
+	@if (aviso()) {
+		<p class="aviso" role="status">{{ aviso() }}</p>
+	}
+
+	<table>
+		<thead>
+			<tr>
+				<th scope="col">Login</th>
+				<th scope="col">Associado</th>
+				<th scope="col">Perfil</th>
+				<th scope="col"><span class="oculto">Ações</span></th>
+			</tr>
+		</thead>
+		<tbody>
+			@for (conta of lista(); track conta.id) {
+				<tr>
+					<td class="login">
+						{{ conta.login }}
+						@if (conta.login === meuLogin()) {
+							<span class="voce">você</span>
+						}
+					</td>
+					<td class="associado">
+						{{ conta.nomeProfissional ?? '—' }}
+					</td>
+					<td>
+						<span class="selo" [class.admin]="eAdministrador(conta)">
+							{{ eAdministrador(conta) ? 'diretoria' : 'associado' }}
+						</span>
+					</td>
+					<td>
+						<button type="button" class="link" (click)="alternarPerfil(conta)">
+							{{ eAdministrador(conta) ? 'Retirar da diretoria' : 'Tornar diretoria' }}
+						</button>
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+
+	<p class="nota">
+		O sistema recusa a operação que deixaria a associação sem nenhuma conta da diretoria —
+		só a diretoria mexe em conta da diretoria, e sair dessa situação exigiria alterar o
+		banco à mão. A conta sem associado vinculado é a de instalação, criada quando o
+		sistema subiu pela primeira vez.
+	</p>
+</main>
