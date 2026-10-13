@@ -39,6 +39,7 @@ export class Cadastro {
 	readonly formulario = this.formBuilder.nonNullable.group({
 		nome: ['', [Validators.required, Validators.maxLength(150)]],
 		cpf: ['', [Validators.required, cpfValido]],
+		lattesUrl: ['', Validators.maxLength(255)],
 		dataNascimento: ['', [Validators.required, naoFutura]],
 		dataAssociacao: ['', Validators.required]
 	});
@@ -60,6 +61,7 @@ export class Cadastro {
 				this.formulario.patchValue({
 					nome: ficha.nome,
 					cpf: ficha.cpf,
+				lattesUrl: ficha.lattesUrl ?? '',
 					dataNascimento: ficha.dataNascimento,
 					dataAssociacao: ficha.dataAssociacao
 				});

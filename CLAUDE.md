@@ -229,10 +229,31 @@ Primeira conversa de validação. O que ficou confirmado:
   manter — compromisso contínuo da associação. Vale perguntar ao orientador se o IFAC
   hospeda projeto de aluno.
 
+### Quarta conversa (out/2026) — sistema demonstrado à diretoria
+
+- **Retorno geral positivo**, com uma sugestão de cores adiada pelo autor.
+- **Campo Lattes** (migration `V8`). Quem trabalha na área normalmente tem Lattes.
+  Coluna no `PROFISSIONAL`, **não** um `CONTATO` de tipo novo: não é meio de contato, é
+  referência a currículo público, e forçá-lo em `CONTATO` faria `EMAIL/TELEFONE` perder o
+  sentido. Opcional, vazio gravado como nulo, e o endereço é conferido contra o próprio
+  `lattes.cnpq.br` — sem isso o campo aceitaria qualquer link e deixaria de significar
+  "Lattes".
+- **O documento do certificado é opcional, e agora a tela diz isso.** A diretoria decidiu
+  confiar na boa-fé de quem declara. Tecnicamente nada mudou — o arquivo já era opcional
+  desde a `V5` —, mas o texto fazia a ausência parecer pendência: o selo
+  "declarado, sem documento" virou **"sem documento (opcional)"**, "aguardando visto" virou
+  **"documento anexado"**, e há aviso em destaque dizendo que um certificado sem arquivo
+  vale do mesmo jeito.
+  **O registro do certificado continua existindo (RF06)** — dispensou-se a comprovação, não
+  o dado. Isso importa para o texto: a justificativa do trabalho apoia-se no registro de
+  formações e certificados como núcleo do sistema.
+
 Ainda em aberto com a diretoria: se as cinco áreas de atuação da migration `V2` são as
 corretas (saíram da literatura, não da prática da entidade); e **o que fazer com os
 cadastros que hoje estão em planilhas e papel** — se ninguém migrar o que já existe, o
 sistema entra em operação vazio e a associação continua consultando a planilha.
+
+Adiado por decisão do autor: ajuste de cores sugerido pela diretoria.
 
 ---
 

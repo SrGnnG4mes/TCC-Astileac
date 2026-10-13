@@ -43,6 +43,19 @@
 				</div>
 			</div>
 
+			<div class="campo">
+				<label for="lattesUrl">Currículo Lattes <span class="opcional">(opcional)</span></label>
+				<input
+					id="lattesUrl"
+					type="url"
+					formControlName="lattesUrl"
+					placeholder="http://lattes.cnpq.br/0000000000000000"
+					maxlength="255" />
+				<small class="nota">
+					Se você tem Lattes, informe o endereço. Deixe em branco se não tiver.
+				</small>
+			</div>
+
 			<button type="submit" [disabled]="salvando()">
 				{{ salvando() ? 'Salvando...' : 'Salvar meus dados' }}
 			</button>

@@ -49,7 +49,8 @@ export class MeuCadastro {
 
 	readonly formulario = this.formBuilder.nonNullable.group({
 		nome: ['', [Validators.required, Validators.maxLength(150)]],
-		dataNascimento: ['', [Validators.required, naoFutura]]
+		dataNascimento: ['', [Validators.required, naoFutura]],
+		lattesUrl: ['', Validators.maxLength(255)]
 	});
 
 	/**
@@ -89,6 +90,7 @@ export class MeuCadastro {
 				this.dataAssociacao.set(ficha.dataAssociacao);
 				this.formulario.patchValue({
 					nome: ficha.nome,
+					lattesUrl: ficha.lattesUrl ?? '',
 					dataNascimento: ficha.dataNascimento
 				});
 			},
@@ -132,6 +134,7 @@ export class MeuCadastro {
 		this.profissionais.atualizar(id, {
 			nome: dados.nome,
 			cpf: cpf,
+			lattesUrl: dados.lattesUrl,
 			dataNascimento: dados.dataNascimento,
 			dataAssociacao: associacao
 		}).subscribe({

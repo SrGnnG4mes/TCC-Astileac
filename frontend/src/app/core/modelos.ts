@@ -44,6 +44,8 @@ export interface ProfissionalFicha {
 	dataAssociacao: string;
 	ativo: boolean;
 	dataExclusaoSolicitada: string | null;
+	/** Endereco do Lattes. Nulo quando o associado nao informou. */
+	lattesUrl: string | null;
 }
 
 /** Tabela de dominio das areas de atuacao. */
@@ -63,6 +65,8 @@ export interface AreaAtuacao {
 export interface ProfissionalRequest {
 	nome: string;
 	cpf: string;
+	/** Endereco do Lattes. Vazio vira nulo no servidor. */
+	lattesUrl?: string;
 	dataNascimento: string;
 	dataAssociacao: string;
 }

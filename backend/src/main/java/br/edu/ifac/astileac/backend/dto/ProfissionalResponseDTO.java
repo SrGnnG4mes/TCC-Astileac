@@ -18,6 +18,9 @@ public record ProfissionalResponseDTO(
 		LocalDate dataNascimento,
 		LocalDate dataAssociacao,
 		Boolean ativo,
-		LocalDateTime dataExclusaoSolicitada
+		LocalDateTime dataExclusaoSolicitada,
+
+		/** Endereco do curriculo Lattes. Nulo quando o associado nao informou. */
+		String lattesUrl
 ) {
 }

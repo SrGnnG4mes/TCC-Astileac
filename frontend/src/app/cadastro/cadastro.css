@@ -137,3 +137,14 @@ button[type="submit"]:disabled {
 	background: #e4f1e4;
 	color: #22642a;
 }
+
+.opcional {
+	font-weight: 400;
+	color: #5c6470;
+}
+
+.nota {
+	color: #5c6470;
+	font-size: 0.74rem;
+	line-height: 1.4;
+}
