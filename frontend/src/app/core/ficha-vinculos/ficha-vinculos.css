@@ -199,3 +199,10 @@ select:focus-visible {
 	background: #fdecea;
 	color: #8f2018;
 }
+
+.ajuda.destaque {
+	padding: 10px 12px;
+	border-radius: 6px;
+	background: #eef3fb;
+	color: #22406e;
+}

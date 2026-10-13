@@ -112,6 +112,11 @@
 		Um certificado pode apontar para uma formação acima, e só para formação do mesmo
 		titular — é o que impede que a comprovação de habilitação se misture entre pessoas.
 	</p>
+	<p class="ajuda destaque">
+		<strong>Anexar o PDF é opcional.</strong> A associação registra o que você declara;
+		o documento serve para quem quiser deixá-lo guardado junto do cadastro. Um
+		certificado sem arquivo vale do mesmo jeito.
+	</p>
 
 	@if (certificados().length === 0) {
 		<p class="vazio">Nenhum certificado registrado.</p>
@@ -124,10 +129,10 @@
 
 						@switch (situacao(certificado)) {
 							@case ('declarado') {
-								<span class="selo declarado">declarado, sem documento</span>
+								<span class="selo declarado">sem documento (opcional)</span>
 							}
 							@case ('enviado') {
-								<span class="selo enviado">aguardando visto</span>
+								<span class="selo enviado">documento anexado</span>
 							}
 							@case ('reconhecido') {
 								<span class="selo reconhecido">documento visto</span>
@@ -192,10 +197,11 @@
 
 					@if (certificado.temDocumento) {
 						<p class="nota">
-							O visto registra que alguém da diretoria abriu o documento e ele confere
-							com o que foi declarado. <strong>Não atesta autenticidade</strong> junto à
-							instituição emissora. Substituir o arquivo retira o visto, porque ele vale
-							só para o documento que foi visto.
+							O visto é opcional e registra apenas que alguém da diretoria abriu o
+							documento e ele confere com o que foi declarado.
+							<strong>Não atesta autenticidade</strong> junto à instituição emissora.
+							Substituir o arquivo retira o visto, porque ele vale só para o documento
+							que foi visto.
 						</p>
 					}
 				</li>

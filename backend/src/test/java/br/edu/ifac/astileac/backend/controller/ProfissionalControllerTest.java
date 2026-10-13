@@ -58,7 +58,7 @@ class ProfissionalControllerTest {
 
 	private ProfissionalResponseDTO respostaValida() {
 		return new ProfissionalResponseDTO(
-				1L, "Maria Silva", CPF_VALIDO, LocalDate.of(1990, 5, 10), LocalDate.of(2024, 1, 15), true, null);
+				1L, "Maria Silva", CPF_VALIDO, LocalDate.of(1990, 5, 10), LocalDate.of(2024, 1, 15), true, null, null);
 	}
 
 	private String corpoValido() {
@@ -187,7 +187,7 @@ class ProfissionalControllerTest {
 	void deveDesativarProfissional() throws Exception {
 		when(profissionalService.alterarSituacao(1L, false)).thenReturn(
 				new ProfissionalResponseDTO(1L, "Maria Silva", CPF_VALIDO,
-						LocalDate.of(1990, 5, 10), LocalDate.of(2024, 1, 15), false, null));
+						LocalDate.of(1990, 5, 10), LocalDate.of(2024, 1, 15), false, null, null));
 
 		mockMvc.perform(put("/profissionais/1/situacao")
 						.contentType(MediaType.APPLICATION_JSON)

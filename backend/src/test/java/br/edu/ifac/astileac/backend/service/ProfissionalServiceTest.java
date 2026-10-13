@@ -51,7 +51,7 @@ class ProfissionalServiceTest {
 
 	private ProfissionalRequestDTO dtoValido() {
 		return new ProfissionalRequestDTO(
-				"Maria Silva", CPF_VALIDO, LocalDate.of(1990, 5, 10), LocalDate.of(2024, 1, 15));
+				"Maria Silva", CPF_VALIDO, LocalDate.of(1990, 5, 10), LocalDate.of(2024, 1, 15), null);
 	}
 
 	private Profissional entidadeExistente() {
@@ -137,7 +137,7 @@ class ProfissionalServiceTest {
 		when(profissionalRepository.save(any(Profissional.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
 		ProfissionalRequestDTO dto = new ProfissionalRequestDTO(
-				"Maria Silva Santos", CPF_VALIDO, LocalDate.of(1990, 5, 10), LocalDate.of(2024, 1, 15));
+				"Maria Silva Santos", CPF_VALIDO, LocalDate.of(1990, 5, 10), LocalDate.of(2024, 1, 15), null);
 		ProfissionalResponseDTO resultado = profissionalService.atualizar(1L, dto);
 
 		assertEquals("Maria Silva Santos", resultado.nome());
@@ -151,7 +151,7 @@ class ProfissionalServiceTest {
 		when(profissionalRepository.existsByCpf(OUTRO_CPF_VALIDO)).thenReturn(true);
 
 		ProfissionalRequestDTO dto = new ProfissionalRequestDTO(
-				"Maria Silva", OUTRO_CPF_VALIDO, LocalDate.of(1990, 5, 10), LocalDate.of(2024, 1, 15));
+				"Maria Silva", OUTRO_CPF_VALIDO, LocalDate.of(1990, 5, 10), LocalDate.of(2024, 1, 15), null);
 
 		assertThrows(CpfJaCadastradoException.class, () -> profissionalService.atualizar(1L, dto));
 	}

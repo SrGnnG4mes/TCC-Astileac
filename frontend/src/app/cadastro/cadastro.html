@@ -49,6 +49,20 @@
 			</div>
 		</div>
 
+		<div class="campo">
+			<label for="lattesUrl">Currículo Lattes <span class="opcional">(opcional)</span></label>
+			<input
+				id="lattesUrl"
+				type="url"
+				formControlName="lattesUrl"
+				placeholder="http://lattes.cnpq.br/0000000000000000"
+				maxlength="255" />
+			<small class="nota">
+				Deixe em branco se a pessoa não tiver. O endereço precisa ser do próprio
+				lattes.cnpq.br.
+			</small>
+		</div>
+
 		<button type="submit" [disabled]="salvando()">
 			{{ salvando() ? 'Salvando...' : (id() ? 'Salvar alterações' : 'Cadastrar') }}
 		</button>

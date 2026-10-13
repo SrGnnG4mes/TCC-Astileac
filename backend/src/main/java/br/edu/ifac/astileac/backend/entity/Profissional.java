@@ -45,6 +45,16 @@ public class Profissional {
 	private Boolean ativo = true;
 
 	/**
+	 * Endereco do curriculo Lattes, opcional.
+	 *
+	 * Complementa o que o sistema guarda, nao substitui: o Lattes e
+	 * autodeclarado e esta fora do controle da associacao. Nem todo
+	 * associado tem, entao exigir impediria o cadastro de quem nao tem.
+	 */
+	@Column(name = "lattes_url", length = 255)
+	private String lattesUrl;
+
+	/**
 	 * Quando o titular pediu a eliminacao dos seus dados (LGPD Art. 18,
 	 * VI). Nulo = cadastro normal. Preenchido = janela de
 	 * arrependimento: os dados ficam bloqueados por 30 dias e, passado

@@ -35,6 +35,7 @@ public class ProfissionalService {
 		profissional.setDataNascimento(dto.dataNascimento());
 		profissional.setDataAssociacao(dto.dataAssociacao());
 		profissional.setAtivo(true);
+		profissional.setLattesUrl(vazioComoNulo(dto.lattesUrl()));
 
 		return toResponseDTO(profissionalRepository.save(profissional));
 	}
@@ -92,6 +93,7 @@ public class ProfissionalService {
 		profissional.setCpf(dto.cpf());
 		profissional.setDataNascimento(dto.dataNascimento());
 		profissional.setDataAssociacao(dto.dataAssociacao());
+		profissional.setLattesUrl(vazioComoNulo(dto.lattesUrl()));
 
 		return toResponseDTO(profissionalRepository.save(profissional));
 	}
@@ -161,6 +163,18 @@ public class ProfissionalService {
 		return "***.***." + cpf.substring(6, 9) + "-" + cpf.substring(9);
 	}
 
+	/**
+	 * Campo de texto opcional vazio vira nulo.
+	 *
+	 * O formulario manda string vazia quando o usuario nao preenche, e
+	 * gravar "" faria o banco distinguir "nao informou" de "informou
+	 * nada" -- duas formas de dizer a mesma coisa, que depois exigiriam
+	 * dois testes em toda consulta.
+	 */
+	private String vazioComoNulo(String valor) {
+		return (valor == null || valor.isBlank()) ? null : valor.trim();
+	}
+
 	private ProfissionalResponseDTO toResponseDTO(Profissional profissional) {
 		return new ProfissionalResponseDTO(
 				profissional.getId(),
@@ -169,7 +183,8 @@ public class ProfissionalService {
 				profissional.getDataNascimento(),
 				profissional.getDataAssociacao(),
 				profissional.getAtivo(),
-				profissional.getDataExclusaoSolicitada()
+				profissional.getDataExclusaoSolicitada(),
+				profissional.getLattesUrl()
 		);
 	}
 
