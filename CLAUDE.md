@@ -672,6 +672,29 @@ Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.propertie
 > **409 ao tentar retirar o último administrador** → troca de senha recusada com a senha
 > atual errada e aceita com a correta.
 
+> **Endereço, contatos e vínculos na interface** — fecha o front-end.
+> - As três seções entram no `FichaVinculos`, então valem para a ficha da diretoria e para o
+>   autoatendimento ao mesmo tempo. Ordem na tela segue a leitura de uma ficha: quem é e
+>   como achar (contatos, endereço), o que faz (áreas), o que comprova (formações,
+>   certificados), onde trabalhou (vínculos).
+> - **Endereço sem cadastro devolve 404, e a tela trata como "não informado"**, não como
+>   erro — é o estado normal de uma relação 1:1 opcional. Salvar usa `PUT` tanto para criar
+>   quanto para substituir, porque cabe um endereço só.
+> - **Contato principal:** marcar um novo desmarca o anterior **do mesmo tipo**, no
+>   servidor. O e-mail do convite já aparece como principal — o RF12 alimentando o RF03 sem
+>   a pessoa redigitar.
+> - **Vínculo em andamento é término em branco.** `atual` é derivado no servidor; a tela
+>   não pergunta.
+> - O formulário de vincular **área** se chamava `vinculo`, nome que colidia com os vínculos
+>   empregatícios; virou `novaArea`.
+>
+> **Defeito encontrado preenchendo a tela como uma pessoa preencheria:** o CEP digitado com
+> hífen (`69900-000`) nunca salvava. A remoção do hífen acontecia na hora de salvar, mas o
+> validador do formulário exigia 8 dígitos **antes** — e roda primeiro. O mesmo valia para
+> a UF em minúscula. Os dois validadores passaram a aceitar a forma que a pessoa digita, e a
+> normalização continua no salvar. Lição: validar no cliente o formato **de entrada**, não
+> o formato **de armazenamento**.
+
 ### Próximos passos (nesta ordem)
 1. ~~Migrations Flyway `V1` — criar as 9 tabelas + carga inicial das áreas de atuação~~ ✅
 2. ~~Entidades JPA + repositories~~ ✅
@@ -683,11 +706,10 @@ Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.propertie
 4. ~~Demais cadastros: endereço, contatos, áreas, formações, certificados, vínculos~~ ✅
 5. ~~Consulta e filtro por área de atuação (RF08)~~ ✅
 6. ~~Autenticação e perfis (RF09)~~ ✅ (falta verificar as regras de perfil com um admin real)
-7. Front-end Angular — **em andamento**. Prontos: login, consulta do RF08, ficha, cadastro
-   de profissional com áreas, formações e certificados, telas da LGPD (RF10/RF11) e
-   manutenção da tabela de áreas, o autoatendimento do associado (`/meu-cadastro`) e a
-   interface do RF12 (convites, cadastro público, contas, troca de senha).
-   **Faltam:** as telas de endereço, contatos e vínculos.
+7. ~~Front-end Angular~~ ✅ — todas as telas: login, cadastro público por convite,
+   consulta do RF08, ficha completa (contatos, endereço, áreas, formações, certificados,
+   vínculos), telas da LGPD, manutenção das áreas, autoatendimento, convites e contas.
+   Pendente só o ajuste de cores sugerido pela diretoria, adiado pelo autor.
 8. ~~Upload de certificados~~ ✅ — com o reconhecimento pela diretoria (RF13)
 9. Testes e validação com a ASTILEAC — **a primeira conversa aconteceu** (ver seção 5);
    faltam os três pontos ainda em aberto e o registro formal para citar no TCC
