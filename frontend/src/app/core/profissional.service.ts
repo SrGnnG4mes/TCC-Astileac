@@ -7,6 +7,10 @@ import {
 	AreaAtuacaoRequest,
 	Certificado,
 	CertificadoRequest,
+	Contato,
+	ContatoRequest,
+	Endereco,
+	EnderecoRequest,
 	FiltroProfissional,
 	Formacao,
 	FormacaoRequest,
@@ -15,7 +19,9 @@ import {
 	ProfissionalAreaRequest,
 	ProfissionalFicha,
 	ProfissionalRequest,
-	ProfissionalResumo
+	ProfissionalResumo,
+	Vinculo,
+	VinculoRequest
 } from './modelos';
 
 @Injectable({ providedIn: 'root' })
@@ -108,6 +114,74 @@ export class ProfissionalService {
 		return this.http.delete<void>(
 			`${API}/profissionais/${profissionalId}/areas/${areaAtuacaoId}`
 		);
+	}
+
+	// --- endereco (RF02) ---
+
+	/**
+	 * Busca o endereco. O back-end devolve 404 quando ainda nao ha
+	 * endereco -- relacao 1:1 opcional --, e quem chama deve tratar esse
+	 * 404 como "nao informado", nao como erro.
+	 */
+	buscarEndereco(profissionalId: number): Observable<Endereco> {
+		return this.http.get<Endereco>(`${API}/profissionais/${profissionalId}/endereco`);
+	}
+
+	/**
+	 * PUT, e nao POST: cabe um endereco so por profissional, entao a
+	 * operacao e "criar ou substituir", idempotente. A rota no singular
+	 * diz a mesma coisa.
+	 */
+	salvarEndereco(profissionalId: number, dados: EnderecoRequest): Observable<Endereco> {
+		return this.http.put<Endereco>(`${API}/profissionais/${profissionalId}/endereco`, dados);
+	}
+
+	removerEndereco(profissionalId: number): Observable<void> {
+		return this.http.delete<void>(`${API}/profissionais/${profissionalId}/endereco`);
+	}
+
+	// --- contatos (RF03) ---
+
+	listarContatos(profissionalId: number): Observable<Contato[]> {
+		return this.http.get<Contato[]>(`${API}/profissionais/${profissionalId}/contatos`);
+	}
+
+	criarContato(profissionalId: number, dados: ContatoRequest): Observable<Contato> {
+		return this.http.post<Contato>(`${API}/profissionais/${profissionalId}/contatos`, dados);
+	}
+
+	atualizarContato(
+		profissionalId: number, contatoId: number, dados: ContatoRequest
+	): Observable<Contato> {
+		return this.http.put<Contato>(
+			`${API}/profissionais/${profissionalId}/contatos/${contatoId}`, dados
+		);
+	}
+
+	removerContato(profissionalId: number, contatoId: number): Observable<void> {
+		return this.http.delete<void>(`${API}/profissionais/${profissionalId}/contatos/${contatoId}`);
+	}
+
+	// --- vinculos empregaticios (RF07) ---
+
+	listarVinculos(profissionalId: number): Observable<Vinculo[]> {
+		return this.http.get<Vinculo[]>(`${API}/profissionais/${profissionalId}/vinculos`);
+	}
+
+	criarVinculo(profissionalId: number, dados: VinculoRequest): Observable<Vinculo> {
+		return this.http.post<Vinculo>(`${API}/profissionais/${profissionalId}/vinculos`, dados);
+	}
+
+	atualizarVinculo(
+		profissionalId: number, vinculoId: number, dados: VinculoRequest
+	): Observable<Vinculo> {
+		return this.http.put<Vinculo>(
+			`${API}/profissionais/${profissionalId}/vinculos/${vinculoId}`, dados
+		);
+	}
+
+	removerVinculo(profissionalId: number, vinculoId: number): Observable<void> {
+		return this.http.delete<void>(`${API}/profissionais/${profissionalId}/vinculos/${vinculoId}`);
 	}
 
 	// --- formacoes (RF05) ---

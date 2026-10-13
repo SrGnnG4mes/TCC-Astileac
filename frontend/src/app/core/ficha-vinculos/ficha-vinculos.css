@@ -206,3 +206,87 @@ select:focus-visible {
 	background: #eef3fb;
 	color: #22406e;
 }
+
+/* --- endereco --- */
+
+.endereco {
+	padding: 12px 14px;
+	border-radius: 6px;
+	background: #f4f5f7;
+}
+
+.endereco p {
+	margin: 0 0 8px;
+	font-size: 0.9rem;
+	line-height: 1.6;
+}
+
+.form-endereco {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.linha {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+}
+
+.campo.largo {
+	flex: 2 1 260px;
+}
+
+.campo.minimo {
+	flex: 0 1 70px;
+}
+
+.acoes-linha {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 14px;
+}
+
+.form-endereco button[type="submit"] {
+	padding: 9px 16px;
+	border: 0;
+	border-radius: 6px;
+	background: #2c5aa0;
+	color: #fff;
+	font: inherit;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.botao-secundario {
+	padding: 8px 14px;
+	border: 1px solid #c8ccd4;
+	border-radius: 6px;
+	background: #fff;
+	color: #39404a;
+	font: inherit;
+	font-size: 0.86rem;
+	cursor: pointer;
+}
+
+/* --- contatos --- */
+
+.marcar {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding-bottom: 9px;
+	font-weight: 400;
+	white-space: nowrap;
+}
+
+.opcional {
+	font-weight: 400;
+	color: #5c6470;
+}
+
+.falha {
+	color: #8f2018;
+	font-size: 0.76rem;
+}

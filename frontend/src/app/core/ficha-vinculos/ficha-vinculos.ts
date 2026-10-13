@@ -3,26 +3,40 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AutenticacaoService } from '../autenticacao.service';
 import { ProfissionalService } from '../profissional.service';
-import { AreaAtuacao, Certificado, Formacao, ProfissionalArea } from '../modelos';
+import {
+	AreaAtuacao,
+	Certificado,
+	Contato,
+	Endereco,
+	Formacao,
+	ProfissionalArea,
+	TipoContato,
+	Vinculo
+} from '../modelos';
 import { naoFutura } from '../validadores';
 
 /**
- * Areas de atuacao, formacoes e certificados de um profissional
- * (RF04, RF05, RF06).
+ * Tudo que pende de um profissional: contatos, endereco, areas de
+ * atuacao, formacoes, certificados e vinculos empregaticios
+ * (RF02 a RF07).
  *
- * Componente compartilhado porque as mesmas tres secoes aparecem em
- * duas telas com donos diferentes: a ficha que a diretoria administra
- * e o autoatendimento do proprio associado. O back-end ja autoriza os
- * dois -- os controllers sao
+ * Componente compartilhado porque as mesmas secoes aparecem em duas
+ * telas com donos diferentes: a ficha que a diretoria administra e o
+ * autoatendimento do proprio associado. O back-end ja autoriza os dois
+ * -- os controllers sao
  * `hasRole('ADMIN') or @autorizacao.eOProprioProfissional(#profissionalId)`
  * --, entao nao ha nada a distinguir aqui: quem pode o que e decidido
  * no servidor, e este componente apenas chama a API.
  *
- * As tres secoes ficam juntas, e nao em tres componentes, porque
- * compartilham estado: o seletor de formacao do certificado depende da
+ * As secoes ficam num componente so, e nao em seis, porque parte delas
+ * compartilha estado: o seletor de formacao do certificado depende da
  * lista de formacoes, que muda quando uma formacao e adicionada ou
  * removida. Separa-las exigiria coordenacao entre irmaos para ganhar
  * nada.
+ *
+ * A ordem na tela segue a leitura de uma ficha: quem e e como achar
+ * (contatos, endereco), o que faz (areas), o que comprova (formacoes,
+ * certificados) e onde trabalhou (vinculos).
  */
 @Component({
 	selector: 'app-ficha-vinculos',
@@ -43,11 +57,23 @@ export class FichaVinculos implements OnInit {
 	readonly areasDoProfissional = signal<ProfissionalArea[]>([]);
 	readonly formacoes = signal<Formacao[]>([]);
 	readonly certificados = signal<Certificado[]>([]);
+	readonly contatos = signal<Contato[]>([]);
+	readonly vinculos = signal<Vinculo[]>([]);
+
+	/**
+	 * Endereco: `null` significa "ainda nao informado", que e estado
+	 * normal -- a relacao e 1:1 opcional. O back-end responde 404 nesse
+	 * caso, e o 404 aqui NAO e erro.
+	 */
+	readonly endereco = signal<Endereco | null>(null);
+	/** Formulario de endereco aberto (para criar ou editar). */
+	readonly editandoEndereco = signal(false);
+
 	readonly erro = signal<string | null>(null);
 	/** Id do certificado cujo upload esta em curso, para desabilitar o botao. */
 	readonly enviando = signal<number | null>(null);
 
-	readonly vinculo = this.formBuilder.nonNullable.group({
+	readonly novaArea = this.formBuilder.nonNullable.group({
 		areaAtuacaoId: ['', Validators.required],
 		dataInicio: ['', [Validators.required, naoFutura]]
 	});
@@ -69,6 +95,46 @@ export class FichaVinculos implements OnInit {
 		dataEmissao: ['', [Validators.required, naoFutura]]
 	});
 
+	/**
+	 * CEP e UF conferidos ja aqui.
+	 *
+	 * O CEP aceita COM ou SEM hifen ("69900-000" ou "69900000"), e o hifen
+	 * e removido ao salvar, porque o back-end so aceita digitos. A
+	 * primeira versao exigia 8 digitos ja no formulario -- e como o
+	 * validador roda antes do salvar, quem digitasse o CEP do jeito
+	 * normal, com hifen, nao conseguia salvar nunca. Descoberto
+	 * preenchendo a tela como uma pessoa preencheria.
+	 */
+	readonly formEndereco = this.formBuilder.nonNullable.group({
+		cep: ['', [Validators.required, Validators.pattern(/^\d{5}-?\d{3}$/)]],
+		logradouro: ['', [Validators.required, Validators.maxLength(150)]],
+		numero: ['', [Validators.required, Validators.maxLength(20)]],
+		complemento: ['', Validators.maxLength(100)],
+		bairro: ['', [Validators.required, Validators.maxLength(100)]],
+		cidade: ['', [Validators.required, Validators.maxLength(100)]],
+		// Aceita minuscula pelo mesmo motivo do CEP: e convertida ao
+		// salvar, e exigir maiuscula aqui travaria quem digita "ac".
+		uf: ['AC', [Validators.required, Validators.pattern(/^[A-Za-z]{2}$/)]]
+	});
+
+	readonly novoContato = this.formBuilder.nonNullable.group({
+		tipo: ['EMAIL' as TipoContato, Validators.required],
+		valor: ['', [Validators.required, Validators.maxLength(150)]],
+		principal: false
+	});
+
+	/**
+	 * Vinculo empregaticio. `dataFim` vazia = vinculo em andamento; o
+	 * servidor deriva `atual` disso, entao o formulario nao pergunta.
+	 */
+	readonly novoVinculo = this.formBuilder.nonNullable.group({
+		instituicao: ['', [Validators.required, Validators.maxLength(150)]],
+		cargo: ['', [Validators.required, Validators.maxLength(100)]],
+		tipoVinculo: ['', [Validators.required, Validators.maxLength(50)]],
+		dataInicio: ['', [Validators.required, naoFutura]],
+		dataFim: ['', naoFutura]
+	});
+
 	ngOnInit(): void {
 		this.profissionais.listarAreas().subscribe({
 			next: areas => this.areas.set(areas)
@@ -78,6 +144,23 @@ export class FichaVinculos implements OnInit {
 
 	private recarregar(): void {
 		const id = this.profissionalId();
+		this.profissionais.buscarEndereco(id).subscribe({
+			next: endereco => this.endereco.set(endereco),
+			// 404 aqui e "ainda nao informado", estado normal da relacao
+			// 1:1 opcional. Qualquer outro status e erro de verdade.
+			error: (falha: HttpErrorResponse) => {
+				this.endereco.set(null);
+				if (falha.status !== 404) {
+					this.erro.set(this.mensagemDe(falha));
+				}
+			}
+		});
+		this.profissionais.listarContatos(id).subscribe({
+			next: lista => this.contatos.set(lista)
+		});
+		this.profissionais.listarVinculos(id).subscribe({
+			next: lista => this.vinculos.set(lista)
+		});
 		this.profissionais.listarAreasDo(id).subscribe({
 			next: lista => this.areasDoProfissional.set(lista)
 		});
@@ -97,21 +180,178 @@ export class FichaVinculos implements OnInit {
 		return this.formacoes().find(f => f.id === formacaoId)?.curso ?? null;
 	}
 
-	// ---------- areas (RF04) ----------
+	// ---------- endereco (RF02) ----------
 
-	vincularArea(): void {
-		if (this.vinculo.invalid) {
-			this.vinculo.markAllAsTouched();
+	abrirEndereco(): void {
+		const atual = this.endereco();
+		this.formEndereco.reset({
+			cep: atual?.cep ?? '',
+			logradouro: atual?.logradouro ?? '',
+			numero: atual?.numero ?? '',
+			complemento: atual?.complemento ?? '',
+			bairro: atual?.bairro ?? '',
+			cidade: atual?.cidade ?? '',
+			uf: atual?.uf ?? 'AC'
+		});
+		this.editandoEndereco.set(true);
+	}
+
+	cancelarEndereco(): void {
+		this.editandoEndereco.set(false);
+	}
+
+	/**
+	 * Cria ou substitui -- e a mesma chamada nos dois casos, porque o
+	 * back-end publica PUT numa rota no singular: cabe um endereco so.
+	 */
+	salvarEndereco(): void {
+		if (this.formEndereco.invalid) {
+			this.formEndereco.markAllAsTouched();
 			return;
 		}
 
-		const { areaAtuacaoId, dataInicio } = this.vinculo.getRawValue();
+		const dados = this.formEndereco.getRawValue();
+
+		this.profissionais.salvarEndereco(this.profissionalId(), {
+			...dados,
+			// Mascara comum de CEP ("69900-000") vira so digitos, que e o
+			// formato que o back-end aceita.
+			cep: dados.cep.replace(/\D/g, ''),
+			uf: dados.uf.toUpperCase()
+		}).subscribe({
+			next: endereco => {
+				this.endereco.set(endereco);
+				this.editandoEndereco.set(false);
+			},
+			error: (falha: HttpErrorResponse) => this.erro.set(this.mensagemDe(falha))
+		});
+	}
+
+	removerEndereco(): void {
+		this.profissionais.removerEndereco(this.profissionalId()).subscribe({
+			next: () => this.endereco.set(null),
+			error: (falha: HttpErrorResponse) => this.erro.set(this.mensagemDe(falha))
+		});
+	}
+
+	/** CEP para exibicao: "69900000" vira "69900-000". */
+	cepFormatado(cep: string): string {
+		return cep.length === 8 ? `${cep.slice(0, 5)}-${cep.slice(5)}` : cep;
+	}
+
+	// ---------- contatos (RF03) ----------
+
+	adicionarContato(): void {
+		if (this.novoContato.invalid) {
+			this.novoContato.markAllAsTouched();
+			return;
+		}
+
+		const dados = this.novoContato.getRawValue();
+
+		this.profissionais.criarContato(this.profissionalId(), {
+			tipo: dados.tipo,
+			// Telefone so com digitos: "(68) 99999-8888" vira
+			// "68999998888", formato que o back-end valida.
+			valor: dados.tipo === 'TELEFONE' ? dados.valor.replace(/\D/g, '') : dados.valor.trim(),
+			principal: dados.principal
+		}).subscribe({
+			next: () => {
+				this.novoContato.reset({ tipo: dados.tipo, valor: '', principal: false });
+				this.recarregar();
+			},
+			error: (falha: HttpErrorResponse) => this.erro.set(this.mensagemDe(falha))
+		});
+	}
+
+	/**
+	 * Torna principal. O servidor desmarca sozinho o principal anterior
+	 * do MESMO tipo -- um e-mail e um telefone principais, nunca dois do
+	 * mesmo tipo --, entao basta recarregar.
+	 */
+	tornarPrincipal(contato: Contato): void {
+		this.profissionais.atualizarContato(this.profissionalId(), contato.id, {
+			tipo: contato.tipo,
+			valor: contato.valor,
+			principal: true
+		}).subscribe({
+			next: () => this.recarregar(),
+			error: (falha: HttpErrorResponse) => this.erro.set(this.mensagemDe(falha))
+		});
+	}
+
+	removerContato(contatoId: number): void {
+		this.profissionais.removerContato(this.profissionalId(), contatoId).subscribe({
+			next: () => this.recarregar(),
+			error: (falha: HttpErrorResponse) => this.erro.set(this.mensagemDe(falha))
+		});
+	}
+
+	/** Telefone para exibicao: "68999998888" vira "(68) 99999-8888". */
+	valorFormatado(contato: Contato): string {
+		const v = contato.valor;
+		if (contato.tipo !== 'TELEFONE') {
+			return v;
+		}
+		if (v.length === 11) {
+			return `(${v.slice(0, 2)}) ${v.slice(2, 7)}-${v.slice(7)}`;
+		}
+		if (v.length === 10) {
+			return `(${v.slice(0, 2)}) ${v.slice(2, 6)}-${v.slice(6)}`;
+		}
+		return v;
+	}
+
+	// ---------- vinculos empregaticios (RF07) ----------
+
+	adicionarVinculo(): void {
+		if (this.novoVinculo.invalid) {
+			this.novoVinculo.markAllAsTouched();
+			return;
+		}
+
+		const dados = this.novoVinculo.getRawValue();
+
+		this.profissionais.criarVinculo(this.profissionalId(), {
+			instituicao: dados.instituicao.trim(),
+			cargo: dados.cargo.trim(),
+			tipoVinculo: dados.tipoVinculo.trim(),
+			dataInicio: dados.dataInicio,
+			// Vazio vira nulo, que e como o servidor entende "em andamento".
+			dataFim: dados.dataFim || null
+		}).subscribe({
+			next: () => {
+				this.novoVinculo.reset({
+					instituicao: '', cargo: '', tipoVinculo: '', dataInicio: '', dataFim: ''
+				});
+				this.recarregar();
+			},
+			error: (falha: HttpErrorResponse) => this.erro.set(this.mensagemDe(falha))
+		});
+	}
+
+	removerVinculo(vinculoId: number): void {
+		this.profissionais.removerVinculo(this.profissionalId(), vinculoId).subscribe({
+			next: () => this.recarregar(),
+			error: (falha: HttpErrorResponse) => this.erro.set(this.mensagemDe(falha))
+		});
+	}
+
+	// ---------- areas (RF04) ----------
+
+	vincularArea(): void {
+		if (this.novaArea.invalid) {
+			this.novaArea.markAllAsTouched();
+			return;
+		}
+
+		const { areaAtuacaoId, dataInicio } = this.novaArea.getRawValue();
 
 		this.profissionais
 			.associarArea(this.profissionalId(), { areaAtuacaoId: Number(areaAtuacaoId), dataInicio })
 			.subscribe({
 				next: () => {
-					this.vinculo.reset({ areaAtuacaoId: '', dataInicio: '' });
+					this.novaArea.reset({ areaAtuacaoId: '', dataInicio: '' });
 					this.recarregar();
 				},
 				error: (falha: HttpErrorResponse) => this.erro.set(this.mensagemDe(falha))
