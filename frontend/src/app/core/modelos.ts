@@ -83,6 +83,74 @@ export interface ProfissionalAreaRequest {
 	dataInicio: string;
 }
 
+// ---------- endereco, contatos e vinculos (RF02, RF03, RF07) ----------
+
+/** Endereco (RF02). Relacao 1:1: um profissional tem no maximo um. */
+export interface Endereco {
+	id: number;
+	cep: string;
+	logradouro: string;
+	numero: string;
+	complemento: string | null;
+	bairro: string;
+	cidade: string;
+	uf: string;
+}
+
+export interface EnderecoRequest {
+	cep: string;
+	logradouro: string;
+	numero: string;
+	complemento: string;
+	bairro: string;
+	cidade: string;
+	uf: string;
+}
+
+export type TipoContato = 'EMAIL' | 'TELEFONE';
+
+/**
+ * Contato (RF03). Um principal por TIPO: marcar um novo como principal
+ * desmarca o anterior do mesmo tipo, no servidor.
+ */
+export interface Contato {
+	id: number;
+	tipo: TipoContato;
+	valor: string;
+	principal: boolean;
+}
+
+export interface ContatoRequest {
+	tipo: TipoContato;
+	valor: string;
+	principal: boolean;
+}
+
+/**
+ * Vinculo empregaticio (RF07).
+ *
+ * `atual` e DERIVADO no servidor: dataFim nula significa "em andamento".
+ * Nao entra no request -- aceitar os dois deixaria o cliente gravar uma
+ * contradicao.
+ */
+export interface Vinculo {
+	id: number;
+	instituicao: string;
+	cargo: string;
+	tipoVinculo: string;
+	dataInicio: string;
+	dataFim: string | null;
+	atual: boolean;
+}
+
+export interface VinculoRequest {
+	instituicao: string;
+	cargo: string;
+	tipoVinculo: string;
+	dataInicio: string;
+	dataFim: string | null;
+}
+
 /** Entrada da tabela de dominio de areas (RF04, manutencao pela diretoria). */
 export interface AreaAtuacaoRequest {
 	nome: string;
