@@ -33,9 +33,15 @@ export class AutenticacaoService {
 	 * Desde o Spring Security 6 o token e resolvido de forma preguicosa:
 	 * o cookie so e gravado quando alguem LE o token. Sem esta chamada o
 	 * cookie nunca existe, o interceptor de CSRF do Angular nao acha
-	 * nada para enviar, e o proprio POST de login volta 403.
+	 * nada para enviar, e o POST volta 403.
+	 *
+	 * Publico porque o cadastro por convite precisa do mesmo: quem chega
+	 * por um link de e-mail nunca passou pelo login e tambem nao tem
+	 * cookie. Toda operacao que escreve a partir de visitante anonimo
+	 * chama isto antes, dentro da propria operacao -- depender de ordem
+	 * de chamada e o que ja quebrou a colecao do Postman tres vezes.
 	 */
-	private renovarCsrf(): Observable<void> {
+	public renovarCsrf(): Observable<void> {
 		return this.http.get<{ token: string }>(`${API}/autenticacao/csrf`).pipe(map(() => void 0));
 	}
 

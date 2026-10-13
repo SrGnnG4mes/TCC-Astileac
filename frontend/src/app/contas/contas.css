@@ -1,0 +1,118 @@
+.conteudo {
+	max-width: 760px;
+	padding: 24px 20px 48px;
+}
+
+h1 {
+	margin: 0 0 6px;
+	font-size: 1.25rem;
+}
+
+.ajuda {
+	margin: 0 0 20px;
+	font-size: 0.85rem;
+	color: #5c6470;
+	line-height: 1.6;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.9rem;
+}
+
+th,
+td {
+	padding: 10px;
+	text-align: left;
+	border-bottom: 1px solid #e3e6ea;
+	vertical-align: middle;
+}
+
+th {
+	font-size: 0.76rem;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: #5c6470;
+}
+
+td.login {
+	font-weight: 600;
+	white-space: nowrap;
+}
+
+td.associado {
+	color: #5c6470;
+}
+
+.voce {
+	margin-left: 8px;
+	padding: 1px 7px;
+	border-radius: 10px;
+	background: #eef3fb;
+	color: #22406e;
+	font-size: 0.7rem;
+	font-weight: 500;
+}
+
+.selo {
+	display: inline-block;
+	padding: 2px 9px;
+	border-radius: 10px;
+	background: #eceef1;
+	color: #5c6470;
+	font-size: 0.74rem;
+	white-space: nowrap;
+}
+
+.selo.admin {
+	background: #eef3fb;
+	color: #22406e;
+	font-weight: 600;
+}
+
+.link {
+	padding: 0;
+	border: 0;
+	background: none;
+	color: #2c5aa0;
+	font: inherit;
+	font-size: 0.84rem;
+	text-decoration: underline;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.oculto {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+}
+
+.nota {
+	margin: 18px 0 0;
+	font-size: 0.78rem;
+	color: #5c6470;
+	line-height: 1.6;
+}
+
+.erro,
+.aviso {
+	margin: 0 0 16px;
+	padding: 9px 10px;
+	border-radius: 6px;
+	font-size: 0.85rem;
+	line-height: 1.5;
+}
+
+.erro {
+	background: #fdecea;
+	color: #8f2018;
+}
+
+.aviso {
+	background: #e4f1e4;
+	color: #22642a;
+}

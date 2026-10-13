@@ -19,6 +19,15 @@ export const routes: Routes = [
 		loadComponent: () => import('./login/login').then(m => m.Login)
 	},
 	{
+		// UNICA rota sem guarda alem do login: quem usa o convite ainda
+		// nao tem conta. O token na query string vem do link de e-mail e
+		// e validado contra o servidor antes de a tela mostrar qualquer
+		// coisa.
+		path: 'cadastro',
+		loadComponent: () =>
+			import('./cadastro-por-convite/cadastro-por-convite').then(m => m.CadastroPorConvite)
+	},
+	{
 		path: 'profissionais',
 		canActivate: [autenticadoGuard, adminGuard],
 		loadComponent: () => import('./profissionais/profissionais').then(m => m.Profissionais)
@@ -27,6 +36,16 @@ export const routes: Routes = [
 		path: 'areas-atuacao',
 		canActivate: [autenticadoGuard, adminGuard],
 		loadComponent: () => import('./areas/areas').then(m => m.Areas)
+	},
+	{
+		path: 'convites',
+		canActivate: [autenticadoGuard, adminGuard],
+		loadComponent: () => import('./convites/convites').then(m => m.Convites)
+	},
+	{
+		path: 'contas',
+		canActivate: [autenticadoGuard, adminGuard],
+		loadComponent: () => import('./contas/contas').then(m => m.Contas)
 	},
 	{
 		path: 'profissionais/novo',
