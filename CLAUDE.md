@@ -622,6 +622,35 @@ Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.propertie
 >   Hibernate desliga a própria checagem de nulidade, e `ddl-auto=validate` não confere
 >   nulidade de coluna — mas era anotação mentindo sobre o banco.
 
+> **Interface do RF12** — convites, cadastro público e contas.
+> - **`/convites` (ADMIN).** A diretoria emite depois de confirmar o pagamento. O token
+>   aparece **uma vez**, com link pronto para copiar; recarregar a página o faz sumir,
+>   porque ele só existe em memória. A listagem mostra pendente/utilizado/expirado e
+>   **nunca** o código.
+>   Emitir à mão é o substituto do gatilho enquanto a integração com o banco não existe —
+>   quando ela chegar, chamará o mesmo ponto de emissão. A tela continua útil de todo modo,
+>   para a exceção: quem pagou em dinheiro, e-mail que voltou, associado fundador.
+> - **`/cadastro?convite=...` (pública).** Única rota sem guarda além do login — quem usa o
+>   convite ainda não tem conta. O token chega na URL porque é assim que link de e-mail
+>   funciona; dali em diante vai **no corpo**, nunca em outra URL.
+> - **`/contas` (ADMIN).** Concede e retira o perfil. Não cria conta: contas nascem pelo
+>   convite. A guarda do último administrador aparece com a mensagem do servidor.
+> - **Troca de senha no autoatendimento**, exigindo a senha atual.
+>
+> **Defeito encontrado rodando — o mesmo padrão de CSRF, terceira vez:**
+> quem chega por um link de e-mail **nunca leu o token CSRF**, então não tem o cookie — e a
+> validação do convite é um POST. A primeira visita à tela de cadastro falhava com 403
+> antes de mostrar qualquer campo. Corrigido fazendo as duas chamadas públicas renovarem o
+> CSRF **dentro da própria operação**, como o `entrar()` já fazia. A lição que se repete:
+> toda operação de escrita precisa ser autossuficiente quanto ao token, nunca depender de
+> alguém ter chamado algo antes.
+>
+> Verificado rodando o fluxo inteiro: emissão → link → validação sem sessão alguma →
+> tentativa falhada **sem queimar o convite** → cadastro → convite invalidado → login da
+> conta nova caindo no painel como `PROFISSIONAL` → concessão e retirada de perfil →
+> **409 ao tentar retirar o último administrador** → troca de senha recusada com a senha
+> atual errada e aceita com a correta.
+
 ### Próximos passos (nesta ordem)
 1. ~~Migrations Flyway `V1` — criar as 9 tabelas + carga inicial das áreas de atuação~~ ✅
 2. ~~Entidades JPA + repositories~~ ✅
@@ -635,9 +664,9 @@ Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.propertie
 6. ~~Autenticação e perfis (RF09)~~ ✅ (falta verificar as regras de perfil com um admin real)
 7. Front-end Angular — **em andamento**. Prontos: login, consulta do RF08, ficha, cadastro
    de profissional com áreas, formações e certificados, telas da LGPD (RF10/RF11) e
-   manutenção da tabela de áreas e o autoatendimento do associado (`/meu-cadastro`).
-   **Faltam:** a interface do RF12 (emitir convite, tela pública de cadastro, gestão de
-   contas) e as telas de endereço, contatos e vínculos.
+   manutenção da tabela de áreas, o autoatendimento do associado (`/meu-cadastro`) e a
+   interface do RF12 (convites, cadastro público, contas, troca de senha).
+   **Faltam:** as telas de endereço, contatos e vínculos.
 8. ~~Upload de certificados~~ ✅ — com o reconhecimento pela diretoria (RF13)
 9. Testes e validação com a ASTILEAC — **a primeira conversa aconteceu** (ver seção 5);
    faltam os três pontos ainda em aberto e o registro formal para citar no TCC
