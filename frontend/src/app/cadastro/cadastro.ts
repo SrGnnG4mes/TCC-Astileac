@@ -31,6 +31,7 @@ export class Cadastro {
 	private readonly router = inject(Router);
 
 	readonly id = signal<number | null>(null);
+	readonly ativo = signal<boolean | null>(null);
 	readonly salvando = signal(false);
 	readonly erro = signal<string | null>(null);
 	readonly aviso = signal<string | null>(null);
@@ -54,12 +55,44 @@ export class Cadastro {
 
 	private carregar(id: number): void {
 		this.profissionais.buscarPorId(id).subscribe({
-			next: ficha => this.formulario.patchValue({
-				nome: ficha.nome,
-				cpf: ficha.cpf,
-				dataNascimento: ficha.dataNascimento,
-				dataAssociacao: ficha.dataAssociacao
-			}),
+			next: ficha => {
+				this.ativo.set(ficha.ativo);
+				this.formulario.patchValue({
+					nome: ficha.nome,
+					cpf: ficha.cpf,
+					dataNascimento: ficha.dataNascimento,
+					dataAssociacao: ficha.dataAssociacao
+				});
+			},
+			error: (falha: HttpErrorResponse) => this.erro.set(this.mensagemDe(falha))
+		});
+	}
+
+	/**
+	 * Tira ou devolve alguem ao quadro de associados.
+	 *
+	 * Nao existe exclusao administrativa: apagar destruiria o registro
+	 * de que a pessoa foi associada. Exclusao definitiva so pelo pedido
+	 * do titular, em "Dados pessoais".
+	 */
+	alterarSituacao(): void {
+		const id = this.id();
+		const atual = this.ativo();
+		if (id === null || atual === null) {
+			return;
+		}
+
+		this.erro.set(null);
+		this.aviso.set(null);
+
+		this.profissionais.alterarSituacao(id, !atual).subscribe({
+			next: ficha => {
+				this.ativo.set(ficha.ativo);
+				this.aviso.set(ficha.ativo
+					? 'Profissional reativado: volta a aparecer nas consultas.'
+					: 'Profissional desativado: sai das consultas por situacao, '
+						+ 'mas o cadastro e o histórico continuam guardados.');
+			},
 			error: (falha: HttpErrorResponse) => this.erro.set(this.mensagemDe(falha))
 		});
 	}

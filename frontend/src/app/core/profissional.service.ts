@@ -77,6 +77,18 @@ export class ProfissionalService {
 		return this.http.put<ProfissionalFicha>(`${API}/profissionais/${id}`, dados);
 	}
 
+	/**
+	 * Desativa ou reativa no quadro de associados.
+	 *
+	 * NAO existe exclusao administrativa: tirar alguem do quadro e
+	 * decisao da diretoria sobre a associacao, e apagar destruiria o
+	 * registro de que a pessoa FOI associada. Exclusao definitiva so
+	 * acontece pelo pedido do titular (RF10).
+	 */
+	alterarSituacao(id: number, ativo: boolean): Observable<ProfissionalFicha> {
+		return this.http.put<ProfissionalFicha>(`${API}/profissionais/${id}/situacao`, { ativo });
+	}
+
 	// --- areas de atuacao do profissional (RF04) ---
 
 	listarAreasDo(profissionalId: number): Observable<ProfissionalArea[]> {

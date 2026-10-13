@@ -127,10 +127,10 @@
 								<span class="selo declarado">declarado, sem documento</span>
 							}
 							@case ('enviado') {
-								<span class="selo enviado">aguardando reconhecimento</span>
+								<span class="selo enviado">aguardando visto</span>
 							}
 							@case ('reconhecido') {
-								<span class="selo reconhecido">reconhecido</span>
+								<span class="selo reconhecido">documento visto</span>
 							}
 						}
 
@@ -147,7 +147,7 @@
 							&middot; comprova {{ curso }}
 						}
 						@if (certificado.validadoEm) {
-							&middot; reconhecido por {{ certificado.validadoPor }} em
+							&middot; visto por {{ certificado.validadoPor }} em
 							{{ certificado.validadoEm }}
 						}
 					</span>
@@ -177,7 +177,7 @@
 
 						@if (eAdmin() && certificado.temDocumento && !certificado.validadoEm) {
 							<button type="button" class="link destaque" (click)="reconhecer(certificado.id)">
-								Reconhecer documento
+								Dar visto no documento
 							</button>
 						}
 						@if (eAdmin() && certificado.validadoEm) {
@@ -185,15 +185,17 @@
 								type="button"
 								class="link"
 								(click)="desfazerReconhecimento(certificado.id)">
-								Desfazer reconhecimento
+								Retirar o visto
 							</button>
 						}
 					</div>
 
-					@if (certificado.temDocumento && !certificado.validadoEm) {
+					@if (certificado.temDocumento) {
 						<p class="nota">
-							Substituir o documento desfaz o reconhecimento: o selo só vale para o
-							arquivo que a diretoria viu.
+							O visto registra que alguém da diretoria abriu o documento e ele confere
+							com o que foi declarado. <strong>Não atesta autenticidade</strong> junto à
+							instituição emissora. Substituir o arquivo retira o visto, porque ele vale
+							só para o documento que foi visto.
 						</p>
 					}
 				</li>

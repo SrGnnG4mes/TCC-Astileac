@@ -96,9 +96,28 @@ public class ProfissionalService {
 		return toResponseDTO(profissionalRepository.save(profissional));
 	}
 
+	/**
+	 * Desativa ou reativa um profissional, decisao da diretoria sobre o
+	 * quadro de associados.
+	 *
+	 * SUBSTITUI A EXCLUSAO ADMINISTRATIVA QUE EXISTIA AQUI, por decisao
+	 * da diretoria. Sao duas coisas diferentes que estavam confundidas:
+	 *
+	 *  - o TITULAR que pede eliminacao exerce o Art. 18, e ai apaga
+	 *    mesmo -- e o RF10, com janela de arrependimento e expurgo;
+	 *  - a DIRETORIA que tira alguem do quadro (saiu, parou de pagar,
+	 *    faleceu) esta administrando a associacao, nao atendendo a um
+	 *    direito. Apagar aqui destruiria o registro de que a pessoa FOI
+	 *    associada, que e justamente o que a entidade precisa guardar.
+	 *
+	 * Por isso nao ha mais exclusao administrativa: remover em definitivo
+	 * e ato de protecao de dados, nao de administracao do quadro.
+	 */
 	@Transactional
-	public void remover(Long id) {
-		profissionalRepository.delete(buscarEntidadePorId(id));
+	public ProfissionalResponseDTO alterarSituacao(Long id, boolean ativo) {
+		Profissional profissional = buscarEntidadePorId(id);
+		profissional.setAtivo(ativo);
+		return toResponseDTO(profissionalRepository.save(profissional));
 	}
 
 	/**

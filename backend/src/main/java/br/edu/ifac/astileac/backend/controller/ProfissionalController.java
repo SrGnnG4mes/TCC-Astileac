@@ -3,6 +3,7 @@ package br.edu.ifac.astileac.backend.controller;
 import br.edu.ifac.astileac.backend.dto.ProfissionalRequestDTO;
 import br.edu.ifac.astileac.backend.dto.ProfissionalResponseDTO;
 import br.edu.ifac.astileac.backend.dto.ProfissionalResumoDTO;
+import br.edu.ifac.astileac.backend.dto.SituacaoRequestDTO;
 import br.edu.ifac.astileac.backend.service.ProfissionalService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -68,13 +68,26 @@ public class ProfissionalController {
 		return profissionalService.atualizar(id, dto);
 	}
 
-	// Exclusao administrativa. O associado que quer sair usa o pedido
-	// de eliminacao do RF10, que tem janela de arrependimento.
+	/**
+	 * Desativa ou reativa um profissional no quadro de associados.
+	 *
+	 * SUBSTITUI o DELETE que existia aqui, por decisao da diretoria.
+	 * Tirar alguem do quadro e administracao da associacao, e apagar o
+	 * cadastro destruiria o registro de que a pessoa FOI associada --
+	 * informacao que a entidade precisa guardar.
+	 *
+	 * Exclusao definitiva so existe pelo caminho do titular: o pedido de
+	 * eliminacao do RF10, com janela de arrependimento e expurgo. Remover
+	 * em definitivo e ato de protecao de dados, nao de administracao.
+	 *
+	 * PUT, e nao dois verbos: a operacao declara o estado desejado e e
+	 * idempotente.
+	 */
 	@PreAuthorize("hasRole('ADMIN')")
-	@DeleteMapping("/{id}")
-	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void remover(@PathVariable Long id) {
-		profissionalService.remover(id);
+	@PutMapping("/{id}/situacao")
+	public ProfissionalResponseDTO alterarSituacao(
+			@PathVariable Long id, @Valid @RequestBody SituacaoRequestDTO dto) {
+		return profissionalService.alterarSituacao(id, dto.ativo());
 	}
 
 }

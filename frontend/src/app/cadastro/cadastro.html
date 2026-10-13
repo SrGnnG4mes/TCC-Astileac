@@ -54,6 +54,31 @@
 		</button>
 	</form>
 
+	@if (ativo(); as estaAtivo) {
+		<section class="situacao">
+			<h2>Situação no quadro</h2>
+			<p>
+				Este profissional está <strong>ativo</strong> e aparece nas consultas.
+				Desativar tira das buscas por situação, mas mantém o cadastro e o histórico —
+				a associação continua podendo responder quem foi associado e quando.
+			</p>
+			<button type="button" class="secundario" (click)="alterarSituacao()">
+				Desativar no quadro
+			</button>
+		</section>
+	} @else if (ativo() === false) {
+		<section class="situacao inativo">
+			<h2>Situação no quadro</h2>
+			<p>
+				Este profissional está <strong>inativo</strong> e não aparece nas consultas
+				por situação.
+			</p>
+			<button type="button" class="secundario" (click)="alterarSituacao()">
+				Reativar no quadro
+			</button>
+		</section>
+	}
+
 	@if (id(); as profissionalId) {
 		<app-ficha-vinculos [profissionalId]="profissionalId" />
 	}
