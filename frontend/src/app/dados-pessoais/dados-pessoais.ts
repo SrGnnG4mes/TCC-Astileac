@@ -5,6 +5,7 @@ import { AutenticacaoService } from '../core/autenticacao.service';
 import { Barra } from '../core/barra/barra';
 import { DadosPessoaisService } from '../core/dados-pessoais.service';
 import { DadosPessoais, ExclusaoResposta, LogAcesso, Pagina } from '../core/modelos';
+import { AcaoPipe, DataBrPipe, EntidadePipe } from '../core/formatos';
 
 /**
  * Direitos do titular (RF10) e registro de acesso (RF11).
@@ -19,7 +20,7 @@ import { DadosPessoais, ExclusaoResposta, LogAcesso, Pagina } from '../core/mode
  */
 @Component({
 	selector: 'app-dados-pessoais',
-	imports: [RouterLink, Barra],
+	imports: [RouterLink, Barra, DataBrPipe, AcaoPipe, EntidadePipe],
 	templateUrl: './dados-pessoais.html',
 	styleUrl: './dados-pessoais.css'
 })
@@ -48,7 +49,7 @@ export class DadosPessoaisTela {
 		if (id === null) {
 			// Perfil ADMIN sem profissional vinculado: nao ha "meus
 			// dados" porque o login administrativo nao e um associado.
-			this.erro.set('Este usuario nao esta vinculado a um cadastro de profissional.');
+			this.erro.set('Este usuário não está vinculado a um cadastro de profissional.');
 			return;
 		}
 
@@ -131,11 +132,11 @@ export class DadosPessoaisTela {
 
 	private mensagemDe(falha: HttpErrorResponse): string {
 		if (falha.status === 0) {
-			return 'Nao foi possivel falar com o servidor.';
+			return 'Não foi possível falar com o servidor.';
 		}
 		// O 403 nao ganha mensagem propria: o back-end distingue falta
 		// de permissao de falha de token CSRF, e trocar as duas por um
 		// texto generico torna o erro indiagnosticavel.
-		return falha.error?.mensagem ?? 'Nao foi possivel completar a operacao.';
+		return falha.error?.mensagem ?? 'Não foi possível completar a operação.';
 	}
 }

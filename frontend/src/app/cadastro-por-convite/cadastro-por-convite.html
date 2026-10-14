@@ -37,9 +37,9 @@
 				}
 
 				<label for="dataNascimento">Data de nascimento</label>
-				<input id="dataNascimento" type="date" formControlName="dataNascimento" />
+				<input id="dataNascimento" type="date" [min]="dataMinima" [max]="hoje" formControlName="dataNascimento" />
 				@if (formulario.controls.dataNascimento.touched && formulario.controls.dataNascimento.invalid) {
-					<small class="falha">Informe uma data no passado.</small>
+					<small class="falha">Informe uma data válida, que não esteja no futuro.</small>
 				}
 
 				<label for="login">Login que você vai usar</label>

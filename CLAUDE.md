@@ -800,7 +800,7 @@ Testes de integração: `CREATE DATABASE astileac_teste;` (o Flyway aplica as mi
 >   ser vários e a formação é opcional; e `USUARIO` exigia profissional, mas a conta de
 >   instalação não tem.
 
-> **Testes do front-end** (Vitest, pelo builder `@angular/build:unit-test`, 35 testes).
+> **Testes do front-end** (Vitest, pelo builder `@angular/build:unit-test`; 35 nesta rodada, 56 depois do site e dos ajustes).
 > Antes havia só o teste gerado pelo Angular. Escolhidos pelo que já deu errado, não por
 > cobertura: cada defeito encontrado rodando o front-end virou um caso.
 > - **Ordem das requisições do login:** CSRF antes, POST como formulário, CSRF de novo
@@ -870,6 +870,36 @@ Testes de integração: `CREATE DATABASE astileac_teste;` (o Flyway aplica as mi
 > - **Em aberto:** os valores de referência e os contatos (o autor vai passar); os textos de
 >   "Quem somos" precisam da revisão da diretoria; decidir com o orientador se o site entra
 >   como requisito (seria o RF14) ou como complemento.
+
+> **Ajustes pedidos pelo autor depois da demonstração** (out/2026).
+> - **Botão que "quebrava" no formulário de linha única** (Convites e Áreas). Com
+>   `align-items: flex-end`, a mensagem de erro que aparece embaixo do campo aumentava o
+>   bloco e empurrava o botão para baixo. Agora o botão alinha com o **campo**, e não com a
+>   base do bloco. Conferido medindo: campo e botão ficam na mesma altura com a mensagem
+>   visível.
+> - **Campo de data aceitava ano de 5 dígitos ("20066"), e a validação deixava passar.** O
+>   `naoFutura` comparava as datas como texto: "20066-07-08" vem antes de "2026-..." na
+>   ordem alfabética, então passava como data no passado. E calculava "hoje" em UTC — às 20h
+>   no Acre já é o dia seguinte, e a data de amanhã passava. Corrigido com `dataValida` (ano
+>   de 4 dígitos, a partir de 1900), `hoje()` no fuso local e `min`/`max` em todos os campos
+>   de data: com o `max`, o navegador limita o ano a 4 dígitos. Teste de regressão conferido
+>   contra o código antigo.
+> - **Acentuação em todo o sistema.** As ~120 mensagens do back-end estavam sem acento, e as
+>   de validação ainda saíam com o nome técnico do campo duplicado ("dataFim: dataFim nao
+>   pode..."). Reescritas uma a uma como frase legível ("A data de término não pode estar no
+>   futuro.") — sem troca automática de palavra, porque "e" e "é" não se distinguem por
+>   regra. O tratamento de erro deixou de prefixar o nome do campo, e os status 404/405/415
+>   ganharam texto em português (antes saía "Not Found"). As respostas de erro da segurança
+>   passaram a declarar **UTF-8**: sem isso o Tomcat usa ISO-8859-1, e o navegador, que lê
+>   JSON como UTF-8, mostraria os acentos quebrados.
+> - **Datas e códigos legíveis na tela.** Datas no formato brasileiro ("20/10/2026 às
+>   20:00"), formatadas a partir do texto, sem `new Date()` — que leria "2020-01-01" como
+>   meia-noite UTC e mostraria 31/12/2019 no fuso do Acre. Ação do registro de acesso como
+>   palavra ("Exportação", não "EXPORTACAO"), perfil como "diretoria"/"associado".
+> - **Troca de senha para qualquer conta** (`/minha-senha`, link na barra). Antes ficava no
+>   fim do "Meu cadastro", que só existe para quem tem cadastro de associado: a conta da
+>   diretoria criada na instalação não tinha onde trocar a senha. Pede a senha atual e a
+>   nova duas vezes.
 
 ### Próximos passos (nesta ordem)
 1. ~~Migrations Flyway `V1` — criar as 9 tabelas + carga inicial das áreas de atuação~~ ✅

@@ -14,7 +14,7 @@ package br.edu.ifac.astileac.backend.exception;
 public class CpfJaCadastradoException extends ConflitoException {
 
 	public CpfJaCadastradoException() {
-		super("Ja existe um profissional cadastrado com este CPF");
+		super("Já existe um profissional cadastrado com este CPF.");
 	}
 
 }

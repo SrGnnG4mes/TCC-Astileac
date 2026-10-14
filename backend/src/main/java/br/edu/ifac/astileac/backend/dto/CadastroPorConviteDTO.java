@@ -23,27 +23,27 @@ import java.time.LocalDate;
  * administrador preenchendo um campo.
  */
 public record CadastroPorConviteDTO(
-		@NotBlank(message = "token e obrigatorio")
+		@NotBlank(message = "O código do convite é obrigatório.")
 		String token,
 
-		@NotBlank(message = "nome e obrigatorio")
-		@Size(max = 150, message = "nome deve ter no maximo 150 caracteres")
+		@NotBlank(message = "Informe o nome.")
+		@Size(max = 150, message = "O nome deve ter no máximo 150 caracteres.")
 		String nome,
 
-		@NotBlank(message = "cpf e obrigatorio")
-		@Cpf(message = "cpf invalido: informe 11 digitos numericos com digitos verificadores corretos")
+		@NotBlank(message = "Informe o CPF.")
+		@Cpf(message = "CPF inválido: informe os 11 dígitos, com os dígitos verificadores corretos.")
 		String cpf,
 
-		@NotNull(message = "data de nascimento e obrigatoria")
-		@Past(message = "data de nascimento deve estar no passado")
+		@NotNull(message = "Informe a data de nascimento.")
+		@Past(message = "A data de nascimento deve estar no passado.")
 		LocalDate dataNascimento,
 
-		@NotBlank(message = "login e obrigatorio")
-		@Size(min = 4, max = 100, message = "login deve ter entre 4 e 100 caracteres")
+		@NotBlank(message = "Informe o login.")
+		@Size(min = 4, max = 100, message = "O login deve ter entre 4 e 100 caracteres.")
 		String login,
 
-		@NotBlank(message = "senha e obrigatoria")
-		@Size(min = 8, max = 100, message = "senha deve ter no minimo 8 caracteres")
+		@NotBlank(message = "Informe a senha.")
+		@Size(min = 8, max = 100, message = "A senha deve ter no mínimo 8 caracteres.")
 		String senha
 ) {
 }

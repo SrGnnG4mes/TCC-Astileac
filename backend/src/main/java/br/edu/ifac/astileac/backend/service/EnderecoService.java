@@ -63,7 +63,7 @@ public class EnderecoService {
 	private Endereco buscarEntidade(Long profissionalId) {
 		return enderecoRepository.findByProfissionalId(profissionalId)
 				.orElseThrow(() -> new RecursoNaoEncontradoException(
-						"Profissional nao possui endereco cadastrado: id " + profissionalId));
+						"Profissional não possui endereço cadastrado: id " + profissionalId));
 	}
 
 	private EnderecoResponseDTO toResponseDTO(Endereco endereco) {

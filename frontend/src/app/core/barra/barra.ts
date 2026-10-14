@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AutenticacaoService } from '../autenticacao.service';
+import { PerfilPipe } from '../formatos';
 
 /**
  * Barra de navegacao das telas autenticadas.
@@ -21,7 +22,7 @@ import { AutenticacaoService } from '../autenticacao.service';
  */
 @Component({
 	selector: 'app-barra',
-	imports: [RouterLink, RouterLinkActive],
+	imports: [RouterLink, RouterLinkActive, PerfilPipe],
 	templateUrl: './barra.html',
 	styleUrl: './barra.css'
 })

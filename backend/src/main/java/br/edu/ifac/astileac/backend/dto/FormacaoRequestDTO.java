@@ -16,19 +16,19 @@ import jakarta.validation.constraints.Size;
  * nao do codigo.
  */
 public record FormacaoRequestDTO(
-		@NotBlank(message = "nivel e obrigatorio")
-		@Size(max = 50, message = "nivel deve ter no maximo 50 caracteres")
+		@NotBlank(message = "Informe o nível da formação.")
+		@Size(max = 50, message = "O nível deve ter no máximo 50 caracteres.")
 		String nivel,
 
-		@NotBlank(message = "curso e obrigatorio")
-		@Size(max = 150, message = "curso deve ter no maximo 150 caracteres")
+		@NotBlank(message = "Informe o curso.")
+		@Size(max = 150, message = "O curso deve ter no máximo 150 caracteres.")
 		String curso,
 
-		@NotBlank(message = "instituicao e obrigatoria")
-		@Size(max = 150, message = "instituicao deve ter no maximo 150 caracteres")
+		@NotBlank(message = "Informe a instituição.")
+		@Size(max = 150, message = "A instituição deve ter no máximo 150 caracteres.")
 		String instituicao,
 
-		@NotNull(message = "anoConclusao e obrigatorio")
+		@NotNull(message = "Informe o ano de conclusão.")
 		Integer anoConclusao
 ) {
 }

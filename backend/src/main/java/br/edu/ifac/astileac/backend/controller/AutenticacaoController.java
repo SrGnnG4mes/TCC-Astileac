@@ -53,7 +53,7 @@ public class AutenticacaoController {
 	@GetMapping("/eu")
 	public UsuarioAutenticadoDTO eu() {
 		UsuarioAutenticado usuario = usuarioLogado.atual()
-				.orElseThrow(() -> new RecursoNaoEncontradoException("Nenhuma sessao ativa"));
+				.orElseThrow(() -> new RecursoNaoEncontradoException("Nenhuma sessão ativa."));
 
 		return new UsuarioAutenticadoDTO(
 				usuario.getLogin(),

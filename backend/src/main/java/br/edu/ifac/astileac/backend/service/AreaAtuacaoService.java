@@ -26,7 +26,7 @@ public class AreaAtuacaoService {
 	public AreaAtuacaoResponseDTO criar(AreaAtuacaoRequestDTO dto) {
 		String nome = normalizar(dto.nome());
 		if (areaAtuacaoRepository.existsByNome(nome)) {
-			throw new ConflitoException("Ja existe uma area de atuacao com este nome");
+			throw new ConflitoException("Já existe uma área de atuação com este nome.");
 		}
 
 		AreaAtuacao area = new AreaAtuacao();
@@ -55,7 +55,7 @@ public class AreaAtuacaoService {
 
 		boolean nomeMudou = !area.getNome().equals(nome);
 		if (nomeMudou && areaAtuacaoRepository.existsByNome(nome)) {
-			throw new ConflitoException("Ja existe uma area de atuacao com este nome");
+			throw new ConflitoException("Já existe uma área de atuação com este nome.");
 		}
 
 		area.setNome(nome);
@@ -81,7 +81,7 @@ public class AreaAtuacaoService {
 	@Transactional(readOnly = true)
 	public AreaAtuacao buscarEntidade(Long id) {
 		return areaAtuacaoRepository.findById(id)
-				.orElseThrow(() -> new RecursoNaoEncontradoException("Area de atuacao nao encontrada: id " + id));
+				.orElseThrow(() -> new RecursoNaoEncontradoException("Área de atuação não encontrada: id " + id));
 	}
 
 	/**

@@ -10,11 +10,11 @@ import jakarta.validation.constraints.Size;
  * trocaria a senha e trancaria o dono para fora da propria conta.
  */
 public record SenhaRequestDTO(
-		@NotBlank(message = "senha atual e obrigatoria")
+		@NotBlank(message = "Informe a senha atual.")
 		String senhaAtual,
 
-		@NotBlank(message = "senha nova e obrigatoria")
-		@Size(min = 8, max = 100, message = "senha nova deve ter no minimo 8 caracteres")
+		@NotBlank(message = "Informe a senha nova.")
+		@Size(min = 8, max = 100, message = "A senha nova deve ter no mínimo 8 caracteres.")
 		String senhaNova
 ) {
 }

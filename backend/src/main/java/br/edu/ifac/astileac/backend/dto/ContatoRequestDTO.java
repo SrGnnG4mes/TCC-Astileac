@@ -14,11 +14,11 @@ import jakarta.validation.constraints.Size;
  * como regra de negocio.
  */
 public record ContatoRequestDTO(
-		@NotNull(message = "tipo e obrigatorio: EMAIL ou TELEFONE")
+		@NotNull(message = "Informe o tipo de contato: e-mail ou telefone.")
 		TipoContato tipo,
 
-		@NotBlank(message = "valor e obrigatorio")
-		@Size(max = 150, message = "valor deve ter no maximo 150 caracteres")
+		@NotBlank(message = "Informe o contato.")
+		@Size(max = 150, message = "O contato deve ter no máximo 150 caracteres.")
 		String valor,
 
 		/** Nulo equivale a false: contato comum, nao o principal. */

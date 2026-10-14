@@ -34,17 +34,17 @@
 		<div class="linha">
 			<div class="campo">
 				<label for="dataNascimento">Data de nascimento</label>
-				<input id="dataNascimento" type="date" formControlName="dataNascimento" />
+				<input id="dataNascimento" type="date" [min]="dataMinima" [max]="hoje" formControlName="dataNascimento" />
 				@if (formulario.controls.dataNascimento.touched && formulario.controls.dataNascimento.invalid) {
-					<small class="falha">Informe uma data no passado.</small>
+					<small class="falha">Informe uma data válida, que não esteja no futuro.</small>
 				}
 			</div>
 
 			<div class="campo">
 				<label for="dataAssociacao">Data de associação</label>
-				<input id="dataAssociacao" type="date" formControlName="dataAssociacao" />
+				<input id="dataAssociacao" type="date" [min]="dataMinima" [max]="hoje" formControlName="dataAssociacao" />
 				@if (formulario.controls.dataAssociacao.touched && formulario.controls.dataAssociacao.invalid) {
-					<small class="falha">Informe a data de associação.</small>
+					<small class="falha">Informe uma data de associação válida, que não esteja no futuro.</small>
 				}
 			</div>
 		</div>

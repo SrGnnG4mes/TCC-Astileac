@@ -75,7 +75,7 @@ public class DadosPessoaisService {
 		Profissional profissional = profissionalService.buscarEntidade(profissionalId);
 
 		logAcessoService.registrar(AcaoLog.EXPORTACAO, LogAcessoService.ENTIDADE_PROFISSIONAL, profissionalId, null,
-				"Exportacao de dados pessoais (LGPD Art. 18)");
+				"Exportação de dados pessoais (LGPD, Art. 18)");
 
 		return new DadosPessoaisDTO(
 				LocalDate.now(),
@@ -143,7 +143,7 @@ public class DadosPessoaisService {
 		Profissional profissional = profissionalService.buscarEntidade(profissionalId);
 
 		if (profissional.getDataExclusaoSolicitada() != null) {
-			throw new ConflitoException("Ja existe um pedido de exclusao em andamento para este cadastro");
+			throw new ConflitoException("Já existe um pedido de exclusão em andamento para este cadastro.");
 		}
 
 		LocalDateTime agora = LocalDateTime.now();
@@ -154,11 +154,11 @@ public class DadosPessoaisService {
 		LocalDate dataDoPedido = agora.toLocalDate();
 		LocalDate dataDaExclusao = dataDoPedido.plusDays(DIAS_ATE_EXCLUSAO_DEFINITIVA);
 
-		String mensagem = ("Pedido de exclusao registrado. Os seus dados serao mantidos por %d dias, "
-				+ "ate %s, e nesse periodo ficam bloqueados: nao aparecem em consultas nem em "
-				+ "listagens da associacao. O prazo existe para o caso de voce mudar de ideia. "
-				+ "Passada essa data, os dados serao apagados definitivamente e nao havera como "
-				+ "recupera-los.")
+		String mensagem = ("Pedido de exclusão registrado. Os seus dados serão mantidos por %d dias, "
+				+ "até %s, e nesse período ficam bloqueados: não aparecem em consultas nem em "
+				+ "listagens da associação. O prazo existe para o caso de você mudar de ideia. "
+				+ "Passada essa data, os dados serão apagados definitivamente e não haverá como "
+				+ "recuperá-los.")
 				.formatted(DIAS_ATE_EXCLUSAO_DEFINITIVA, dataDaExclusao.format(DATA_BR));
 
 		return new ExclusaoRespostaDTO(
@@ -179,7 +179,7 @@ public class DadosPessoaisService {
 
 		if (profissional.getDataExclusaoSolicitada() == null) {
 			throw new RecursoNaoEncontradoException(
-					"Nao ha pedido de exclusao em andamento para este cadastro");
+					"Não há pedido de exclusão em andamento para este cadastro.");
 		}
 
 		profissional.setDataExclusaoSolicitada(null);
@@ -187,7 +187,7 @@ public class DadosPessoaisService {
 		profissionalRepository.save(profissional);
 
 		return new ExclusaoRespostaDTO(
-				"Pedido de exclusao cancelado. O cadastro voltou a ficar ativo e os dados nao serao apagados.",
+				"Pedido de exclusão cancelado. O cadastro voltou a ficar ativo e os dados não serão apagados.",
 				LocalDate.now(),
 				null,
 				0,
@@ -251,7 +251,7 @@ public class DadosPessoaisService {
 			// Sem CPF nem nome: o log registra que a eliminacao
 			// ocorreu, nao quem era a pessoa.
 			logAcessoService.registrar(AcaoLog.EXCLUSAO, LogAcessoService.ENTIDADE_PROFISSIONAL, id, null,
-					"Exclusao definitiva apos a janela de " + DIAS_ATE_EXCLUSAO_DEFINITIVA + " dias");
+					"Exclusão definitiva após a janela de " + DIAS_ATE_EXCLUSAO_DEFINITIVA + " dias");
 			log.info("Cadastro {} apagado definitivamente apos a janela de arrependimento", id);
 		}
 

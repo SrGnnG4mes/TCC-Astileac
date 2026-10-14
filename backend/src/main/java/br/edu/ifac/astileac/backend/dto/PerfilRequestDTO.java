@@ -10,7 +10,7 @@ import jakarta.validation.constraints.NotBlank;
  * conta, e nao a criacao de outro tipo de usuario.
  */
 public record PerfilRequestDTO(
-		@NotBlank(message = "perfil e obrigatorio")
+		@NotBlank(message = "Informe o perfil.")
 		String perfil
 ) {
 }

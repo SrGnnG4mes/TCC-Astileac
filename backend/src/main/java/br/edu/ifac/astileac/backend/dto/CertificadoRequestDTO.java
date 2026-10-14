@@ -23,20 +23,20 @@ import java.time.LocalDate;
 public record CertificadoRequestDTO(
 		Long formacaoId,
 
-		@NotBlank(message = "titulo e obrigatorio")
-		@Size(max = 150, message = "titulo deve ter no maximo 150 caracteres")
+		@NotBlank(message = "Informe o título do certificado.")
+		@Size(max = 150, message = "O título deve ter no máximo 150 caracteres.")
 		String titulo,
 
-		@NotBlank(message = "instituicaoEmissora e obrigatoria")
-		@Size(max = 150, message = "instituicaoEmissora deve ter no maximo 150 caracteres")
+		@NotBlank(message = "Informe a instituição emissora.")
+		@Size(max = 150, message = "A instituição emissora deve ter no máximo 150 caracteres.")
 		String instituicaoEmissora,
 
-		@NotNull(message = "cargaHoraria e obrigatoria")
-		@Positive(message = "cargaHoraria deve ser maior que zero")
+		@NotNull(message = "Informe a carga horária.")
+		@Positive(message = "A carga horária deve ser maior que zero.")
 		Integer cargaHoraria,
 
-		@NotNull(message = "dataEmissao e obrigatoria")
-		@PastOrPresent(message = "dataEmissao nao pode estar no futuro")
+		@NotNull(message = "Informe a data de emissão.")
+		@PastOrPresent(message = "A data de emissão não pode estar no futuro.")
 		LocalDate dataEmissao
 ) {
 }

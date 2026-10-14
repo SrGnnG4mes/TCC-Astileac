@@ -38,7 +38,7 @@ public class ProfissionalAreaService {
 
 		ProfissionalAreaId chave = new ProfissionalAreaId(profissionalId, dto.areaAtuacaoId());
 		if (profissionalAreaRepository.existsById(chave)) {
-			throw new ConflitoException("Este profissional ja atua nesta area de atuacao");
+			throw new ConflitoException("Este profissional já atua nesta área.");
 		}
 
 		ProfissionalArea vinculo = new ProfissionalArea();
@@ -79,7 +79,7 @@ public class ProfissionalAreaService {
 		profissionalService.buscarEntidade(profissionalId);
 		return profissionalAreaRepository.findById(new ProfissionalAreaId(profissionalId, areaAtuacaoId))
 				.orElseThrow(() -> new RecursoNaoEncontradoException(
-						"Profissional nao atua nesta area de atuacao: area id " + areaAtuacaoId));
+						"Profissional não atua nesta área de atuação: área id " + areaAtuacaoId));
 	}
 
 	private ProfissionalAreaResponseDTO toResponseDTO(ProfissionalArea vinculo) {

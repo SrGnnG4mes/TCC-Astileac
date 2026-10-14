@@ -12,11 +12,11 @@ import jakarta.validation.constraints.Size;
  * profissional e N:N, e nao uma coluna booleana por area.
  */
 public record AreaAtuacaoRequestDTO(
-		@NotBlank(message = "nome e obrigatorio")
-		@Size(max = 50, message = "nome deve ter no maximo 50 caracteres")
+		@NotBlank(message = "Informe o nome.")
+		@Size(max = 50, message = "O nome deve ter no máximo 50 caracteres.")
 		String nome,
 
-		@Size(max = 255, message = "descricao deve ter no maximo 255 caracteres")
+		@Size(max = 255, message = "A descrição deve ter no máximo 255 caracteres.")
 		String descricao
 ) {
 }

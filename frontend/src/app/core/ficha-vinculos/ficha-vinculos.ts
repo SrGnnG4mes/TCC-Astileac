@@ -13,7 +13,8 @@ import {
 	TipoContato,
 	Vinculo
 } from '../modelos';
-import { naoFutura } from '../validadores';
+import { naoFutura, DATA_MINIMA, hoje } from '../validadores';
+import { DataBrPipe } from '../formatos';
 
 /**
  * Tudo que pende de um profissional: contatos, endereco, areas de
@@ -40,11 +41,18 @@ import { naoFutura } from '../validadores';
  */
 @Component({
 	selector: 'app-ficha-vinculos',
-	imports: [ReactiveFormsModule],
+	imports: [ReactiveFormsModule, DataBrPipe],
 	templateUrl: './ficha-vinculos.html',
 	styleUrl: './ficha-vinculos.css'
 })
 export class FichaVinculos implements OnInit {
+
+	/**
+	 * Limites dos campos de data. Com o max, o navegador deixa o ano com 4
+	 * digitos e nao oferece data futura no calendario.
+	 */
+	readonly dataMinima = DATA_MINIMA;
+	readonly hoje = hoje();
 
 	/** Dono dos registros. Vem da rota (diretoria) ou da sessao (associado). */
 	readonly profissionalId = input.required<number>();
@@ -499,11 +507,11 @@ export class FichaVinculos implements OnInit {
 
 	private mensagemDe(falha: HttpErrorResponse): string {
 		if (falha.status === 0) {
-			return 'Nao foi possivel falar com o servidor.';
+			return 'Não foi possível falar com o servidor.';
 		}
 		// O 403 nao ganha mensagem propria: o back-end distingue falta
 		// de permissao de falha de token CSRF, e trocar as duas por um
 		// texto generico torna o erro indiagnosticavel.
-		return falha.error?.mensagem ?? 'Nao foi possivel completar a operacao.';
+		return falha.error?.mensagem ?? 'Não foi possível completar a operação.';
 	}
 }

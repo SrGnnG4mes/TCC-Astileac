@@ -76,7 +76,7 @@ public class VinculoEmpregaticioService {
 
 	private void validarPeriodo(VinculoEmpregaticioRequestDTO dto) {
 		if (dto.dataFim() != null && dto.dataFim().isBefore(dto.dataInicio())) {
-			throw new RegraDeNegocioException("dataFim: nao pode ser anterior a dataInicio");
+			throw new RegraDeNegocioException("A data de término não pode ser anterior à data de início.");
 		}
 	}
 
@@ -84,7 +84,7 @@ public class VinculoEmpregaticioService {
 		return vinculoEmpregaticioRepository.findById(vinculoId)
 				.filter(vinculo -> vinculo.getProfissional().getId().equals(profissionalId))
 				.orElseThrow(() -> new RecursoNaoEncontradoException(
-						"Vinculo nao encontrado para este profissional: id " + vinculoId));
+						"Vínculo não encontrado para este profissional: id " + vinculoId));
 	}
 
 	private VinculoEmpregaticioResponseDTO toResponseDTO(VinculoEmpregaticio vinculo) {

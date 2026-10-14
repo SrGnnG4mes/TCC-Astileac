@@ -49,11 +49,11 @@ public class UsuarioService {
 		try {
 			novo = Perfil.valueOf(perfilDesejado.trim().toUpperCase());
 		} catch (IllegalArgumentException e) {
-			throw new RegraDeNegocioException("Perfil invalido: use ADMIN ou PROFISSIONAL");
+			throw new RegraDeNegocioException("Perfil inválido: use ADMIN ou PROFISSIONAL.");
 		}
 
 		Usuario usuario = usuarioRepository.findById(id)
-				.orElseThrow(() -> new RecursoNaoEncontradoException("Conta nao encontrada: id " + id));
+				.orElseThrow(() -> new RecursoNaoEncontradoException("Conta não encontrada: id " + id));
 
 		boolean eraAdmin = Perfil.ADMIN.name().equals(usuario.getPerfil());
 		boolean deixaDeSerAdmin = eraAdmin && novo != Perfil.ADMIN;
@@ -63,7 +63,7 @@ public class UsuarioService {
 		// recuperar exigiria alterar o banco na mao.
 		if (deixaDeSerAdmin && usuarioRepository.countByPerfil(Perfil.ADMIN.name()) <= 1) {
 			throw new ConflitoException(
-					"Esta e a unica conta administradora. Conceda o perfil a outra conta antes de retirar desta.");
+					"Esta é a única conta administradora. Conceda o perfil a outra conta antes de retirá-lo desta.");
 		}
 
 		usuario.setPerfil(novo.name());
@@ -84,14 +84,14 @@ public class UsuarioService {
 	@Transactional
 	public void trocarPropriaSenha(String login, String senhaAtual, String senhaNova) {
 		Usuario usuario = usuarioRepository.findByLogin(login)
-				.orElseThrow(() -> new RecursoNaoEncontradoException("Conta nao encontrada"));
+				.orElseThrow(() -> new RecursoNaoEncontradoException("Conta não encontrada."));
 
 		if (!passwordEncoder.matches(senhaAtual, usuario.getSenhaHash())) {
-			throw new RegraDeNegocioException("Senha atual incorreta");
+			throw new RegraDeNegocioException("Senha atual incorreta.");
 		}
 
 		if (passwordEncoder.matches(senhaNova, usuario.getSenhaHash())) {
-			throw new RegraDeNegocioException("A senha nova deve ser diferente da atual");
+			throw new RegraDeNegocioException("A senha nova deve ser diferente da atual.");
 		}
 
 		usuario.setSenhaHash(passwordEncoder.encode(senhaNova));

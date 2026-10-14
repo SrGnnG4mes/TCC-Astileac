@@ -158,7 +158,7 @@
 								"exec": [
 									"pm.test('401 sem autenticação', () => pm.response.to.have.status(401));",
 									"pm.test('Responde JSON, não página de login', () => {",
-									"    pm.expect(pm.response.json().mensagem).to.include('Autenticacao');",
+									"    pm.expect(pm.response.json().mensagem).to.include('Entre no sistema');",
 									"});"
 								]
 							}
@@ -188,7 +188,7 @@
 								"exec": [
 									"pm.test('401', () => pm.response.to.have.status(401));",
 									"pm.test('Não revela se o login existe', () => {",
-									"    pm.expect(pm.response.json().mensagem).to.eql('Credenciais invalidas');",
+									"    pm.expect(pm.response.json().mensagem).to.eql('Login ou senha incorretos.');",
 									"});"
 								]
 							}
@@ -482,7 +482,7 @@
 								"exec": [
 									"pm.test('400', () => pm.response.to.have.status(400));",
 									"pm.test('Recusa CPF que não é real', () => {",
-									"    pm.expect(pm.response.json().mensagem).to.include('cpf');",
+									"    pm.expect(pm.response.json().mensagem).to.include('CPF');",
 									"});",
 									"// 12345678901 tem 11 dígitos mas não é um CPF válido."
 								]
@@ -2328,7 +2328,7 @@
 									"pm.test('Inválido, com a mensagem genérica', () => {",
 									"    const v = pm.response.json();",
 									"    pm.expect(v.valido).to.be.false;",
-									"    pm.expect(v.motivo).to.include('invalido, ja utilizado ou expirado');",
+									"    pm.expect(v.motivo).to.include('inválido, já utilizado ou expirado');",
 									"});",
 									"// Token inventado e token já usado recebem a mesma resposta:",
 									"// distinguir confirmaria a um estranho que o código existe."
