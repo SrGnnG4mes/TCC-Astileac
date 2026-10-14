@@ -40,7 +40,7 @@ Um profissional pode atuar em **mais de uma área ao mesmo tempo**.
 
 | Camada         | Tecnologia                                    |
 |----------------|-----------------------------------------------|
-| Back-end       | Java 21 + **Spring Boot 4.1.0**               |
+| Back-end       | Java 21 + **Spring Boot 4.1.1**               |
 | Persistência   | Spring Data JPA + Hibernate                   |
 | Banco          | PostgreSQL                                    |
 | Migrations     | Flyway (`flyway-core` + `flyway-database-postgresql`) |
@@ -69,8 +69,11 @@ astileac/
 ├── frontend/      Aplicação Angular
 ├── docs/          Documento do TCC (LaTeX) e diagramas
 │   ├── tcc/                    ← fonte LaTeX (tcc.tex, abntspiifac.cls, refs.bib)
-│   ├── ASTILEAC-BD.mmd         ← diagrama entidade-relacionamento (Mermaid)
-│   ├── ASTILEAC-BDimage.png    ← DER exportado como imagem
+│   ├── ASTILEAC-BD-atual.mmd   ← DER do sistema atual, 11 tabelas (Mermaid)
+│   ├── ASTILEAC-BD-atual.png   ← DER atual exportado como imagem
+│   ├── ASTILEAC-BD.mmd         ← DER inicial (ago/2026), 9 tabelas, registro histórico
+│   ├── ASTILEAC-BDimage.png    ← DER inicial exportado como imagem
+│   ├── medicao/                ← medição do índice do RF08 (script, saídas, conclusão)
 │   └── ASTILEAC_Projeto_TCC.pdf ← documento do TCC compilado
 ├── Postman/      Coleção de demonstração da API (importar no Postman)
 ├── .gitignore
@@ -98,7 +101,10 @@ controller  →  service  →  repository  →  entity
 
 ## 4. Modelo de dados
 
-O DER completo está em `docs/ASTILEAC-BD.mmd`. São **9 tabelas**:
+O DER atual está em `docs/ASTILEAC-BD-atual.mmd`. São **11 tabelas**: as 9 do modelo
+inicial (`docs/ASTILEAC-BD.mmd`, mantido como registro da evolução) mais `LOG_ACESSO` (V4)
+e `CONVITE` (V6). As colunas que entraram depois do modelo inicial estão listadas no fim
+desta seção.
 
 ### PROFISSIONAL (entidade central)
 `id` PK, `nome`, `cpf` (único), `data_nascimento`, `data_associacao`, `ativo`
@@ -135,6 +141,23 @@ Chave primária **composta**: `profissional_id` + `area_atuacao_id`. Mais `data_
 `data_inicio`, `data_fim`, `atual`
 
 > `data_fim` nula = vínculo em andamento. Guardamos o histórico, não só o vínculo atual.
+
+### Colunas acrescentadas depois do modelo inicial
+- `profissional.data_exclusao_solicitada` (V4) — pedido de eliminação do titular; bloqueia
+  o cadastro durante a janela de 30 dias.
+- `profissional.lattes_url` (V8) — opcional, só aceita endereço do `lattes.cnpq.br`.
+- `certificado.arquivo_path` passou a ser **opcional** (V5).
+- `certificado.validado_em` e `validado_por` (V7) — visto da diretoria no documento.
+
+### LOG_ACESSO (V4) — registro de acesso (RF11)
+`id`, `data_hora`, `autor`, `origem`, `acao`, `entidade`, `registro_id`, `detalhe`.
+**Sem chave estrangeira, de propósito**: o registro de que alguém acessou um dado precisa
+sobreviver à eliminação desse dado.
+
+### CONVITE (V6) — cadastro por convite (RF12)
+`id`, `email`, `token_hash` (SHA-256, único), `data_emissao`, `data_expiracao`,
+`data_consumo` (nula = ainda não usado), `profissional_id` (único, preenchido no
+cadastro), `emitido_por`.
 
 ### USUARIO — 1:1 opcional com profissional
 `id` PK, `profissional_id` FK, `login` (único), `senha_hash`, `perfil`
@@ -291,16 +314,30 @@ Adiado por decisão do autor: ajuste de cores sugerido pela diretoria.
 ```bash
 # Back-end
 cd backend
-./mvnw spring-boot:run          # http://localhost:8080
+./mvnw spring-boot:run          # API em http://localhost:8080/api
                                 # Swagger: http://localhost:8080/swagger-ui.html
+                                # (só no perfil local)
 
-# Front-end
+# Front-end em desenvolvimento
 cd frontend
 npm install
-ng serve                        # http://localhost:4200
+npm start                       # http://localhost:4200, proxy de /api para o back-end
+
+# Tudo num processo só (o back-end serve o Angular compilado)
+cd frontend && npm run build
+cd ../backend && ./mvnw spring-boot:run      # http://localhost:8080
+./mvnw package                  # um .jar com tudo, SEM o application-local.properties
+
+# Testes
+./mvnw test                     # unidade
+./mvnw verify -Pintegracao      # unidade + integração (banco astileac_teste)
 ```
 
 Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.properties`.
+Testes de integração: `CREATE DATABASE astileac_teste;` (o Flyway aplica as migrations).
+
+**`java` não está no PATH do Windows** desta máquina: use
+`JAVA_HOME=~/.jdks/jbr-21.0.11`.
 
 ---
 
@@ -381,10 +418,10 @@ Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.propertie
 > - `spring.profiles.active=local` virou **`spring.profiles.default=local`**: fallback em vez
 >   de valor fixo brigando com a variável de ambiente.
 >
-> **Ainda em aberto** (achados da revisão não fechados no 3.5): `DELETE` continua sendo
-> exclusão real — virar desativação depende da decisão excluir × desativar; Swagger segue
-> ligado, a desligar no perfil do ambiente quando houver deploy; sem `@Version`
-> (bloqueio otimista), decisão consciente.
+> **Achados da revisão não fechados no 3.5:** `DELETE` como exclusão real — **fechado** na
+> terceira conversa com a diretoria (virou desativação); Swagger ligado — **fechado**
+> (desligado por padrão, ligado só no perfil local); sem `@Version` (bloqueio otimista) —
+> continua, decisão consciente.
 
 > **RF10 e RF11 — LGPD** (branch `feat/direitos-titular-log-acesso`, migration `V4`).
 > - **RF10, direitos do titular (Art. 18).** `GET .../dados-pessoais` exporta tudo sobre a
@@ -436,9 +473,12 @@ Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.propertie
 >   listagem geral — não existem dois caminhos de código.
 > - **O bloqueio da LGPD se propaga**: quem pediu exclusão não aparece na consulta.
 >   Verificado nos dois sentidos (some ao pedir, volta ao cancelar).
-> - **Pendente de medição:** o índice `idx_profissional_area_area` (V3) só é usado se o
->   PostgreSQL escolher começar pela área; num `EXISTS` correlacionado ele pode preferir a
->   PK composta. Confirmar com `EXPLAIN` sobre volume real antes de afirmar ganho no TCC.
+> - **Índice medido** (`docs/medicao/rf08-indice.md`): com 300 profissionais o PostgreSQL
+>   **não usa** o índice `idx_profissional_area_area`, e a consulta leva menos de 0,5 ms com
+>   ou sem ele. Passa a usá-lo por volta de 10 mil cadastros (área rara 2,9 vezes mais
+>   rápida). O receio de ele preferir a PK composta não se confirmou: o `EXISTS` vira
+>   *hashed SubPlan*, que busca pelo índice da área. **Não afirmar ganho de desempenho no
+>   volume real**; a justificativa honesta é preparo para crescimento.
 
 > **RF09 — autenticação e perfis** (branch `feat/autenticacao-e-perfis`, 64 testes).
 > - **Sessão com cookie, não JWT.** Logout com JWT exigiria lista de revogação — o estado
@@ -481,9 +521,10 @@ Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.propertie
 >   requisição naquele caminho, inclusive a navegação do navegador pedindo o HTML, então
 >   abrir `localhost:4200/profissionais` devolvia o JSON cru da API em vez da aplicação —
 >   recarregar a página na tela de busca, favoritar ou digitar a URL ficava inviável.
->   O prefixo separa os espaços de nome; o back-end **não muda**, continua publicando
->   `/profissionais` sem prefixo. O valor está em `core/api.ts` para virar string vazia
->   quando a aplicação for servida pelo próprio back-end.
+>   O prefixo separa os espaços de nome. Nesta primeira versão o proxy removia o
+>   prefixo e o back-end seguia sem ele; **depois o back-end passou a publicar a API sob
+>   `/api` também** (ver "Processo único" mais abaixo), porque o plano de trocar o prefixo
+>   por string vazia traria a mesma colisão de volta na implantação.
 >   **Descoberto rodando, não lendo** — compila e funciona em toda navegação interna.
 > - **`Pagina<T>` traz os metadados aninhados em `page`**, não no topo:
 >   `{"content":[...],"page":{"size","number","totalElements","totalPages"}}`. É o formato
@@ -695,6 +736,68 @@ Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.propertie
 > normalização continua no salvar. Lição: validar no cliente o formato **de entrada**, não
 > o formato **de armazenamento**.
 
+> **Pendências do levantamento do capítulo (out/2026)** — testes de integração, processo
+> único, Postman, medição do índice e DER.
+> - **Testes de integração contra PostgreSQL** (`./mvnw verify -Pintegracao`, banco
+>   `astileac_teste`, pacote `integracao`, 11 testes). Ficam fora do `./mvnw test` para quem
+>   clona o repositório rodar a suíte de unidade sem banco. **Não são `@Transactional`**: um
+>   teste transacional desfaria tudo no fim e esconderia exatamente o que se quer ver (o que
+>   o service grava ao confirmar e o que desfaz ao falhar). A base **confere o nome do banco
+>   antes do `TRUNCATE`** e se recusa a rodar fora do `astileac_teste`.
+>   Cobrem: convite de uso único (inclusive duas tentativas simultâneas), falha no cadastro
+>   que não queima o convite (rollback), expurgo completo e o prazo mínimo de 30 dias,
+>   documento do certificado acompanhando o registro, consulta do RF08 (EXISTS sem
+>   duplicar, filtros, bloqueio da LGPD) e registro de acesso de ponta a ponta.
+>   **Conferido que pegam os defeitos:** sem a correção do convite, 2 dos 3 testes falham —
+>   inclusive o de concorrência, em que o mesmo convite chegou a criar **dois** cadastros;
+>   sem o ajuste do prefixo no interceptor, o do registro de acesso falha.
+> - **Defeito encontrado pelos testes de integração: o PDF sobrevivia à exclusão.**
+>   Remover um certificado ou expurgar um cadastro apagava as linhas e **deixava o PDF no
+>   disco** — dado pessoal órfão, sem registro nenhum que apontasse para ele. O Art. 18 era
+>   cumprido no banco e não no disco. Agora o arquivo é apagado **depois que a transação
+>   confirma** (`TransactionSynchronization.afterCommit`): arquivo não participa da
+>   transação, e apagar antes faria um rollback deixar o registro apontando para nada. A
+>   troca de documento passou a usar o mesmo caminho — o comentário antigo dizia "só
+>   depois de a troca estar gravada", mas `save()` não é confirmação.
+> - **`@WithMockUser` não serve para testar o RF11.** O autor do registro sai do principal,
+>   e o usuário simulado do Spring não é `UsuarioAutenticado`: o registro sairia como
+>   `nao-autenticado`. O teste usa uma conta de verdade, carregada do banco.
+> - **Processo único: o back-end serve o Angular compilado.** `./mvnw package` empacota
+>   `frontend/dist/frontend/browser` como conteúdo estático. Exigiu três coisas:
+>   - **A API foi para `/api` também no back-end** (`WebConfig.PREFIXO_API`, via
+>     `addPathPrefix` restrito ao pacote `controller`, para não mexer no springdoc). Sem
+>     prefixo, as rotas do Angular colidem com as da API (`/profissionais`, `/convites`,
+>     `/areas-atuacao`). O proxy do `ng serve` deixou de reescrever o caminho: o mesmo
+>     `/api` vale nos dois ambientes. **O interceptor do RF11 teve de tirar o prefixo**
+>     antes de deduzir entidade e id — sem isso gravaria tudo como entidade `API`, e o
+>     titular veria o próprio registro vazio, em silêncio.
+>   - **Volta para o `index.html`** em caminho que não é arquivo, para recarga e link
+>     direto (inclusive o do convite) funcionarem. Exceções: o que está sob `/api` e o que
+>     tem extensão continuam dando 404 de verdade. Na segurança, fora de `/api` só `GET` é
+>     público (é o Angular, sem dado nenhum); o resto é `denyAll`.
+>   - A página de teste antiga (`static/index.html`) foi removida: o front-end a substituiu.
+>   Verificado rodando: login, escrita com CSRF, link do convite aberto sem sessão e
+>   registro de acesso gravando a entidade certa.
+> - **O `application-local.properties` ia para dentro do `.jar`**, com a senha do banco e a
+>   do admin inicial — quem recebesse o pacote extrairia com um unzip. O `maven-jar-plugin`
+>   agora o exclui; ele continua em `target/classes` para `spring-boot:run` e testes. Na
+>   implantação, fica ao lado do `.jar` ou vem de variável de ambiente.
+> - **Swagger desligado por padrão** (`application.properties`), ligado só no perfil local.
+>   Conferido no `.jar` sem perfil local: a documentação não existe.
+> - **Coleção do Postman atualizada**: `baseUrl` com `/api`; pastas novas para o RF13
+>   (anexar, baixar, visto, troca derruba o visto), o RF12 (emissão, validação, cadastro,
+>   uso único, login do associado, 403 nos dados alheios e no visto do próprio documento,
+>   concessão de perfil) e a situação no quadro (desativar, `DELETE` → 405). CPFs gerados a
+>   cada execução e asserções pelos ids da própria execução: **roda várias vezes seguidas**
+>   — antes dependia da limpeza por `DELETE`, que não existe mais. Já havia uma asserção
+>   quebrada desde o RF13 (`arquivoPath` nulo, campo que saiu da API). Verificada com o
+>   newman: 139 asserções, nenhuma falha, em duas execuções seguidas.
+> - **DER atualizado** (`docs/ASTILEAC-BD-atual.*`). O inicial tinha três erros de
+>   cardinalidade, corrigidos no atual: faltava a relação `PROFISSIONAL`–`CERTIFICADO`;
+>   `FORMACAO`–`CERTIFICADO` dizia "no máximo um certificado por formação", quando podem
+>   ser vários e a formação é opcional; e `USUARIO` exigia profissional, mas a conta de
+>   instalação não tem.
+
 ### Próximos passos (nesta ordem)
 1. ~~Migrations Flyway `V1` — criar as 9 tabelas + carga inicial das áreas de atuação~~ ✅
 2. ~~Entidades JPA + repositories~~ ✅
@@ -705,7 +808,8 @@ Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.propertie
 
 4. ~~Demais cadastros: endereço, contatos, áreas, formações, certificados, vínculos~~ ✅
 5. ~~Consulta e filtro por área de atuação (RF08)~~ ✅
-6. ~~Autenticação e perfis (RF09)~~ ✅ (falta verificar as regras de perfil com um admin real)
+6. ~~Autenticação e perfis (RF09)~~ ✅ — regras de perfil verificadas com contas reais de
+   diretoria e de associado
 7. ~~Front-end Angular~~ ✅ — todas as telas: login, cadastro público por convite,
    consulta do RF08, ficha completa (contatos, endereço, áreas, formações, certificados,
    vínculos), telas da LGPD, manutenção das áreas, autoatendimento, convites e contas.

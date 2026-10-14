@@ -34,8 +34,10 @@ certificados e vínculos empregatícios.
 astileac/
 ├── backend/       API REST em Spring Boot
 ├── frontend/      Aplicação Angular
-├── docs/          Documentação do TCC (LaTeX) e diagramas
-│   └── tcc/       Fonte LaTeX do TCC
+├── docs/          Documentação do TCC (LaTeX), diagramas e medições
+│   ├── tcc/       Fonte LaTeX do TCC
+│   └── medicao/   Medição do índice da consulta por área (RF08)
+├── Postman/       Coleção de demonstração da API
 └── README.md
 ```
 
@@ -43,7 +45,7 @@ astileac/
 
 ### Pré-requisitos
 - JDK 21
-- Node.js 20+
+- Node.js 24 LTS
 - PostgreSQL 16+
 
 ### Banco de dados
@@ -58,20 +60,51 @@ cp src/main/resources/application-example.properties src/main/resources/applicat
 # edite application-local.properties com as suas credenciais
 ./mvnw spring-boot:run
 ```
-A API sobe em `http://localhost:8080`
-Swagger UI: `http://localhost:8080/swagger-ui.html`
+A API fica sob `http://localhost:8080/api`.
+Swagger UI: `http://localhost:8080/swagger-ui.html` (ligado só no perfil local).
 
-### Front-end
+### Front-end, em desenvolvimento
 ```bash
 cd frontend
 npm install
-ng serve
+npm start
 ```
-A aplicação sobe em `http://localhost:4200`
+A aplicação sobe em `http://localhost:4200`, e o proxy do `ng serve` repassa
+`/api` ao back-end.
+
+### Tudo num processo só
+O back-end também serve o Angular compilado: uma porta, um processo, sem
+`ng serve`.
+```bash
+cd frontend && npm run build
+cd ../backend && ./mvnw spring-boot:run
+```
+A aplicação inteira fica em `http://localhost:8080`. Para gerar um pacote
+único, `./mvnw package` produz `backend/target/backend-0.0.1-SNAPSHOT.jar`,
+que roda com `java -jar`. O `application-local.properties` **não** vai para
+dentro do `.jar`: na máquina de destino ele fica ao lado do arquivo, ou as
+credenciais vêm de variáveis de ambiente (`SPRING_DATASOURCE_URL`,
+`SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD`).
+
+## Testes
+
+```bash
+cd backend
+./mvnw test                    # testes de unidade
+./mvnw verify -Pintegracao     # unidade + integração contra PostgreSQL
+```
+Os testes de integração exigem um banco separado, que eles limpam a cada
+caso e se recusam a rodar em qualquer outro:
+```sql
+CREATE DATABASE astileac_teste;
+```
 
 ## Modelo de dados
 
-O diagrama entidade-relacionamento está em `docs/ASTILEAC-BD.mmd`.
+O diagrama entidade-relacionamento do sistema atual está em
+`docs/ASTILEAC-BD-atual.mmd` (imagem em `docs/ASTILEAC-BD-atual.png`).
+`docs/ASTILEAC-BD.mmd` é o modelo inicial, de agosto, com as nove tabelas
+de partida, mantido como registro da evolução.
 
 ## Licença
 
