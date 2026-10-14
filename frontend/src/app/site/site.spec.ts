@@ -30,7 +30,7 @@ describe('site publico', () => {
 	it('a raiz abre o inicio do site, e nao o login', async () => {
 		await harness.navigateByUrl('/');
 
-		expect(texto()).toContain('Tradutores e intérpretes de Libras do Acre');
+		expect(texto()).toContain('Tradutores, intérpretes e guias-intérpretes de Língua Brasileira de Sinais do Acre');
 		expect(texto()).toContain('Área do associado');
 	});
 
@@ -66,6 +66,6 @@ describe('site publico', () => {
 	it('caminho inexistente volta para o inicio do site', async () => {
 		await harness.navigateByUrl('/pagina-que-nao-existe');
 
-		expect(texto()).toContain('Tradutores e intérpretes de Libras do Acre');
+		expect(texto()).toContain('Tradutores, intérpretes e guias-intérpretes de Língua Brasileira de Sinais do Acre');
 	});
 });
