@@ -1,5 +1,6 @@
 package br.edu.ifac.astileac.backend.service;
 
+import br.edu.ifac.astileac.backend.config.WebConfig;
 import br.edu.ifac.astileac.backend.dto.CertificadoResponseDTO;
 import br.edu.ifac.astileac.backend.dto.ContatoResponseDTO;
 import br.edu.ifac.astileac.backend.dto.DadosPessoaisDTO;
@@ -165,7 +166,7 @@ public class DadosPessoaisService {
 				dataDoPedido,
 				dataDaExclusao,
 				DIAS_ATE_EXCLUSAO_DEFINITIVA,
-				"Para desfazer, use POST /profissionais/" + profissionalId
+				"Para desfazer, use POST " + WebConfig.PREFIXO_API + "/profissionais/" + profissionalId
 						+ "/dados-pessoais/exclusao/cancelamento");
 	}
 

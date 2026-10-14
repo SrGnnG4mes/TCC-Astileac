@@ -71,7 +71,7 @@ class ProfissionalControllerTest {
 	void deveCriarProfissionalERetornar201() throws Exception {
 		when(profissionalService.criar(any())).thenReturn(respostaValida());
 
-		mockMvc.perform(post("/profissionais")
+		mockMvc.perform(post("/api/profissionais")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(corpoValido()))
 				.andExpect(status().isCreated())
@@ -81,7 +81,7 @@ class ProfissionalControllerTest {
 
 	@Test
 	void deveRetornar400QuandoNomeEmBrancoECpfInvalido() throws Exception {
-		mockMvc.perform(post("/profissionais")
+		mockMvc.perform(post("/api/profissionais")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content("""
 								{"nome":"","cpf":"123","dataNascimento":"1990-05-10","dataAssociacao":"2024-01-15"}
@@ -92,7 +92,7 @@ class ProfissionalControllerTest {
 	@Test
 	void deveRetornar400QuandoCpfTemFormatoCertoMasDigitoVerificadorErrado() throws Exception {
 		// 11 digitos, mas nao e um CPF real.
-		mockMvc.perform(post("/profissionais")
+		mockMvc.perform(post("/api/profissionais")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content("""
 								{"nome":"Maria Silva","cpf":"12345678901","dataNascimento":"1990-05-10","dataAssociacao":"2024-01-15"}
@@ -104,7 +104,7 @@ class ProfissionalControllerTest {
 
 	@Test
 	void deveRetornar400QuandoCorpoEMalformado() throws Exception {
-		mockMvc.perform(post("/profissionais")
+		mockMvc.perform(post("/api/profissionais")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content("{\"nome\": "))
 				.andExpect(status().isBadRequest());
@@ -112,7 +112,7 @@ class ProfissionalControllerTest {
 
 	@Test
 	void deveRetornar400QuandoIdNaoENumero() throws Exception {
-		mockMvc.perform(get("/profissionais/abc"))
+		mockMvc.perform(get("/api/profissionais/abc"))
 				.andExpect(status().isBadRequest());
 	}
 
@@ -120,7 +120,7 @@ class ProfissionalControllerTest {
 	void deveRetornar409QuandoCpfJaCadastrado() throws Exception {
 		when(profissionalService.criar(any())).thenThrow(new CpfJaCadastradoException());
 
-		mockMvc.perform(post("/profissionais")
+		mockMvc.perform(post("/api/profissionais")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(corpoValido()))
 				.andExpect(status().isConflict())
@@ -137,7 +137,7 @@ class ProfissionalControllerTest {
 		when(profissionalService.atualizar(anyLong(), any()))
 				.thenThrow(new org.springframework.dao.DataIntegrityViolationException("fk"));
 
-		mockMvc.perform(put("/profissionais/1")
+		mockMvc.perform(put("/api/profissionais/1")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(corpoValido()))
 				.andExpect(status().isConflict());
@@ -147,7 +147,7 @@ class ProfissionalControllerTest {
 	void rotaInexistenteDeveRetornar404ENao500() throws Exception {
 		// Garante que o handler generico de Exception nao volte a
 		// engolir as excecoes do proprio Spring.
-		mockMvc.perform(get("/rota-que-nao-existe"))
+		mockMvc.perform(get("/api/rota-que-nao-existe"))
 				.andExpect(status().isNotFound());
 	}
 
@@ -156,7 +156,7 @@ class ProfissionalControllerTest {
 		when(profissionalService.buscarPorId(999L))
 				.thenThrow(new RecursoNaoEncontradoException("Profissional nao encontrado: id 999"));
 
-		mockMvc.perform(get("/profissionais/999"))
+		mockMvc.perform(get("/api/profissionais/999"))
 				.andExpect(status().isNotFound());
 	}
 
@@ -167,7 +167,7 @@ class ProfissionalControllerTest {
 		when(profissionalService.consultar(any(), any(), any(), any(Pageable.class)))
 				.thenReturn(new PageImpl<>(List.of(resumo), pagina, 1));
 
-		mockMvc.perform(get("/profissionais"))
+		mockMvc.perform(get("/api/profissionais"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content[0].nome").value("Maria Silva"))
 				.andExpect(jsonPath("$.content[0].cpfMascarado").value("***.***.777-35"));
@@ -179,7 +179,7 @@ class ProfissionalControllerTest {
 	 */
 	@Test
 	void naoDeveExistirExclusaoAdministrativa() throws Exception {
-		mockMvc.perform(delete("/profissionais/1"))
+		mockMvc.perform(delete("/api/profissionais/1"))
 				.andExpect(status().isMethodNotAllowed());
 	}
 
@@ -189,7 +189,7 @@ class ProfissionalControllerTest {
 				new ProfissionalResponseDTO(1L, "Maria Silva", CPF_VALIDO,
 						LocalDate.of(1990, 5, 10), LocalDate.of(2024, 1, 15), false, null, null));
 
-		mockMvc.perform(put("/profissionais/1/situacao")
+		mockMvc.perform(put("/api/profissionais/1/situacao")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content("{\"ativo\":false}"))
 				.andExpect(status().isOk())

@@ -37,10 +37,11 @@ public class LogAcessoInterceptor implements HandlerInterceptor {
 
 		try {
 			String caminho = request.getRequestURI();
+			String recurso = semPrefixo(caminho);
 			logAcessoService.registrar(
 					acaoDe(request.getMethod()),
-					entidadeDe(caminho),
-					registroIdDe(caminho),
+					entidadeDe(recurso),
+					registroIdDe(recurso),
 					request.getRemoteAddr(),
 					request.getMethod() + " " + caminho);
 		} catch (RuntimeException falha) {
@@ -58,6 +59,22 @@ public class LogAcessoInterceptor implements HandlerInterceptor {
 			case "DELETE" -> AcaoLog.EXCLUSAO;
 			default -> AcaoLog.CONSULTA;
 		};
+	}
+
+	/**
+	 * Tira o "/api" da frente antes de interpretar o caminho.
+	 *
+	 * A entidade e o id saem da posicao dos segmentos na URL. Quando a API
+	 * ganhou o prefixo, o primeiro segmento passou a ser "api": sem esta
+	 * linha, tudo seria gravado como entidade API e sem id -- e o titular,
+	 * que consulta o proprio registro pela entidade PROFISSIONAIS, veria a
+	 * lista vazia. Nada falharia; o registro so deixaria de servir. Quem
+	 * vigia isso e o RegistroDeAcessoIT.
+	 */
+	private String semPrefixo(String caminho) {
+		return caminho.startsWith(WebConfig.PREFIXO_API + "/")
+				? caminho.substring(WebConfig.PREFIXO_API.length())
+				: caminho;
 	}
 
 	/**
