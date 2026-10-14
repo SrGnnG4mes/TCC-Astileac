@@ -15,6 +15,9 @@
 		<p class="aviso" role="status">{{ aviso() }}</p>
 	}
 
+	<!-- Rolagem propria: no celular a tabela rola dentro desta area, e nao
+	     a pagina inteira para o lado. tabindex para alcancar pelo teclado. -->
+	<div class="tabela-rolavel" role="region" aria-label="Áreas de atuação" tabindex="0">
 	<table>
 		<thead>
 			<tr>
@@ -36,6 +39,7 @@
 			}
 		</tbody>
 	</table>
+	</div>
 
 	<section class="formulario">
 		<h2>{{ editando() ? 'Editar área' : 'Nova área' }}</h2>

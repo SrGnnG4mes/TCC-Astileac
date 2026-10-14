@@ -1,1 +1,96 @@
-/* You can add global styles to this file, and also import other style files */
+/*
+ * Identidade visual da ASTILEAC.
+ *
+ * As cores saem da logo da associacao -- verde, amarelo e vermelho, as
+ * cores da bandeira do Acre --, extraidas dos pixels da propria imagem.
+ *
+ * As cores PURAS da logo nao servem para texto nem para botao: branco
+ * sobre o verde da logo tem contraste de 3,1:1, e sobre o vermelho, 4,1:1,
+ * abaixo dos 4,5:1 que a WCAG 2.1 (nivel AA) exige para texto. Por isso
+ * ha dois grupos:
+ *   - "marca": as cores exatas da logo, para faixas e detalhes, onde nao
+ *     ha texto em cima;
+ *   - "cor": tons mais escuros do MESMO verde e do MESMO vermelho, com
+ *     contraste conferido, para texto, botoes e links.
+ *
+ * Todas as combinacoes de texto e fundo abaixo foram conferidas: texto
+ * com pelo menos 4,5:1, e bordas de campo e contorno de foco com pelo
+ * menos 3:1 (WCAG 1.4.3 e 1.4.11).
+ *
+ * Nenhuma fonte externa: carregar fonte do Google enviaria o IP de cada
+ * usuario a um terceiro, num sistema que existe para cumprir a LGPD.
+ */
+:root {
+	/* Marca: cores exatas da logo. So decoracao. */
+	--marca-verde: #04a75a;
+	--marca-amarelo: #fef013;
+	--marca-vermelho: #ec3238;
+
+	/* Primaria: o verde da logo escurecido ate passar no contraste. */
+	--cor-primaria: #02703d;          /* 6,2:1 com branco */
+	--cor-primaria-escura: #01572f;   /* 8,7:1 com branco */
+	--cor-primaria-fundo: #e6f4ec;
+	--cor-sobre-primaria: #ffffff;
+
+	--cor-texto: #1f2a24;
+	--cor-texto-suave: #4f5b54;       /* 7,1:1 no branco */
+	--cor-texto-desabilitado: #66716a;
+
+	--cor-fundo: #f3f6f4;
+	--cor-superficie: #ffffff;
+	--cor-superficie-suave: #f7f9f8;
+	--cor-superficie-realce: #e9eeeb;
+
+	--cor-borda: #dce3df;             /* separadores, sem funcao de controle */
+	--cor-borda-campo: #7c8a82;       /* contorno de campo: 3,6:1 no branco */
+	--cor-desabilitado: #9aa59e;
+
+	/* Erro: o vermelho da logo escurecido. */
+	--cor-erro: #aa2428;              /* 7,0:1 com branco */
+	--cor-erro-escura: #8a1d21;
+	--cor-erro-fundo: #fdecea;
+	--cor-erro-borda: #e3b3ae;
+
+	--cor-ok: #1e6b35;
+	--cor-ok-fundo: #e6f4ec;
+	--cor-ok-borda: #9fcbb0;
+
+	/* Aviso: o amarelo da logo, clareado para fundo, com texto escuro. */
+	--cor-aviso: #5e4a00;
+	--cor-aviso-fundo: #fff9c7;
+	--cor-aviso-borda: #e3cf2b;
+
+	--cor-foco: var(--cor-primaria);
+	--sombra: 0 1px 4px rgb(0 0 0 / 12%);
+}
+
+body {
+	margin: 0;
+	background: var(--cor-fundo);
+	color: var(--cor-texto);
+	font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+	line-height: 1.5;
+}
+
+/*
+ * Contorno de foco em TUDO que recebe foco pelo teclado, nao so nos
+ * campos. Quem navega sem mouse precisa ver onde esta -- inclusive em
+ * botoes e links, que antes ficavam com o padrao do navegador.
+ */
+:focus-visible {
+	outline: 3px solid var(--cor-foco);
+	outline-offset: 2px;
+}
+
+/*
+ * Tabela larga em tela estreita rola dentro da propria area, e nao a
+ * pagina inteira para o lado (WCAG 1.4.10). A area recebe foco para que
+ * quem usa teclado tambem consiga rolar.
+ */
+.tabela-rolavel {
+	/* relative: o rotulo "Acoes", escondido na tela e lido pelo leitor de
+	   tela, e posicionado em absoluto e escapava da area de rolagem. */
+	position: relative;
+	max-width: 100%;
+	overflow-x: auto;
+}

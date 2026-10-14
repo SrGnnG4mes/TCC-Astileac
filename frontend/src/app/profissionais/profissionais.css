@@ -20,8 +20,8 @@ h1 {
 	margin-left: auto;
 	padding: 8px 14px;
 	border-radius: 6px;
-	background: #2c5aa0;
-	color: #fff;
+	background: var(--cor-primaria);
+	color: var(--cor-sobre-primaria);
 	font-size: 0.84rem;
 	font-weight: 600;
 	text-decoration: none;
@@ -36,7 +36,7 @@ h1 {
 .ajuda {
 	margin: 0 0 20px;
 	font-size: 0.85rem;
-	color: #5c6470;
+	color: var(--cor-texto-suave);
 	line-height: 1.5;
 }
 
@@ -49,7 +49,7 @@ h1 {
 	align-items: flex-end;
 	padding: 16px;
 	border-radius: 8px;
-	background: #f4f5f7;
+	background: var(--cor-fundo);
 }
 
 .campo {
@@ -63,21 +63,21 @@ h1 {
 .campo label {
 	font-size: 0.78rem;
 	font-weight: 600;
-	color: #39404a;
+	color: var(--cor-texto);
 }
 
 input,
 select {
 	padding: 8px 9px;
-	border: 1px solid #c8ccd4;
+	border: 1px solid var(--cor-borda-campo);
 	border-radius: 6px;
 	font: inherit;
-	background: #fff;
+	background: var(--cor-superficie);
 }
 
 input:focus-visible,
 select:focus-visible {
-	outline: 2px solid #2c5aa0;
+	outline: 2px solid var(--cor-foco);
 	outline-offset: 1px;
 }
 
@@ -90,22 +90,22 @@ select:focus-visible {
 	padding: 9px 16px;
 	border: 0;
 	border-radius: 6px;
-	background: #2c5aa0;
-	color: #fff;
+	background: var(--cor-primaria);
+	color: var(--cor-sobre-primaria);
 	font: inherit;
 	font-weight: 600;
 	cursor: pointer;
 }
 
 .acoes button:disabled {
-	background: #8b9cb8;
+	background: var(--cor-desabilitado);
 	cursor: default;
 }
 
 .acoes .secundario {
 	background: transparent;
-	border: 1px solid #c8ccd4;
-	color: #39404a;
+	border: 1px solid var(--cor-borda-campo);
+	color: var(--cor-texto);
 	font-weight: 500;
 }
 
@@ -122,25 +122,25 @@ caption {
 	margin-bottom: 8px;
 	text-align: left;
 	font-size: 0.82rem;
-	color: #5c6470;
+	color: var(--cor-texto-suave);
 }
 
 th,
 td {
 	padding: 9px 10px;
 	text-align: left;
-	border-bottom: 1px solid #e3e6ea;
+	border-bottom: 1px solid var(--cor-borda);
 }
 
 th {
 	font-size: 0.78rem;
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
-	color: #5c6470;
+	color: var(--cor-texto-suave);
 }
 
 tbody tr:hover {
-	background: #f8f9fb;
+	background: var(--cor-superficie-suave);
 }
 
 .mono {
@@ -150,21 +150,21 @@ tbody tr:hover {
 .situacao {
 	padding: 2px 8px;
 	border-radius: 10px;
-	background: #e4f1e4;
-	color: #22642a;
+	background: var(--cor-ok-fundo);
+	color: var(--cor-ok);
 	font-size: 0.76rem;
 }
 
 .situacao.inativo {
-	background: #eceef1;
-	color: #5c6470;
+	background: var(--cor-superficie-realce);
+	color: var(--cor-texto-suave);
 }
 
 .link {
 	padding: 0;
 	border: 0;
 	background: none;
-	color: #2c5aa0;
+	color: var(--cor-primaria);
 	font: inherit;
 	font-size: 0.86rem;
 	text-decoration: underline;
@@ -192,16 +192,16 @@ tbody tr:hover {
 
 .paginacao button {
 	padding: 6px 12px;
-	border: 1px solid #c8ccd4;
+	border: 1px solid var(--cor-borda-campo);
 	border-radius: 6px;
-	background: #fff;
+	background: var(--cor-superficie);
 	font: inherit;
 	font-size: 0.85rem;
 	cursor: pointer;
 }
 
 .paginacao button:disabled {
-	color: #a4aab3;
+	color: var(--cor-texto-desabilitado);
 	cursor: default;
 }
 
@@ -210,7 +210,7 @@ tbody tr:hover {
 .ficha {
 	margin-top: 28px;
 	padding: 18px;
-	border: 1px solid #d6dae0;
+	border: 1px solid var(--cor-borda);
 	border-radius: 8px;
 }
 
@@ -240,7 +240,7 @@ tbody tr:hover {
 
 .ficha dt {
 	font-weight: 600;
-	color: #5c6470;
+	color: var(--cor-texto-suave);
 }
 
 .ficha dd {
@@ -250,7 +250,7 @@ tbody tr:hover {
 .nota {
 	margin: 16px 0 0;
 	font-size: 0.78rem;
-	color: #5c6470;
+	color: var(--cor-texto-suave);
 	line-height: 1.5;
 }
 
@@ -260,8 +260,8 @@ tbody tr:hover {
 	margin: 18px 0 0;
 	padding: 9px 10px;
 	border-radius: 6px;
-	background: #fdecea;
-	color: #8f2018;
+	background: var(--cor-erro-fundo);
+	color: var(--cor-erro);
 	font-size: 0.85rem;
 }
 
@@ -269,8 +269,8 @@ tbody tr:hover {
 	margin: 0 0 14px;
 	padding: 9px 10px;
 	border-radius: 6px;
-	background: #fdf4e3;
-	color: #7a5106;
+	background: var(--cor-aviso-fundo);
+	color: var(--cor-aviso);
 	font-size: 0.82rem;
 	line-height: 1.5;
 }
@@ -279,8 +279,8 @@ tbody tr:hover {
 	margin-top: 24px;
 	padding: 20px;
 	border-radius: 8px;
-	background: #f8f9fb;
-	color: #5c6470;
+	background: var(--cor-superficie-suave);
+	color: var(--cor-texto-suave);
 	font-size: 0.9rem;
 	text-align: center;
 }

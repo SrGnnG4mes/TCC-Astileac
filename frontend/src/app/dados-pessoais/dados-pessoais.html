@@ -89,6 +89,9 @@
 			@if (r.content.length === 0) {
 				<p class="vazio">Nenhum acesso registrado até agora.</p>
 			} @else {
+				<!-- Rolagem propria: no celular a tabela rola dentro desta area, e nao
+				     a pagina inteira para o lado. tabindex para alcancar pelo teclado. -->
+				<div class="tabela-rolavel" role="region" aria-label="Registro de acesso" tabindex="0">
 				<table>
 					<thead>
 						<tr>
@@ -109,6 +112,7 @@
 						}
 					</tbody>
 				</table>
+				</div>
 				<p class="nota">{{ r.page.totalElements }} registro(s) no total.</p>
 			}
 		</section>

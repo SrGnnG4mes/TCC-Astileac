@@ -1,5 +1,10 @@
 <header class="barra">
-	<strong class="marca">ASTILEAC</strong>
+	<span class="marca">
+		<!-- alt vazio: o nome vem escrito ao lado, e o leitor de tela nao
+		     precisa anunciar a associacao duas vezes. -->
+		<img src="logo-astileac.webp" alt="" width="40" height="38" />
+		<strong>ASTILEAC</strong>
+	</span>
 
 	@if (usuario(); as eu) {
 		<nav>

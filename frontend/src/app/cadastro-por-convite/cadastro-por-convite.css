@@ -4,7 +4,7 @@
 	align-items: center;
 	justify-content: center;
 	padding: 24px 16px;
-	background: #f4f5f7;
+	background: var(--cor-fundo);
 }
 
 .cartao {
@@ -12,8 +12,8 @@
 	max-width: 420px;
 	padding: 28px;
 	border-radius: 10px;
-	background: #fff;
-	box-shadow: 0 1px 4px rgb(0 0 0 / 12%);
+	background: var(--cor-superficie);
+	box-shadow: var(--sombra);
 }
 
 h1 {
@@ -25,17 +25,17 @@ h1 {
 .subtitulo {
 	margin: 0 0 18px;
 	font-size: 0.8rem;
-	color: #5c6470;
+	color: var(--cor-texto-suave);
 }
 
 .convidado {
 	margin: 0 0 18px;
 	padding: 10px 12px;
 	border-radius: 6px;
-	background: #eef3fb;
+	background: var(--cor-primaria-fundo);
 	font-size: 0.84rem;
 	line-height: 1.5;
-	color: #22406e;
+	color: var(--cor-primaria-escura);
 }
 
 form {
@@ -48,24 +48,24 @@ label {
 	margin-top: 12px;
 	font-size: 0.78rem;
 	font-weight: 600;
-	color: #39404a;
+	color: var(--cor-texto);
 }
 
 input {
 	padding: 9px 10px;
-	border: 1px solid #c8ccd4;
+	border: 1px solid var(--cor-borda-campo);
 	border-radius: 6px;
 	font: inherit;
 }
 
 input:focus-visible {
-	outline: 2px solid #2c5aa0;
+	outline: 2px solid var(--cor-foco);
 	outline-offset: 1px;
-	border-color: #2c5aa0;
+	border-color: var(--cor-primaria);
 }
 
 .falha {
-	color: #8f2018;
+	color: var(--cor-erro);
 	font-size: 0.74rem;
 }
 
@@ -74,8 +74,8 @@ button {
 	padding: 11px;
 	border: 0;
 	border-radius: 6px;
-	background: #2c5aa0;
-	color: #fff;
+	background: var(--cor-primaria);
+	color: var(--cor-sobre-primaria);
 	font: inherit;
 	font-weight: 600;
 	cursor: pointer;
@@ -83,14 +83,14 @@ button {
 }
 
 button:disabled {
-	background: #8b9cb8;
+	background: var(--cor-desabilitado);
 	cursor: default;
 }
 
 .aguarde {
 	margin: 20px 0;
 	font-size: 0.88rem;
-	color: #5c6470;
+	color: var(--cor-texto-suave);
 }
 
 .erro,
@@ -103,24 +103,51 @@ button:disabled {
 }
 
 .erro {
-	background: #fdecea;
-	color: #8f2018;
+	background: var(--cor-erro-fundo);
+	color: var(--cor-erro);
 }
 
 .sucesso {
-	background: #e4f1e4;
-	color: #22642a;
+	background: var(--cor-ok-fundo);
+	color: var(--cor-ok);
 }
 
 .rodape {
 	margin: 20px 0 0;
 	padding-top: 16px;
-	border-top: 1px solid #e3e6ea;
+	border-top: 1px solid var(--cor-borda);
 	font-size: 0.76rem;
 	line-height: 1.6;
-	color: #5c6470;
+	color: var(--cor-texto-suave);
 }
 
 .rodape a {
-	color: #2c5aa0;
+	color: var(--cor-primaria);
+}
+
+/*
+ * Faixa com as tres cores da logo -- verde, amarelo e vermelho, as da
+ * bandeira do Acre. Decorativa: nao ha texto sobre ela, entao as cores
+ * puras da marca podem aparecer.
+ */
+.cartao {
+	border-top: 6px solid transparent;
+	border-image: linear-gradient(
+		to right,
+		var(--marca-verde) 0 60%,
+		var(--marca-amarelo) 60% 85%,
+		var(--marca-vermelho) 85% 100%) 1;
+}
+
+.logo {
+	display: block;
+	margin: 0 auto 10px;
+}
+
+h1 {
+	text-align: center;
+}
+
+.subtitulo {
+	text-align: center;
 }

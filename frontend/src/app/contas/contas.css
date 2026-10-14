@@ -11,7 +11,7 @@ h1 {
 .ajuda {
 	margin: 0 0 20px;
 	font-size: 0.85rem;
-	color: #5c6470;
+	color: var(--cor-texto-suave);
 	line-height: 1.6;
 }
 
@@ -25,7 +25,7 @@ th,
 td {
 	padding: 10px;
 	text-align: left;
-	border-bottom: 1px solid #e3e6ea;
+	border-bottom: 1px solid var(--cor-borda);
 	vertical-align: middle;
 }
 
@@ -33,7 +33,7 @@ th {
 	font-size: 0.76rem;
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
-	color: #5c6470;
+	color: var(--cor-texto-suave);
 }
 
 td.login {
@@ -42,15 +42,15 @@ td.login {
 }
 
 td.associado {
-	color: #5c6470;
+	color: var(--cor-texto-suave);
 }
 
 .voce {
 	margin-left: 8px;
 	padding: 1px 7px;
 	border-radius: 10px;
-	background: #eef3fb;
-	color: #22406e;
+	background: var(--cor-primaria-fundo);
+	color: var(--cor-primaria-escura);
 	font-size: 0.7rem;
 	font-weight: 500;
 }
@@ -59,15 +59,15 @@ td.associado {
 	display: inline-block;
 	padding: 2px 9px;
 	border-radius: 10px;
-	background: #eceef1;
-	color: #5c6470;
+	background: var(--cor-superficie-realce);
+	color: var(--cor-texto-suave);
 	font-size: 0.74rem;
 	white-space: nowrap;
 }
 
 .selo.admin {
-	background: #eef3fb;
-	color: #22406e;
+	background: var(--cor-primaria-fundo);
+	color: var(--cor-primaria-escura);
 	font-weight: 600;
 }
 
@@ -75,7 +75,7 @@ td.associado {
 	padding: 0;
 	border: 0;
 	background: none;
-	color: #2c5aa0;
+	color: var(--cor-primaria);
 	font: inherit;
 	font-size: 0.84rem;
 	text-decoration: underline;
@@ -94,7 +94,7 @@ td.associado {
 .nota {
 	margin: 18px 0 0;
 	font-size: 0.78rem;
-	color: #5c6470;
+	color: var(--cor-texto-suave);
 	line-height: 1.6;
 }
 
@@ -108,11 +108,11 @@ td.associado {
 }
 
 .erro {
-	background: #fdecea;
-	color: #8f2018;
+	background: var(--cor-erro-fundo);
+	color: var(--cor-erro);
 }
 
 .aviso {
-	background: #e4f1e4;
-	color: #22642a;
+	background: var(--cor-ok-fundo);
+	color: var(--cor-ok);
 }

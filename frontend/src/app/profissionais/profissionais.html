@@ -52,6 +52,9 @@
 		@if (p.content.length === 0) {
 			<p class="vazio">Nenhum profissional encontrado com esses filtros.</p>
 		} @else {
+			<!-- Rolagem propria: no celular a tabela rola dentro desta area, e nao
+			     a pagina inteira para o lado. tabindex para alcancar pelo teclado. -->
+			<div class="tabela-rolavel" role="region" aria-label="Profissionais encontrados" tabindex="0">
 			<table>
 				<caption>
 					{{ p.page.totalElements }} profissional(is) encontrado(s) &middot;
@@ -90,6 +93,7 @@
 					}
 				</tbody>
 			</table>
+			</div>
 
 			<nav class="paginacao" aria-label="Paginação">
 				<button type="button" [disabled]="p.page.number === 0" (click)="irPara(p.page.number - 1)">

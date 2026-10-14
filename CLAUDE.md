@@ -276,7 +276,8 @@ corretas (saíram da literatura, não da prática da entidade); e **o que fazer 
 cadastros que hoje estão em planilhas e papel** — se ninguém migrar o que já existe, o
 sistema entra em operação vazio e a associação continua consultando a planilha.
 
-Adiado por decisão do autor: ajuste de cores sugerido pela diretoria.
+O ajuste de cores sugerido pela diretoria foi feito com a paleta da logo da associação
+(ver "Identidade visual e acessibilidade", seção 8).
 
 ---
 
@@ -820,6 +821,34 @@ Testes de integração: `CREATE DATABASE astileac_teste;` (o Flyway aplica as mi
 >   faria, sem servidor. O que só o servidor de verdade mostra continua com os testes de
 >   integração do back-end e com a coleção do Postman.
 
+> **Identidade visual e acessibilidade** (paleta da logo da ASTILEAC).
+> - **Cores extraídas dos pixels da logo**, não escolhidas a olho: verde `#04A75A`, amarelo
+>   `#FEF013` e vermelho `#EC3238` — as cores da bandeira do Acre.
+> - **As cores puras da logo reprovam no contraste.** Branco sobre o verde da logo dá 3,1:1,
+>   e sobre o vermelho, 4,1:1 — abaixo dos 4,5:1 da WCAG 2.1 AA para texto. Por isso há
+>   dois grupos de cor em `styles.css`: as da **marca**, exatas, só em faixas e detalhes
+>   sem texto em cima; e as de **interface**, tons mais escuros do mesmo verde e do mesmo
+>   vermelho, conferidos (primária `#02703D`, 6,2:1; erro `#AA2428`, 7,0:1). O amarelo
+>   entra como fundo claro com texto escuro, e como faixa e contorno de foco sobre o verde
+>   escuro (7,4:1).
+> - **Cores viraram variáveis.** Eram 275 cores escritas direto em 12 arquivos, sem
+>   nenhuma variável; agora cada componente usa `var(--cor-...)` e a paleta mora num lugar só.
+> - **Bordas de campo** passaram de 1,6:1 para 3,6:1 (WCAG 1.4.11 pede 3:1 para o contorno
+>   de um controle). **Contorno de foco** visível em tudo que recebe foco pelo teclado, não só
+>   nos campos.
+> - **`lang="pt-BR"`** — estava `en`, e o leitor de tela lia o português com pronúncia de
+>   inglês. **Título por página** (WCAG 2.4.2) — toda tela se chamava "Frontend".
+> - **Tabelas com rolagem própria** no celular: em cinco telas a página inteira rolava para o
+>   lado (WCAG 1.4.10). A área de rolagem recebe foco, para quem usa teclado.
+> - **Sem fonte externa:** carregar fonte do Google mandaria o IP de cada usuário a terceiro,
+>   num sistema que existe para cumprir a LGPD.
+> - **Logo** na barra, no login e no convite, com `alt` vazio porque o nome vem escrito ao
+>   lado — o leitor de tela não precisa anunciar a associação duas vezes.
+> - **Verificado com o axe-core** (regras WCAG 2.0/2.1 A e AA) em todas as telas, nos três
+>   papéis — diretoria, associado e visitante do convite —: **nenhuma violação**. O axe
+>   automatiza parte da WCAG, não toda; leitor de tela e navegação completa por teclado
+>   ficam para teste manual.
+
 ### Próximos passos (nesta ordem)
 1. ~~Migrations Flyway `V1` — criar as 9 tabelas + carga inicial das áreas de atuação~~ ✅
 2. ~~Entidades JPA + repositories~~ ✅
@@ -835,7 +864,7 @@ Testes de integração: `CREATE DATABASE astileac_teste;` (o Flyway aplica as mi
 7. ~~Front-end Angular~~ ✅ — todas as telas: login, cadastro público por convite,
    consulta do RF08, ficha completa (contatos, endereço, áreas, formações, certificados,
    vínculos), telas da LGPD, manutenção das áreas, autoatendimento, convites e contas.
-   Pendente só o ajuste de cores sugerido pela diretoria, adiado pelo autor.
+   Identidade visual com a paleta da logo e revisão de acessibilidade feitas.
 8. ~~Upload de certificados~~ ✅ — com o reconhecimento pela diretoria (RF13)
 9. Testes e validação com a ASTILEAC — **a primeira conversa aconteceu** (ver seção 5);
    faltam os três pontos ainda em aberto e o registro formal para citar no TCC

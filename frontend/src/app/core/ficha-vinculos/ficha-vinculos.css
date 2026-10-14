@@ -1,7 +1,7 @@
 .secao {
 	margin-top: 32px;
 	padding-top: 22px;
-	border-top: 1px solid #e3e6ea;
+	border-top: 1px solid var(--cor-borda);
 }
 
 h2 {
@@ -12,7 +12,7 @@ h2 {
 .ajuda {
 	margin: 0 0 16px;
 	font-size: 0.85rem;
-	color: #5c6470;
+	color: var(--cor-texto-suave);
 	line-height: 1.5;
 }
 
@@ -34,7 +34,7 @@ h2 {
 	gap: 4px 10px;
 	padding: 9px 11px;
 	border-radius: 6px;
-	background: #f4f5f7;
+	background: var(--cor-fundo);
 	font-size: 0.88rem;
 }
 
@@ -44,7 +44,7 @@ h2 {
 
 .itens .detalhe {
 	flex: 1 1 auto;
-	color: #5c6470;
+	color: var(--cor-texto-suave);
 	font-size: 0.78rem;
 }
 
@@ -56,7 +56,7 @@ h2 {
 	padding: 0;
 	border: 0;
 	background: none;
-	color: #2c5aa0;
+	color: var(--cor-primaria);
 	font: inherit;
 	font-size: 0.82rem;
 	text-decoration: underline;
@@ -91,18 +91,18 @@ h2 {
 }
 
 .selo.declarado {
-	background: #eceef1;
-	color: #5c6470;
+	background: var(--cor-superficie-realce);
+	color: var(--cor-texto-suave);
 }
 
 .selo.enviado {
-	background: #fdf4e3;
-	color: #7a5106;
+	background: var(--cor-aviso-fundo);
+	color: var(--cor-aviso);
 }
 
 .selo.reconhecido {
-	background: #e4f1e4;
-	color: #22642a;
+	background: var(--cor-ok-fundo);
+	color: var(--cor-ok);
 }
 
 .acoes-documento {
@@ -123,7 +123,7 @@ h2 {
 .nota {
 	margin: 2px 0 0;
 	font-size: 0.74rem;
-	color: #5c6470;
+	color: var(--cor-texto-suave);
 	line-height: 1.4;
 }
 
@@ -150,21 +150,21 @@ h2 {
 label {
 	font-size: 0.78rem;
 	font-weight: 600;
-	color: #39404a;
+	color: var(--cor-texto);
 }
 
 input,
 select {
 	padding: 8px 9px;
-	border: 1px solid #c8ccd4;
+	border: 1px solid var(--cor-borda-campo);
 	border-radius: 6px;
 	font: inherit;
-	background: #fff;
+	background: var(--cor-superficie);
 }
 
 input:focus-visible,
 select:focus-visible {
-	outline: 2px solid #2c5aa0;
+	outline: 2px solid var(--cor-foco);
 	outline-offset: 1px;
 }
 
@@ -172,8 +172,8 @@ select:focus-visible {
 	padding: 9px 16px;
 	border: 0;
 	border-radius: 6px;
-	background: #2c5aa0;
-	color: #fff;
+	background: var(--cor-primaria);
+	color: var(--cor-sobre-primaria);
 	font: inherit;
 	font-weight: 600;
 	cursor: pointer;
@@ -191,20 +191,20 @@ select:focus-visible {
 }
 
 .vazio {
-	background: #f8f9fb;
-	color: #5c6470;
+	background: var(--cor-superficie-suave);
+	color: var(--cor-texto-suave);
 }
 
 .erro {
-	background: #fdecea;
-	color: #8f2018;
+	background: var(--cor-erro-fundo);
+	color: var(--cor-erro);
 }
 
 .ajuda.destaque {
 	padding: 10px 12px;
 	border-radius: 6px;
-	background: #eef3fb;
-	color: #22406e;
+	background: var(--cor-primaria-fundo);
+	color: var(--cor-primaria-escura);
 }
 
 /* --- endereco --- */
@@ -212,7 +212,7 @@ select:focus-visible {
 .endereco {
 	padding: 12px 14px;
 	border-radius: 6px;
-	background: #f4f5f7;
+	background: var(--cor-fundo);
 }
 
 .endereco p {
@@ -252,8 +252,8 @@ select:focus-visible {
 	padding: 9px 16px;
 	border: 0;
 	border-radius: 6px;
-	background: #2c5aa0;
-	color: #fff;
+	background: var(--cor-primaria);
+	color: var(--cor-sobre-primaria);
 	font: inherit;
 	font-weight: 600;
 	cursor: pointer;
@@ -261,10 +261,10 @@ select:focus-visible {
 
 .botao-secundario {
 	padding: 8px 14px;
-	border: 1px solid #c8ccd4;
+	border: 1px solid var(--cor-borda-campo);
 	border-radius: 6px;
-	background: #fff;
-	color: #39404a;
+	background: var(--cor-superficie);
+	color: var(--cor-texto);
 	font: inherit;
 	font-size: 0.86rem;
 	cursor: pointer;
@@ -283,10 +283,10 @@ select:focus-visible {
 
 .opcional {
 	font-weight: 400;
-	color: #5c6470;
+	color: var(--cor-texto-suave);
 }
 
 .falha {
-	color: #8f2018;
+	color: var(--cor-erro);
 	font-size: 0.76rem;
 }
