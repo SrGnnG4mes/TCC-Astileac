@@ -155,4 +155,28 @@
 		</plugins>
 	</build>
 
+	<profiles>
+		<!--
+			Testes de integracao (*IT.java), contra um PostgreSQL de verdade.
+			Rodam a parte: ./mvnw verify -Pintegracao
+
+			Ficam fora do ./mvnw test de proposito: exigem um banco
+			astileac_teste criado e as credenciais do perfil local, e quem
+			clona o repositorio precisa conseguir rodar a suite de unidade
+			sem nada disso. O surefire ja ignora *IT por padrao; o failsafe,
+			ligado so neste perfil, e quem os executa.
+		-->
+		<profile>
+			<id>integracao</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
 </project>

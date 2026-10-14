@@ -67,7 +67,13 @@ public class CertificadoService {
 	@Transactional
 	public void remover(Long profissionalId, Long certificadoId) {
 		profissionalService.buscarEntidade(profissionalId);
-		certificadoRepository.delete(buscarEntidade(profissionalId, certificadoId));
+		Certificado certificado = buscarEntidade(profissionalId, certificadoId);
+		certificadoRepository.delete(certificado);
+
+		// O documento sai junto com o registro. Sem isto ficava orfao no
+		// disco: dado pessoal sem nenhum registro que apontasse para ele,
+		// invisivel ate para a diretoria. Achado pelo teste de integracao.
+		arquivoCertificadoService.apagarAoConfirmar(certificado.getArquivoPath());
 	}
 
 	private void aplicar(Certificado certificado, Long profissionalId, CertificadoRequestDTO dto) {
@@ -128,10 +134,10 @@ public class CertificadoService {
 
 		Certificado salvo = certificadoRepository.save(certificado);
 
-		// So depois de a troca estar gravada: se apagassemos antes e a
-		// gravacao falhasse, o certificado ficaria apontando para um
-		// arquivo que nao existe mais.
-		arquivoCertificadoService.apagar(anterior);
+		// So depois de a troca estar confirmada no banco: se apagassemos
+		// antes e a transacao falhasse, o certificado ficaria apontando
+		// para um arquivo que nao existe mais.
+		arquivoCertificadoService.apagarAoConfirmar(anterior);
 
 		return toResponseDTO(salvo);
 	}

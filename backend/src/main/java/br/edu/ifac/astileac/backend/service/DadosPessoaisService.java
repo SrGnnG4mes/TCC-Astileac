@@ -9,6 +9,7 @@ import br.edu.ifac.astileac.backend.dto.FormacaoResponseDTO;
 import br.edu.ifac.astileac.backend.dto.ProfissionalAreaResponseDTO;
 import br.edu.ifac.astileac.backend.dto.VinculoEmpregaticioResponseDTO;
 import br.edu.ifac.astileac.backend.entity.AcaoLog;
+import br.edu.ifac.astileac.backend.entity.Certificado;
 import br.edu.ifac.astileac.backend.entity.Profissional;
 import br.edu.ifac.astileac.backend.exception.ConflitoException;
 import br.edu.ifac.astileac.backend.exception.RecursoNaoEncontradoException;
@@ -58,6 +59,7 @@ public class DadosPessoaisService {
 	private final ConviteRepository conviteRepository;
 	private final ProfissionalService profissionalService;
 	private final LogAcessoService logAcessoService;
+	private final ArquivoCertificadoService arquivoCertificadoService;
 
 	/**
 	 * Reune tudo que o sistema guarda sobre a pessoa (Art. 18, II e V).
@@ -213,7 +215,13 @@ public class DadosPessoaisService {
 		for (Profissional profissional : vencidos) {
 			Long id = profissional.getId();
 
-			certificadoRepository.deleteAll(certificadoRepository.findByProfissionalId(id));
+			List<Certificado> certificados = certificadoRepository.findByProfissionalId(id);
+			certificadoRepository.deleteAll(certificados);
+			// O PDF do certificado e dado do titular como o resto. Sem
+			// isto ele sobrevivia a exclusao definitiva, orfao na pasta de
+			// uploads. Achado pelo teste de integracao.
+			certificados.forEach(certificado ->
+					arquivoCertificadoService.apagarAoConfirmar(certificado.getArquivoPath()));
 			formacaoRepository.deleteAll(formacaoRepository.findByProfissionalId(id));
 			vinculoEmpregaticioRepository.deleteAll(vinculoEmpregaticioRepository.findByProfissionalId(id));
 			profissionalAreaRepository.deleteAll(profissionalAreaRepository.findByIdProfissionalId(id));

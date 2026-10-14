@@ -142,7 +142,7 @@ class CertificadoServiceTest {
 		// O arquivo anterior e removido, e so depois de a troca estar
 		// gravada -- apagar antes deixaria o registro apontando para um
 		// arquivo inexistente se a gravacao falhasse.
-		verify(arquivoCertificadoService).apagar("certificados/antigo.pdf");
+		verify(arquivoCertificadoService).apagarAoConfirmar("certificados/antigo.pdf");
 	}
 
 	@Test
