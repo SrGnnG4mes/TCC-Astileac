@@ -1,0 +1,26 @@
+@if (algumCanal) {
+	<ul class="canais">
+		@if (contato.email; as email) {
+			<li>
+				<span class="rotulo">E-mail</span>
+				<a [href]="'mailto:' + email">{{ email }}</a>
+			</li>
+		}
+		@if (contato.telefone; as telefone) {
+			<li>
+				<span class="rotulo">Telefone</span>
+				<a [href]="linkDoTelefone(telefone)">{{ telefone }}</a>
+			</li>
+		}
+		@if (contato.instagram; as instagram) {
+			<li>
+				<span class="rotulo">Instagram</span>
+				<a [href]="'https://www.instagram.com/' + instagram" target="_blank" rel="noopener">
+					&#64;{{ instagram }}
+				</a>
+			</li>
+		}
+	</ul>
+} @else {
+	<p class="em-breve">Os canais de contato da diretoria serão publicados em breve.</p>
+}

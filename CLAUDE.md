@@ -849,6 +849,28 @@ Testes de integração: `CREATE DATABASE astileac_teste;` (o Flyway aplica as mi
 >   automatiza parte da WCAG, não toda; leitor de tela e navegação completa por teclado
 >   ficam para teste manual.
 
+> **Site público** (`frontend/src/app/site/`) — pedido do autor, tomando como referência
+> a estrutura do site do SINTRA, sem copiar. Três páginas: **Início**, **Valores de
+> referência** e **Associe-se**, com cabeçalho próprio e "Área do associado" levando ao login.
+> - **Mesmo projeto, não site à parte:** o "Associe-se" desemboca no fluxo de convite do
+>   RF12, e a área do associado é o próprio login. Separado, duplicaria identidade e hospedagem.
+> - **Sem diretório público de intérpretes**, ao contrário do SINTRA. A consulta ao quadro é
+>   da diretoria (RF08) e o contato acontece fora do sistema — premissa validada. Expor nome
+>   e área de cada associado a qualquer visitante iria contra o princípio da necessidade.
+> - **Sem formulário de inscrição:** o "Associe-se" descreve os passos reais (falar com a
+>   diretoria e pagar → convite por e-mail, 7 dias, uso único → cadastro → completar a ficha).
+>   O pagamento ainda é confirmado fora do sistema.
+> - **Conteúdo da associação num arquivo só** (`site/conteudo.ts`): valores de referência,
+>   vigência e canais de contato. Enquanto estiverem vazios, as páginas dizem que serão
+>   publicados — **nunca um valor ou contato inventado**. Há teste para isso.
+> - A raiz `/` passou a ser o início do site (antes redirecionava ao login), e caminho
+>   inexistente volta para lá. Testado que o site não captura `/login` nem as rotas do sistema.
+> - "Pular para o conteúdo" (WCAG 2.4.1), feito com foco programático: no Angular, um link
+>   `href="#conteudo"` trocaria a rota para a raiz. axe-core: nenhuma violação nas três páginas.
+> - **Em aberto:** os valores de referência e os contatos (o autor vai passar); os textos de
+>   "Quem somos" precisam da revisão da diretoria; decidir com o orientador se o site entra
+>   como requisito (seria o RF14) ou como complemento.
+
 ### Próximos passos (nesta ordem)
 1. ~~Migrations Flyway `V1` — criar as 9 tabelas + carga inicial das áreas de atuação~~ ✅
 2. ~~Entidades JPA + repositories~~ ✅

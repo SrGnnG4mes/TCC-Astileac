@@ -1,0 +1,35 @@
+.canais {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px 28px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.canais li {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.rotulo {
+	font-size: 0.78rem;
+	font-weight: 600;
+	color: var(--cor-texto-suave);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.canais a {
+	color: var(--cor-primaria);
+	font-weight: 600;
+}
+
+.em-breve {
+	margin: 0;
+	padding: 10px 12px;
+	border-left: 4px solid var(--cor-aviso-borda);
+	background: var(--cor-aviso-fundo);
+	color: var(--cor-aviso);
+}

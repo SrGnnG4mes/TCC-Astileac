@@ -18,7 +18,6 @@ import { adminGuard, autenticadoGuard } from './core/guardas';
  * chamava "Frontend".
  */
 export const routes: Routes = [
-	{ path: '', pathMatch: 'full', redirectTo: 'login' },
 	{
 		path: 'login',
 		title: 'Entrar | ASTILEAC',
@@ -101,5 +100,30 @@ export const routes: Routes = [
 		canActivate: [autenticadoGuard],
 		loadComponent: () => import('./painel/painel').then(m => m.Painel)
 	},
-	{ path: '**', redirectTo: 'login' }
+	{
+		// Site publico: inicio, valores de referencia e associe-se. Sem
+		// guarda nenhuma -- e a porta de entrada de quem ainda nao tem
+		// conta. Vem depois das rotas do sistema, que tem caminhos proprios.
+		path: '',
+		loadComponent: () => import('./site/site').then(m => m.Site),
+		children: [
+			{
+				path: '',
+				pathMatch: 'full',
+				title: 'ASTILEAC | Tradutores e intérpretes de Libras do Acre',
+				loadComponent: () => import('./site/inicio/inicio').then(m => m.Inicio)
+			},
+			{
+				path: 'valores-de-referencia',
+				title: 'Valores de referência | ASTILEAC',
+				loadComponent: () => import('./site/valores/valores').then(m => m.Valores)
+			},
+			{
+				path: 'associe-se',
+				title: 'Associe-se | ASTILEAC',
+				loadComponent: () => import('./site/associe-se/associe-se').then(m => m.AssocieSe)
+			}
+		]
+	},
+	{ path: '**', redirectTo: '' }
 ];
