@@ -1,5 +1,6 @@
 package br.edu.ifac.astileac.backend.config;
 
+import jakarta.servlet.DispatcherType;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
@@ -36,6 +37,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableMethodSecurity
 public class SecurityConfig {
 
+	private static final String API = WebConfig.PREFIXO_API;
+
 	/**
 	 * BCrypt, como manda a regra do projeto. O custo padrao (10) e
 	 * proposital: aumenta-lo torna a verificacao mais lenta tanto para
@@ -64,40 +67,50 @@ public class SecurityConfig {
 						// Uma sessao por usuario: login novo derruba o anterior.
 						.maximumSessions(1))
 				.authorizeHttpRequests(auth -> auth
+						// Repasse interno do Tomcat para a resposta de erro. Sem
+						// isto, o denyAll do fim transformaria o erro de um POST
+						// num 403 e esconderia a causa verdadeira.
+						.dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
 						// Login precisa ser alcancavel por quem ainda nao entrou.
 						// O token CSRF precisa ser alcancavel antes do login:
 						// sem ele o proprio POST de login seria bloqueado.
-						.requestMatchers(HttpMethod.GET, "/autenticacao/csrf").permitAll()
-						// Interface de teste, servida pelo proprio backend. Fica na
-						// mesma origem da API, o que dispensa CORS: o navegador
-						// manda o cookie de sessao sem configuracao extra.
-						.requestMatchers(HttpMethod.GET, "/", "/index.html").permitAll()
-						.requestMatchers(HttpMethod.POST, "/autenticacao/login").permitAll()
+						.requestMatchers(HttpMethod.GET, API + "/autenticacao/csrf").permitAll()
+						.requestMatchers(HttpMethod.POST, API + "/autenticacao/login").permitAll()
 						// Cadastro por convite (RF12). Publico por
 						// necessidade: quem usa o convite ainda nao tem
 						// conta. O que faz as vezes de autenticacao e o
 						// proprio token -- emitido pela diretoria depois do
 						// pagamento, de uso unico e com prazo. Sem token
 						// valido, nenhum dos dois caminhos cria nada.
-						.requestMatchers(HttpMethod.POST, "/cadastro", "/cadastro/validacao").permitAll()
-						// Documentacao da API. Desligar no ambiente de destino
-						// (ver application.properties).
+						.requestMatchers(HttpMethod.POST, API + "/cadastro", API + "/cadastro/validacao").permitAll()
+						// Documentacao da API. So existe quando o springdoc esta
+						// ligado, o que fica restrito ao perfil local (ver
+						// application.properties).
 						.requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
 						// Cadastrar e consultar o quadro de associados e
 						// atribuicao da diretoria. O associado nao navega pelo
 						// cadastro dos outros.
-						.requestMatchers(HttpMethod.POST, "/profissionais").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.GET, "/profissionais").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.POST, API + "/profissionais").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.GET, API + "/profissionais").hasRole("ADMIN")
 						// Manter a tabela de dominio tambem e da diretoria.
-						.requestMatchers(HttpMethod.POST, "/areas-atuacao").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.PUT, "/areas-atuacao/**").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.DELETE, "/areas-atuacao/**").hasRole("ADMIN")
-						// O resto exige login; quem alcanca o que e decidido
-						// por @PreAuthorize nos controllers, porque depende de
-						// quem e o dono do registro.
-						.anyRequest().authenticated())
+						.requestMatchers(HttpMethod.POST, API + "/areas-atuacao").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.PUT, API + "/areas-atuacao/**").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.DELETE, API + "/areas-atuacao/**").hasRole("ADMIN")
+						// O resto da API exige login; quem alcanca o que e
+						// decidido por @PreAuthorize nos controllers, porque
+						// depende de quem e o dono do registro.
+						.requestMatchers(API + "/**").authenticated()
+						// Fora da API, so a aplicacao Angular: HTML, scripts e
+						// estilos, iguais para todo mundo e sem dado nenhum.
+						// Precisa ser publica -- a tela de login e a do convite
+						// sao abertas por quem ainda nao entrou. Os dados que
+						// essas telas mostram vem da API, protegida acima.
+						.requestMatchers(HttpMethod.GET, "/**").permitAll()
+						// Qualquer outra coisa fora da API nao tem uso
+						// legitimo.
+						.anyRequest().denyAll())
 				.formLogin(login -> login
-						.loginProcessingUrl("/autenticacao/login")
+						.loginProcessingUrl(API + "/autenticacao/login")
 						// Nomes do dominio, nao os padroes do Spring.
 						.usernameParameter("login")
 						.passwordParameter("senha")
@@ -110,7 +123,7 @@ public class SecurityConfig {
 							resp.getWriter().write("{\"status\":401,\"mensagem\":\"Credenciais invalidas\"}");
 						}))
 				.logout(logout -> logout
-						.logoutUrl("/autenticacao/logout")
+						.logoutUrl(API + "/autenticacao/logout")
 						.deleteCookies("JSESSIONID")
 						.logoutSuccessHandler((req, resp, auth) -> resp.setStatus(HttpServletResponse.SC_OK)))
 				.exceptionHandling(erros -> erros
@@ -134,7 +147,7 @@ public class SecurityConfig {
 							resp.setContentType(MediaType.APPLICATION_JSON_VALUE);
 							resp.getWriter().write(falhaDeCsrf
 									? "{\"status\":403,\"mensagem\":\"Token CSRF ausente ou invalido. "
-											+ "Obtenha um novo em GET /autenticacao/csrf e envie no cabecalho "
+											+ "Obtenha um novo em GET " + API + "/autenticacao/csrf e envie no cabecalho "
 											+ "X-XSRF-TOKEN.\"}"
 									: "{\"status\":403,\"mensagem\":\"Acesso negado: seu perfil nao permite "
 											+ "esta operacao\"}");

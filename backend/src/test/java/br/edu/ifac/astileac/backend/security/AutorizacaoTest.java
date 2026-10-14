@@ -50,7 +50,7 @@ class AutorizacaoTest {
 	@Test
 	@WithAnonymousUser
 	void semLoginDeveRecusarComNaoAutorizado() throws Exception {
-		mockMvc.perform(get("/profissionais/1/contatos"))
+		mockMvc.perform(get("/api/profissionais/1/contatos"))
 				.andExpect(status().isUnauthorized());
 	}
 
@@ -59,7 +59,7 @@ class AutorizacaoTest {
 	void diretoriaAlcancaQualquerProfissional() throws Exception {
 		when(contatoService.listar(anyLong())).thenReturn(List.of());
 
-		mockMvc.perform(get("/profissionais/1/contatos"))
+		mockMvc.perform(get("/api/profissionais/1/contatos"))
 				.andExpect(status().isOk());
 	}
 
@@ -69,7 +69,7 @@ class AutorizacaoTest {
 		when(usuarioLogado.eOProprioProfissional(1L)).thenReturn(true);
 		when(contatoService.listar(anyLong())).thenReturn(List.of());
 
-		mockMvc.perform(get("/profissionais/1/contatos"))
+		mockMvc.perform(get("/api/profissionais/1/contatos"))
 				.andExpect(status().isOk());
 	}
 
@@ -80,7 +80,7 @@ class AutorizacaoTest {
 		// ser o dono do registro.
 		when(usuarioLogado.eOProprioProfissional(2L)).thenReturn(false);
 
-		mockMvc.perform(get("/profissionais/2/contatos"))
+		mockMvc.perform(get("/api/profissionais/2/contatos"))
 				.andExpect(status().isForbidden());
 	}
 

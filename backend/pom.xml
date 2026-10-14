@@ -103,6 +103,37 @@
 	</dependencies>
 
 	<build>
+		<resources>
+			<!-- As duas primeiras repetem o que o spring-boot-starter-parent ja
+			     declara: declarar resources aqui substitui a lista do parent em
+			     vez de somar a ela. -->
+			<resource>
+				<directory>${basedir}/src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/application*.yml</include>
+					<include>**/application*.yaml</include>
+					<include>**/application*.properties</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>${basedir}/src/main/resources</directory>
+				<excludes>
+					<exclude>**/application*.yml</exclude>
+					<exclude>**/application*.yaml</exclude>
+					<exclude>**/application*.properties</exclude>
+				</excludes>
+			</resource>
+			<!-- O Angular compilado (npm run build, em frontend/) entra como
+			     conteudo estatico: o back-end serve a aplicacao inteira num
+			     processo e numa porta so. Se o front-end nao foi compilado, a
+			     pasta nao existe e o Maven simplesmente pula; a API funciona
+			     sozinha do mesmo jeito. -->
+			<resource>
+				<directory>${basedir}/../frontend/dist/frontend/browser</directory>
+				<targetPath>static</targetPath>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

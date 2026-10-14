@@ -54,7 +54,7 @@ class RegistroDeAcessoIT extends IntegracaoBase {
 		Long id = associados.porConvite("Maria Silva", "11144477735", "maria.silva");
 		UserDetails diretora = contaAdministrativa("diretora");
 
-		mockMvc.perform(get("/profissionais/{id}", id).with(user(diretora))).andExpect(status().isOk());
+		mockMvc.perform(get("/api/profissionais/{id}", id).with(user(diretora))).andExpect(status().isOk());
 
 		assertEquals(1, contar("""
 				SELECT count(*) FROM log_acesso
@@ -62,7 +62,7 @@ class RegistroDeAcessoIT extends IntegracaoBase {
 				  AND acao = 'CONSULTA' AND autor = 'diretora'
 				""", id));
 
-		mockMvc.perform(get("/profissionais/{id}/dados-pessoais/registro-de-acesso", id).with(user(diretora)))
+		mockMvc.perform(get("/api/profissionais/{id}/dados-pessoais/registro-de-acesso", id).with(user(diretora)))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content[?(@.autor == 'diretora' && @.acao == 'CONSULTA')]").exists());
 	}
