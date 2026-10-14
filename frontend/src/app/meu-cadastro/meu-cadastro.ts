@@ -4,10 +4,9 @@ import { RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AutenticacaoService } from '../core/autenticacao.service';
 import { Barra } from '../core/barra/barra';
-import { ContaService } from '../core/conta.service';
 import { FichaVinculos } from '../core/ficha-vinculos/ficha-vinculos';
 import { ProfissionalService } from '../core/profissional.service';
-import { naoFutura } from '../core/validadores';
+import { naoFutura, DATA_MINIMA, hoje } from '../core/validadores';
 
 /**
  * Autoatendimento: o associado mantem o proprio cadastro.
@@ -34,10 +33,16 @@ import { naoFutura } from '../core/validadores';
 })
 export class MeuCadastro {
 
+	/**
+	 * Limites dos campos de data. Com o max, o navegador deixa o ano com 4
+	 * digitos e nao oferece data futura no calendario.
+	 */
+	readonly dataMinima = DATA_MINIMA;
+	readonly hoje = hoje();
+
 	private readonly formBuilder = inject(FormBuilder);
 	private readonly profissionais = inject(ProfissionalService);
 	private readonly autenticacao = inject(AutenticacaoService);
-	private readonly contas = inject(ContaService);
 
 	readonly profissionalId = signal<number | null>(null);
 	/** Guardados do carregamento para reenviar inalterados -- ver salvar(). */
@@ -53,21 +58,6 @@ export class MeuCadastro {
 		lattesUrl: ['', Validators.maxLength(255)]
 	});
 
-	/**
-	 * Troca de senha (RF12).
-	 *
-	 * Exige a senha atual: sem isso, uma sessao sequestrada trocaria a
-	 * senha e trancaria o dono para fora da propria conta.
-	 */
-	readonly formSenha = this.formBuilder.nonNullable.group({
-		senhaAtual: ['', Validators.required],
-		senhaNova: ['', [Validators.required, Validators.minLength(8)]]
-	});
-
-	readonly trocandoSenha = signal(false);
-	readonly erroSenha = signal<string | null>(null);
-	readonly avisoSenha = signal<string | null>(null);
-
 	constructor() {
 		const id = this.autenticacao.usuario()?.profissionalId ?? null;
 		this.profissionalId.set(id);
@@ -76,7 +66,7 @@ export class MeuCadastro {
 			// Conta administrativa sem cadastro de associado vinculado,
 			// como a de bootstrap. Nao e erro: ela simplesmente nao e
 			// titular de dado pessoal algum no sistema.
-			this.erro.set('Esta conta nao esta vinculada a um cadastro de profissional.');
+			this.erro.set('Esta conta não está vinculada a um cadastro de profissional.');
 			return;
 		}
 
@@ -149,38 +139,13 @@ export class MeuCadastro {
 		});
 	}
 
-	trocarSenha(): void {
-		if (this.formSenha.invalid) {
-			this.formSenha.markAllAsTouched();
-			return;
-		}
-
-		this.trocandoSenha.set(true);
-		this.erroSenha.set(null);
-		this.avisoSenha.set(null);
-
-		const { senhaAtual, senhaNova } = this.formSenha.getRawValue();
-
-		this.contas.trocarPropriaSenha(senhaAtual, senhaNova).subscribe({
-			next: () => {
-				this.trocandoSenha.set(false);
-				this.formSenha.reset({ senhaAtual: '', senhaNova: '' });
-				this.avisoSenha.set('Senha trocada.');
-			},
-			error: (falha: HttpErrorResponse) => {
-				this.trocandoSenha.set(false);
-				this.erroSenha.set(this.mensagemDe(falha));
-			}
-		});
-	}
-
 	private mensagemDe(falha: HttpErrorResponse): string {
 		if (falha.status === 0) {
-			return 'Nao foi possivel falar com o servidor.';
+			return 'Não foi possível falar com o servidor.';
 		}
 		// O 403 nao ganha mensagem propria: o back-end distingue falta
 		// de permissao de falha de token CSRF, e trocar as duas por um
 		// texto generico torna o erro indiagnosticavel.
-		return falha.error?.mensagem ?? 'Nao foi possivel salvar.';
+		return falha.error?.mensagem ?? 'Não foi possível salvar.';
 	}
 }

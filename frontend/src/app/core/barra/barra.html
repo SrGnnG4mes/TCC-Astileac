@@ -18,9 +18,10 @@
 				<a routerLink="/meu-cadastro" routerLinkActive="ativo">Meu cadastro</a>
 				<a routerLink="/dados-pessoais" routerLinkActive="ativo">Meus dados</a>
 			}
+			<a routerLink="/minha-senha" routerLinkActive="ativo">Alterar senha</a>
 		</nav>
 
-		<span class="identidade">{{ eu.login }} &middot; {{ eu.perfil }}</span>
+		<span class="identidade">{{ eu.login }} &middot; {{ eu.perfil | perfil }}</span>
 	}
 
 	<button type="button" (click)="sair()">Sair</button>

@@ -108,7 +108,7 @@ export class Areas {
 	 */
 	private mensagemDe(falha: HttpErrorResponse): string {
 		if (falha.status === 0) {
-			return 'Nao foi possivel falar com o servidor.';
+			return 'Não foi possível falar com o servidor.';
 		}
 		if (falha.status === 409) {
 			return 'Esta área está vinculada a profissionais. '
@@ -119,6 +119,6 @@ export class Areas {
 		// erro ser diagnosticavel; trocar isso por um texto generico
 		// joga fora a distincao -- foi o que me fez ler uma falha de
 		// CSRF como problema de perfil.
-		return falha.error?.mensagem ?? 'Nao foi possivel completar a operacao.';
+		return falha.error?.mensagem ?? 'Não foi possível completar a operação.';
 	}
 }

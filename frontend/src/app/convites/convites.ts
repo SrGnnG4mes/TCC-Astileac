@@ -4,6 +4,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Barra } from '../core/barra/barra';
 import { ContaService } from '../core/conta.service';
 import { Convite, ConviteEmitido } from '../core/modelos';
+import { DataBrPipe } from '../core/formatos';
 
 /**
  * Emissao e acompanhamento de convites (RF12).
@@ -16,7 +17,7 @@ import { Convite, ConviteEmitido } from '../core/modelos';
  */
 @Component({
 	selector: 'app-convites',
-	imports: [ReactiveFormsModule, Barra],
+	imports: [ReactiveFormsModule, Barra, DataBrPipe],
 	templateUrl: './convites.html',
 	styleUrl: './convites.css'
 })
@@ -88,8 +89,8 @@ export class Convites {
 
 	private mensagemDe(falha: HttpErrorResponse): string {
 		if (falha.status === 0) {
-			return 'Nao foi possivel falar com o servidor.';
+			return 'Não foi possível falar com o servidor.';
 		}
-		return falha.error?.mensagem ?? 'Nao foi possivel completar a operacao.';
+		return falha.error?.mensagem ?? 'Não foi possível completar a operação.';
 	}
 }

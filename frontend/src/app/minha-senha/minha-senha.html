@@ -1,0 +1,60 @@
+<app-barra />
+
+<main class="conteudo">
+	<h1>Alterar senha</h1>
+	<p class="ajuda">
+		A senha atual é exigida: sem ela, bastaria alguém encontrar a sua sessão aberta para
+		trocar a senha e trancar você fora da própria conta.
+	</p>
+
+	@if (erro()) {
+		<p class="erro" role="alert">{{ erro() }}</p>
+	}
+	@if (aviso()) {
+		<p class="aviso" role="status">{{ aviso() }}</p>
+	}
+
+	<form [formGroup]="formulario" (ngSubmit)="trocar()">
+		<div class="campo">
+			<label for="senhaAtual">Senha atual</label>
+			<input
+				id="senhaAtual"
+				type="password"
+				formControlName="senhaAtual"
+				autocomplete="current-password" />
+			@if (formulario.controls.senhaAtual.touched && formulario.controls.senhaAtual.invalid) {
+				<small class="falha">Informe a senha atual.</small>
+			}
+		</div>
+
+		<div class="campo">
+			<label for="senhaNova">Senha nova</label>
+			<input
+				id="senhaNova"
+				type="password"
+				formControlName="senhaNova"
+				autocomplete="new-password"
+				aria-describedby="regraSenha" />
+			<small id="regraSenha" class="dica">Pelo menos 8 caracteres.</small>
+			@if (formulario.controls.senhaNova.touched && formulario.controls.senhaNova.invalid) {
+				<small class="falha">A senha nova precisa ter pelo menos 8 caracteres.</small>
+			}
+		</div>
+
+		<div class="campo">
+			<label for="confirmacao">Confirme a senha nova</label>
+			<input
+				id="confirmacao"
+				type="password"
+				formControlName="confirmacao"
+				autocomplete="new-password" />
+			@if (formulario.controls.confirmacao.touched && formulario.hasError('diferentes')) {
+				<small class="falha">A confirmação não é igual à senha nova.</small>
+			}
+		</div>
+
+		<button type="submit" [disabled]="enviando()">
+			{{ enviando() ? 'Alterando...' : 'Alterar senha' }}
+		</button>
+	</form>
+</main>

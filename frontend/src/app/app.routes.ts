@@ -95,6 +95,14 @@ export const routes: Routes = [
 			import('./dados-pessoais/dados-pessoais').then(m => m.DadosPessoaisTela)
 	},
 	{
+		// Qualquer conta troca a propria senha -- inclusive a da diretoria
+		// que nao tem cadastro de associado.
+		path: 'minha-senha',
+		title: 'Alterar senha | ASTILEAC',
+		canActivate: [autenticadoGuard],
+		loadComponent: () => import('./minha-senha/minha-senha').then(m => m.MinhaSenha)
+	},
+	{
 		path: 'painel',
 		title: 'Painel | ASTILEAC',
 		canActivate: [autenticadoGuard],

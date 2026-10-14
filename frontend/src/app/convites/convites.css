@@ -25,7 +25,7 @@ h2 {
 form {
 	display: flex;
 	flex-wrap: wrap;
-	align-items: flex-end;
+	align-items: flex-start;
 	gap: 14px;
 	padding: 16px;
 	border-radius: 8px;
@@ -61,6 +61,16 @@ input:focus-visible {
 .falha {
 	color: var(--cor-erro);
 	font-size: 0.76rem;
+}
+
+/*
+ * O botao alinha com o CAMPO, e nao com a base do bloco. Com
+ * align-items: flex-end, a mensagem de erro que aparece embaixo do campo
+ * aumentava o bloco e empurrava o botao para baixo. A margem e a altura
+ * do rotulo (0,78rem x 1,5 de entrelinha) mais o espaco ate o campo.
+ */
+form > button {
+	margin-top: calc(0.78rem * 1.5 + 4px);
 }
 
 form button {

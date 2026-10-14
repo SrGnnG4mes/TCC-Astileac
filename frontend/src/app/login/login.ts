@@ -60,11 +60,11 @@ export class Login {
 	 */
 	private mensagemDe(falha: HttpErrorResponse): string {
 		if (falha.status === 0) {
-			return 'Nao foi possivel falar com o servidor. Verifique se o back-end esta rodando.';
+			return 'Não foi possível falar com o servidor. Verifique se o back-end está rodando.';
 		}
 		if (falha.status === 401) {
 			return 'Login ou senha incorretos.';
 		}
-		return falha.error?.mensagem ?? 'Nao foi possivel entrar. Tente novamente.';
+		return falha.error?.mensagem ?? 'Não foi possível entrar. Tente novamente.';
 	}
 }

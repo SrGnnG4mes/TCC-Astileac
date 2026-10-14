@@ -5,7 +5,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Barra } from '../core/barra/barra';
 import { FichaVinculos } from '../core/ficha-vinculos/ficha-vinculos';
 import { ProfissionalService } from '../core/profissional.service';
-import { cpfValido, naoFutura } from '../core/validadores';
+import { cpfValido, naoFutura, DATA_MINIMA, hoje } from '../core/validadores';
 
 /**
  * Cadastro e correcao de profissional pela diretoria (RF01).
@@ -25,6 +25,13 @@ import { cpfValido, naoFutura } from '../core/validadores';
 })
 export class Cadastro {
 
+	/**
+	 * Limites dos campos de data. Com o max, o navegador deixa o ano com 4
+	 * digitos e nao oferece data futura no calendario.
+	 */
+	readonly dataMinima = DATA_MINIMA;
+	readonly hoje = hoje();
+
 	private readonly formBuilder = inject(FormBuilder);
 	private readonly profissionais = inject(ProfissionalService);
 	private readonly rota = inject(ActivatedRoute);
@@ -41,7 +48,7 @@ export class Cadastro {
 		cpf: ['', [Validators.required, cpfValido]],
 		lattesUrl: ['', Validators.maxLength(255)],
 		dataNascimento: ['', [Validators.required, naoFutura]],
-		dataAssociacao: ['', Validators.required]
+		dataAssociacao: ['', [Validators.required, naoFutura]]
 	});
 
 	constructor() {
@@ -92,7 +99,7 @@ export class Cadastro {
 				this.ativo.set(ficha.ativo);
 				this.aviso.set(ficha.ativo
 					? 'Profissional reativado: volta a aparecer nas consultas.'
-					: 'Profissional desativado: sai das consultas por situacao, '
+					: 'Profissional desativado: sai das consultas por situação, '
 						+ 'mas o cadastro e o histórico continuam guardados.');
 			},
 			error: (falha: HttpErrorResponse) => this.erro.set(this.mensagemDe(falha))
@@ -126,7 +133,7 @@ export class Cadastro {
 					// precisam do profissional ja criado.
 					this.id.set(ficha.id);
 					this.aviso.set('Profissional cadastrado. '
-						+ 'Agora e possivel vincular areas, formacoes e certificados.');
+						+ 'Agora é possível vincular áreas, formações e certificados.');
 					this.router.navigate(['/profissionais', ficha.id, 'editar'], { replaceUrl: true });
 				}
 			},
@@ -139,11 +146,11 @@ export class Cadastro {
 
 	private mensagemDe(falha: HttpErrorResponse): string {
 		if (falha.status === 0) {
-			return 'Nao foi possivel falar com o servidor.';
+			return 'Não foi possível falar com o servidor.';
 		}
 		// O 403 nao ganha mensagem propria: o back-end distingue falta
 		// de permissao de falha de token CSRF, e trocar as duas por um
 		// texto generico torna o erro indiagnosticavel.
-		return falha.error?.mensagem ?? 'Nao foi possivel salvar.';
+		return falha.error?.mensagem ?? 'Não foi possível salvar.';
 	}
 }

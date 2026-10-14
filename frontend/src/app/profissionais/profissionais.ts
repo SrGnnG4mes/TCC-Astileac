@@ -5,6 +5,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Barra } from '../core/barra/barra';
 import { ProfissionalService } from '../core/profissional.service';
 import { AreaAtuacao, Pagina, ProfissionalFicha, ProfissionalResumo } from '../core/modelos';
+import { DataBrPipe } from '../core/formatos';
 
 /**
  * Consulta do quadro de associados (RF08).
@@ -20,7 +21,7 @@ import { AreaAtuacao, Pagina, ProfissionalFicha, ProfissionalResumo } from '../c
  */
 @Component({
 	selector: 'app-profissionais',
-	imports: [ReactiveFormsModule, RouterLink, Barra],
+	imports: [ReactiveFormsModule, RouterLink, Barra, DataBrPipe],
 	templateUrl: './profissionais.html',
 	styleUrl: './profissionais.css'
 })
@@ -48,7 +49,7 @@ export class Profissionais {
 			next: areas => this.areas.set(areas),
 			// Sem as areas a busca por nome e situacao continua
 			// funcionando; so o seletor fica vazio.
-			error: () => this.erro.set('Nao foi possivel carregar as areas de atuacao.')
+			error: () => this.erro.set('Não foi possível carregar as áreas de atuação.')
 		});
 
 		this.buscar();
@@ -107,11 +108,11 @@ export class Profissionais {
 
 	private mensagemDe(falha: HttpErrorResponse): string {
 		if (falha.status === 0) {
-			return 'Nao foi possivel falar com o servidor. Verifique se o back-end esta rodando.';
+			return 'Não foi possível falar com o servidor. Verifique se o back-end está rodando.';
 		}
 		if (falha.status === 401) {
-			return 'Sua sessao expirou. Entre novamente.';
+			return 'Sua sessão expirou. Entre novamente.';
 		}
-		return falha.error?.mensagem ?? 'Nao foi possivel completar a consulta.';
+		return falha.error?.mensagem ?? 'Não foi possível completar a consulta.';
 	}
 }

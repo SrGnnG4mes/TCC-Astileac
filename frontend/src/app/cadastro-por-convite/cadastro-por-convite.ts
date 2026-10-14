@@ -3,7 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ContaService } from '../core/conta.service';
-import { cpfValido, naoFutura } from '../core/validadores';
+import { cpfValido, naoFutura, DATA_MINIMA, hoje } from '../core/validadores';
 
 /**
  * Cadastro feito pelo proprio associado, com o convite em maos (RF12).
@@ -25,6 +25,13 @@ import { cpfValido, naoFutura } from '../core/validadores';
 	styleUrl: './cadastro-por-convite.css'
 })
 export class CadastroPorConvite {
+
+	/**
+	 * Limites dos campos de data. Com o max, o navegador deixa o ano com 4
+	 * digitos e nao oferece data futura no calendario.
+	 */
+	readonly dataMinima = DATA_MINIMA;
+	readonly hoje = hoje();
 
 	private readonly formBuilder = inject(FormBuilder);
 	private readonly contas = inject(ContaService);
@@ -53,7 +60,7 @@ export class CadastroPorConvite {
 		if (!token) {
 			this.conferindo.set(false);
 			this.motivoInvalido.set(
-				'Este endereco precisa do codigo do convite. Use o link que a associacao enviou.');
+				'Este endereço precisa do código do convite. Use o link que a associação enviou.');
 			return;
 		}
 
@@ -103,8 +110,8 @@ export class CadastroPorConvite {
 
 	private mensagemDe(falha: HttpErrorResponse): string {
 		if (falha.status === 0) {
-			return 'Nao foi possivel falar com o servidor.';
+			return 'Não foi possível falar com o servidor.';
 		}
-		return falha.error?.mensagem ?? 'Nao foi possivel concluir o cadastro.';
+		return falha.error?.mensagem ?? 'Não foi possível concluir o cadastro.';
 	}
 }

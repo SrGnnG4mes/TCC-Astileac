@@ -1,0 +1,97 @@
+.conteudo {
+	max-width: 480px;
+	margin: 0 auto;
+	padding: 28px 20px 48px;
+}
+
+h1 {
+	margin: 0 0 8px;
+	font-size: 1.4rem;
+}
+
+.ajuda {
+	margin: 0 0 22px;
+	font-size: 0.88rem;
+	line-height: 1.6;
+	color: var(--cor-texto-suave);
+}
+
+form {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	padding: 20px;
+	border-radius: 8px;
+	background: var(--cor-superficie);
+	box-shadow: var(--sombra);
+}
+
+.campo {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+label {
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: var(--cor-texto);
+}
+
+input {
+	padding: 9px 10px;
+	border: 1px solid var(--cor-borda-campo);
+	border-radius: 6px;
+	font: inherit;
+	background: var(--cor-superficie);
+}
+
+.dica {
+	font-size: 0.76rem;
+	color: var(--cor-texto-suave);
+}
+
+.falha {
+	font-size: 0.78rem;
+	color: var(--cor-erro);
+}
+
+button {
+	align-self: flex-start;
+	padding: 10px 20px;
+	border: 0;
+	border-radius: 6px;
+	background: var(--cor-primaria);
+	color: var(--cor-sobre-primaria);
+	font: inherit;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+button:hover {
+	background: var(--cor-primaria-escura);
+}
+
+button:disabled {
+	background: var(--cor-desabilitado);
+	cursor: default;
+}
+
+.erro,
+.aviso {
+	margin: 0 0 16px;
+	padding: 10px 12px;
+	border-radius: 6px;
+	font-size: 0.86rem;
+	line-height: 1.5;
+}
+
+.erro {
+	background: var(--cor-erro-fundo);
+	color: var(--cor-erro);
+}
+
+.aviso {
+	background: var(--cor-ok-fundo);
+	color: var(--cor-ok);
+}

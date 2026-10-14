@@ -41,7 +41,7 @@
 				</button>
 			</div>
 
-			<p class="validade">Válido até {{ convite.dataExpiracao }}.</p>
+			<p class="validade">Válido até {{ convite.dataExpiracao | dataBr }}.</p>
 		</section>
 	}
 
@@ -65,13 +65,13 @@
 				@for (convite of convites(); track convite.id) {
 					<tr>
 						<td>{{ convite.email }}</td>
-						<td class="data">{{ convite.dataEmissao }}</td>
+						<td class="data">{{ convite.dataEmissao | dataBr }}</td>
 						<td>
 							<span class="selo" [class]="'selo ' + convite.situacao">
 								{{ convite.situacao }}
 							</span>
 							@if (convite.situacao === 'pendente') {
-								<small class="ate">até {{ convite.dataExpiracao }}</small>
+								<small class="ate">até {{ convite.dataExpiracao | dataBr }}</small>
 							}
 						</td>
 					</tr>

@@ -158,7 +158,7 @@
 			@for (area of areasDoProfissional(); track area.areaAtuacaoId) {
 				<li>
 					<span class="nome">{{ area.nome }}</span>
-					<span class="detalhe">desde {{ area.dataInicio }}</span>
+					<span class="detalhe">desde {{ area.dataInicio | dataBr }}</span>
 					<button type="button" class="link" (click)="desvincularArea(area.areaAtuacaoId)">
 						Remover
 					</button>
@@ -180,7 +180,7 @@
 
 		<div class="campo">
 			<label for="dataInicio">Início da atuação</label>
-			<input id="dataInicio" type="date" formControlName="dataInicio" />
+			<input id="dataInicio" type="date" [min]="dataMinima" [max]="hoje" formControlName="dataInicio" />
 		</div>
 
 		<button type="submit">Vincular</button>
@@ -287,13 +287,13 @@
 					<span class="detalhe">
 						{{ certificado.instituicaoEmissora }} &middot;
 						{{ certificado.cargaHoraria }}h &middot;
-						{{ certificado.dataEmissao }}
+						{{ certificado.dataEmissao | dataBr }}
 						@if (nomeDaFormacao(certificado.formacaoId); as curso) {
 							&middot; comprova {{ curso }}
 						}
 						@if (certificado.validadoEm) {
 							&middot; visto por {{ certificado.validadoPor }} em
-							{{ certificado.validadoEm }}
+							{{ certificado.validadoEm | dataBr }}
 						}
 					</span>
 
@@ -371,7 +371,7 @@
 
 		<div class="campo">
 			<label for="dataEmissao">Emissão</label>
-			<input id="dataEmissao" type="date" formControlName="dataEmissao" />
+			<input id="dataEmissao" type="date" [min]="dataMinima" [max]="hoje" formControlName="dataEmissao" />
 		</div>
 
 		<div class="campo">
@@ -404,11 +404,11 @@
 					<span class="nome">{{ v.cargo }}</span>
 					<span class="detalhe">
 						{{ v.instituicao }} &middot; {{ v.tipoVinculo }} &middot;
-						desde {{ v.dataInicio }}
+						desde {{ v.dataInicio | dataBr }}
 						@if (v.atual) {
 							&middot; <strong>em andamento</strong>
 						} @else {
-							até {{ v.dataFim }}
+							até {{ v.dataFim | dataBr }}
 						}
 					</span>
 					<button type="button" class="link" (click)="removerVinculo(v.id)">Remover</button>
@@ -442,12 +442,12 @@
 
 		<div class="campo estreito">
 			<label for="vinculoInicio">Início</label>
-			<input id="vinculoInicio" type="date" formControlName="dataInicio" />
+			<input id="vinculoInicio" type="date" [min]="dataMinima" [max]="hoje" formControlName="dataInicio" />
 		</div>
 
 		<div class="campo estreito">
 			<label for="vinculoFim">Término <span class="opcional">(vazio = atual)</span></label>
-			<input id="vinculoFim" type="date" formControlName="dataFim" />
+			<input id="vinculoFim" type="date" [min]="dataMinima" [max]="hoje" formControlName="dataFim" />
 		</div>
 
 		<button type="submit">Adicionar</button>

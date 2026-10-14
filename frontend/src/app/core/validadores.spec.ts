@@ -1,5 +1,5 @@
 import { FormControl } from '@angular/forms';
-import { cpfValido, naoFutura } from './validadores';
+import { cpfValido, dataValida, hoje, naoFutura } from './validadores';
 
 /**
  * Validadores do formulario.
@@ -51,5 +51,38 @@ describe('naoFutura', () => {
 
 	it('deixa o campo vazio para o Validators.required', () => {
 		expect(validar('')).toBeNull();
+	});
+
+	it('recusa ano com mais de 4 digitos, que passava como data no passado', () => {
+		// O defeito: a comparacao e de texto, e "20066-07-08" vem antes de
+		// "2026-..." na ordem alfabetica.
+		expect(validar('20066-07-08')).toEqual({ data: true });
+	});
+
+	it('aceita hoje, no fuso de quem usa', () => {
+		expect(validar(hoje())).toBeNull();
+	});
+});
+
+describe('dataValida', () => {
+	const validar = (valor: string) => dataValida(new FormControl(valor));
+
+	it('aceita data com ano de 4 digitos a partir de 1900', () => {
+		expect(validar('1900-01-01')).toBeNull();
+		expect(validar('1990-05-20')).toBeNull();
+	});
+
+	it('recusa ano antes de 1900 e ano com mais de 4 digitos', () => {
+		expect(validar('1899-12-31')).toEqual({ data: true });
+		expect(validar('20066-07-08')).toEqual({ data: true });
+	});
+});
+
+describe('hoje', () => {
+	it('e a data local, e nao a de UTC', () => {
+		const agora = new Date();
+		const esperado = [agora.getFullYear(), agora.getMonth() + 1, agora.getDate()]
+			.map((n, i) => String(n).padStart(i === 0 ? 4 : 2, '0')).join('-');
+		expect(hoje()).toBe(esperado);
 	});
 });

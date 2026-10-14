@@ -70,8 +70,8 @@ export class Contas {
 	 */
 	private mensagemDe(falha: HttpErrorResponse): string {
 		if (falha.status === 0) {
-			return 'Nao foi possivel falar com o servidor.';
+			return 'Não foi possível falar com o servidor.';
 		}
-		return falha.error?.mensagem ?? 'Nao foi possivel completar a operacao.';
+		return falha.error?.mensagem ?? 'Não foi possível completar a operação.';
 	}
 }

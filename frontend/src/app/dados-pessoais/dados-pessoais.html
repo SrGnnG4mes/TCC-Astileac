@@ -22,9 +22,9 @@
 			<h2>{{ e.mensagem }}</h2>
 			<dl>
 				<dt>Pedido registrado em</dt>
-				<dd>{{ e.dataDoPedido }}</dd>
+				<dd>{{ e.dataDoPedido | dataBr }}</dd>
 				<dt>Exclusão definitiva em</dt>
-				<dd><strong>{{ e.dataDaExclusaoDefinitiva }}</strong></dd>
+				<dd><strong>{{ e.dataDaExclusaoDefinitiva | dataBr }}</strong></dd>
 				<dt>Prazo para desistir</dt>
 				<dd>{{ e.diasParaArrependimento }} dias</dd>
 			</dl>
@@ -48,9 +48,9 @@
 				<dt>CPF</dt>
 				<dd class="mono">{{ d.identificacao.cpf }}</dd>
 				<dt>Nascimento</dt>
-				<dd>{{ d.identificacao.dataNascimento }}</dd>
+				<dd>{{ d.identificacao.dataNascimento | dataBr }}</dd>
 				<dt>Associação</dt>
-				<dd>{{ d.identificacao.dataAssociacao }}</dd>
+				<dd>{{ d.identificacao.dataAssociacao | dataBr }}</dd>
 				<dt>Situação</dt>
 				<dd>{{ d.identificacao.ativo ? 'ativo' : 'inativo' }}</dd>
 			</dl>
@@ -73,7 +73,7 @@
 			</ul>
 			<p class="nota">
 				O arquivo baixado traz o conteúdo completo de cada um desses itens, exportado
-				em {{ d.dataDaExportacao }}.
+				em {{ d.dataDaExportacao | dataBr }}.
 			</p>
 		</section>
 	}
@@ -104,10 +104,10 @@
 					<tbody>
 						@for (acesso of r.content; track acesso.id) {
 							<tr>
-								<td>{{ acesso.dataHora }}</td>
+								<td>{{ acesso.dataHora | dataBr }}</td>
 								<td>{{ acesso.autor }}</td>
-								<td>{{ acesso.acao }}</td>
-								<td>{{ acesso.entidade }}</td>
+								<td>{{ acesso.acao | acao }}</td>
+								<td>{{ acesso.entidade | entidade }}</td>
 							</tr>
 						}
 					</tbody>
