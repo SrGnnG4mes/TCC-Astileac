@@ -17,24 +17,24 @@ import java.time.LocalDate;
  * a inconsistencia deixa de ser possivel.
  */
 public record VinculoEmpregaticioRequestDTO(
-		@NotBlank(message = "instituicao e obrigatoria")
-		@Size(max = 150, message = "instituicao deve ter no maximo 150 caracteres")
+		@NotBlank(message = "Informe a instituição.")
+		@Size(max = 150, message = "A instituição deve ter no máximo 150 caracteres.")
 		String instituicao,
 
-		@NotBlank(message = "cargo e obrigatorio")
-		@Size(max = 100, message = "cargo deve ter no maximo 100 caracteres")
+		@NotBlank(message = "Informe o cargo.")
+		@Size(max = 100, message = "O cargo deve ter no máximo 100 caracteres.")
 		String cargo,
 
-		@NotBlank(message = "tipoVinculo e obrigatorio")
-		@Size(max = 50, message = "tipoVinculo deve ter no maximo 50 caracteres")
+		@NotBlank(message = "Informe o tipo de vínculo.")
+		@Size(max = 50, message = "O tipo de vínculo deve ter no máximo 50 caracteres.")
 		String tipoVinculo,
 
-		@NotNull(message = "dataInicio e obrigatoria")
-		@PastOrPresent(message = "dataInicio nao pode estar no futuro")
+		@NotNull(message = "Informe a data de início.")
+		@PastOrPresent(message = "A data de início não pode estar no futuro.")
 		LocalDate dataInicio,
 
 		/** Nula = vinculo em andamento. */
-		@PastOrPresent(message = "dataFim nao pode estar no futuro")
+		@PastOrPresent(message = "A data de término não pode estar no futuro.")
 		LocalDate dataFim
 ) {
 }

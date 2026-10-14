@@ -89,7 +89,7 @@ public class ContatoService {
 		return contatoRepository.findById(contatoId)
 				.filter(contato -> contato.getProfissional().getId().equals(profissionalId))
 				.orElseThrow(() -> new RecursoNaoEncontradoException(
-						"Contato nao encontrado para este profissional: id " + contatoId));
+						"Contato não encontrado para este profissional: id " + contatoId));
 	}
 
 	/**
@@ -115,8 +115,8 @@ public class ContatoService {
 
 		if (!valido) {
 			throw new RegraDeNegocioException(switch (dto.tipo()) {
-				case EMAIL -> "valor: informe um e-mail valido para o tipo EMAIL";
-				case TELEFONE -> "valor: telefone deve ter 10 ou 11 digitos com DDD, sem pontuacao";
+				case EMAIL -> "Informe um e-mail válido.";
+				case TELEFONE -> "O telefone deve ter 10 ou 11 dígitos, com DDD e sem pontuação.";
 			});
 		}
 	}

@@ -139,7 +139,7 @@ public class ProfissionalService {
 
 	private Profissional buscarEntidadePorId(Long id) {
 		return profissionalRepository.findById(id)
-				.orElseThrow(() -> new RecursoNaoEncontradoException("Profissional nao encontrado: id " + id));
+				.orElseThrow(() -> new RecursoNaoEncontradoException("Profissional não encontrado: id " + id));
 	}
 
 	private ProfissionalResumoDTO toResumoDTO(Profissional profissional) {

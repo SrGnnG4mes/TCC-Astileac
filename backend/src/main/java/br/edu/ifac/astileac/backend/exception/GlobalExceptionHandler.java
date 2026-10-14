@@ -66,7 +66,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(DataIntegrityViolationException.class)
 	public ResponseEntity<ErroRespostaDTO> tratarViolacaoIntegridade(DataIntegrityViolationException ex) {
 		log.warn("Violacao de integridade referencial", ex);
-		return resposta(HttpStatus.CONFLICT, "Operacao nao permitida: o registro possui dados vinculados");
+		return resposta(HttpStatus.CONFLICT, "Operação não permitida: o registro possui dados vinculados.");
 	}
 
 	/**
@@ -76,7 +76,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	 */
 	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
 	public ResponseEntity<ErroRespostaDTO> tratarTipoInvalido(MethodArgumentTypeMismatchException ex) {
-		return resposta(HttpStatus.BAD_REQUEST, "Valor invalido para o parametro '" + ex.getName() + "'");
+		return resposta(HttpStatus.BAD_REQUEST, "Valor inválido para o parâmetro '" + ex.getName() + "'");
 	}
 
 	/**
@@ -91,7 +91,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	 */
 	@ExceptionHandler(AccessDeniedException.class)
 	public ResponseEntity<ErroRespostaDTO> tratarAcessoNegado(AccessDeniedException ex) {
-		return resposta(HttpStatus.FORBIDDEN, "Acesso negado: seu perfil nao permite esta operacao");
+		return resposta(HttpStatus.FORBIDDEN, "Acesso negado: seu perfil não permite esta operação.");
 	}
 
 	/**
@@ -102,21 +102,27 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ErroRespostaDTO> tratarErroInesperado(Exception ex) {
 		log.error("Erro nao tratado", ex);
-		return resposta(HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno no servidor");
+		return resposta(HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno no servidor.");
 	}
 
 	// ---------- ajustes no tratamento herdado ----------
 
 	/**
-	 * Erros de Bean Validation: lista campo a campo o que falhou, para
-	 * o cliente saber o que corrigir.
+	 * Erros de Bean Validation: lista o que falhou, para o cliente saber
+	 * o que corrigir.
+	 *
+	 * So a mensagem, sem o nome do campo na frente: o nome e o do Java
+	 * ("dataFim", "instituicaoEmissora"), e a tela mostra o texto a quem
+	 * preenche o formulario. Cada mensagem ja diz de qual campo se trata,
+	 * em portugues.
 	 */
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(
 			MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 		String mensagem = ex.getBindingResult().getFieldErrors().stream()
-				.map(erro -> erro.getField() + ": " + erro.getDefaultMessage())
-				.collect(Collectors.joining("; "));
+				.map(erro -> erro.getDefaultMessage())
+				.distinct()
+				.collect(Collectors.joining(" "));
 		return ResponseEntity.status(status).body(new ErroRespostaDTO(status.value(), mensagem));
 	}
 
@@ -129,7 +135,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	protected ResponseEntity<Object> handleHttpMessageNotReadable(
 			HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 		return ResponseEntity.status(status)
-				.body(new ErroRespostaDTO(status.value(), "Corpo da requisicao invalido ou malformado"));
+				.body(new ErroRespostaDTO(status.value(), "Os dados enviados estão em formato inválido."));
 	}
 
 	/**
@@ -144,9 +150,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 				.body(new ErroRespostaDTO(status.value(), textoPadrao(status)));
 	}
 
+	/**
+	 * Texto em portugues para os status que a classe pai trata. O padrao
+	 * do Spring e a frase do protocolo em ingles ("Not Found"), que a tela
+	 * mostraria como esta.
+	 */
 	private String textoPadrao(HttpStatusCode status) {
-		HttpStatus conhecido = HttpStatus.resolve(status.value());
-		return conhecido != null ? conhecido.getReasonPhrase() : "Erro na requisicao";
+		return switch (status.value()) {
+			case 404 -> "Recurso não encontrado.";
+			case 405 -> "Operação não permitida neste endereço.";
+			case 413 -> "O arquivo enviado é grande demais.";
+			case 415 -> "Formato de conteúdo não suportado.";
+			default -> "Erro na requisição.";
+		};
 	}
 
 	private ResponseEntity<ErroRespostaDTO> resposta(HttpStatus status, String mensagem) {

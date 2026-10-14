@@ -69,7 +69,7 @@ public class ArquivoCertificadoService {
 			}
 		} catch (IOException e) {
 			log.error("Falha ao gravar documento de certificado", e);
-			throw new RegraDeNegocioException("Nao foi possivel guardar o arquivo enviado");
+			throw new RegraDeNegocioException("Não foi possível guardar o arquivo enviado.");
 		}
 
 		return "certificados/" + nome;
@@ -88,11 +88,11 @@ public class ArquivoCertificadoService {
 
 		if (!arquivo.startsWith(raiz)) {
 			log.error("Caminho de certificado fora da pasta de uploads: {}", caminhoRelativo);
-			throw new RegraDeNegocioException("Arquivo indisponivel");
+			throw new RegraDeNegocioException("Arquivo indisponível.");
 		}
 
 		if (!Files.isReadable(arquivo)) {
-			throw new RegraDeNegocioException("O arquivo deste certificado nao esta disponivel");
+			throw new RegraDeNegocioException("O arquivo deste certificado não está disponível.");
 		}
 
 		return arquivo;
@@ -143,25 +143,25 @@ public class ArquivoCertificadoService {
 	 */
 	private void validar(MultipartFile arquivo) {
 		if (arquivo == null || arquivo.isEmpty()) {
-			throw new RegraDeNegocioException("Envie um arquivo");
+			throw new RegraDeNegocioException("Envie um arquivo.");
 		}
 
 		if (arquivo.getSize() > TAMANHO_MAXIMO) {
-			throw new RegraDeNegocioException("O arquivo deve ter no maximo 5 MB");
+			throw new RegraDeNegocioException("O arquivo deve ter no máximo 5 MB.");
 		}
 
 		byte[] inicio = new byte[ASSINATURA_PDF.length];
 		try (InputStream entrada = arquivo.getInputStream()) {
 			if (entrada.read(inicio) != ASSINATURA_PDF.length) {
-				throw new RegraDeNegocioException("Envie o certificado em PDF");
+				throw new RegraDeNegocioException("Envie o certificado em PDF.");
 			}
 		} catch (IOException e) {
-			throw new RegraDeNegocioException("Nao foi possivel ler o arquivo enviado");
+			throw new RegraDeNegocioException("Não foi possível ler o arquivo enviado.");
 		}
 
 		for (int i = 0; i < ASSINATURA_PDF.length; i++) {
 			if (inicio[i] != ASSINATURA_PDF[i]) {
-				throw new RegraDeNegocioException("Envie o certificado em PDF");
+				throw new RegraDeNegocioException("Envie o certificado em PDF.");
 			}
 		}
 	}

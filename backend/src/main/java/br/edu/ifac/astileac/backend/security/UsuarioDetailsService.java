@@ -26,7 +26,7 @@ public class UsuarioDetailsService implements UserDetailsService {
 	public UserDetails loadUserByUsername(String login) {
 		return usuarioRepository.findByLogin(login)
 				.map(UsuarioAutenticado::new)
-				.orElseThrow(() -> new UsernameNotFoundException("Credenciais invalidas"));
+				.orElseThrow(() -> new UsernameNotFoundException("Login ou senha incorretos."));
 	}
 
 }

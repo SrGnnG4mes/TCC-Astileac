@@ -13,11 +13,11 @@ import java.time.LocalDate;
  * chave composta, e nao uma simples lista de ids.
  */
 public record ProfissionalAreaRequestDTO(
-		@NotNull(message = "areaAtuacaoId e obrigatorio")
+		@NotNull(message = "Informe a área de atuação.")
 		Long areaAtuacaoId,
 
-		@NotNull(message = "dataInicio e obrigatoria")
-		@PastOrPresent(message = "dataInicio nao pode estar no futuro")
+		@NotNull(message = "Informe a data de início.")
+		@PastOrPresent(message = "A data de início não pode estar no futuro.")
 		LocalDate dataInicio
 ) {
 }

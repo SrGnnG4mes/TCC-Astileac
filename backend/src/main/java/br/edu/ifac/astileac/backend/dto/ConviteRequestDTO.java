@@ -6,9 +6,9 @@ import jakarta.validation.constraints.Size;
 
 /** Emissao de convite (RF12): a diretoria informa so o e-mail de destino. */
 public record ConviteRequestDTO(
-		@NotBlank(message = "email e obrigatorio")
-		@Email(message = "email invalido")
-		@Size(max = 150, message = "email deve ter no maximo 150 caracteres")
+		@NotBlank(message = "Informe o e-mail.")
+		@Email(message = "E-mail inválido.")
+		@Size(max = 150, message = "O e-mail deve ter no máximo 150 caracteres.")
 		String email
 ) {
 }

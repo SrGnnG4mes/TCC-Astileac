@@ -11,31 +11,31 @@ import jakarta.validation.constraints.Size;
  * dado limpo e formatar na apresentacao -- a mesma adotada para o CPF.
  */
 public record EnderecoRequestDTO(
-		@NotBlank(message = "cep e obrigatorio")
-		@Pattern(regexp = "\\d{8}", message = "cep deve conter exatamente 8 digitos numericos, sem hifen")
+		@NotBlank(message = "Informe o CEP.")
+		@Pattern(regexp = "\\d{8}", message = "O CEP deve ter 8 dígitos.")
 		String cep,
 
-		@NotBlank(message = "logradouro e obrigatorio")
-		@Size(max = 150, message = "logradouro deve ter no maximo 150 caracteres")
+		@NotBlank(message = "Informe o logradouro.")
+		@Size(max = 150, message = "O logradouro deve ter no máximo 150 caracteres.")
 		String logradouro,
 
-		@NotBlank(message = "numero e obrigatorio")
-		@Size(max = 20, message = "numero deve ter no maximo 20 caracteres")
+		@NotBlank(message = "Informe o número.")
+		@Size(max = 20, message = "O número deve ter no máximo 20 caracteres.")
 		String numero,
 
-		@Size(max = 100, message = "complemento deve ter no maximo 100 caracteres")
+		@Size(max = 100, message = "O complemento deve ter no máximo 100 caracteres.")
 		String complemento,
 
-		@NotBlank(message = "bairro e obrigatorio")
-		@Size(max = 100, message = "bairro deve ter no maximo 100 caracteres")
+		@NotBlank(message = "Informe o bairro.")
+		@Size(max = 100, message = "O bairro deve ter no máximo 100 caracteres.")
 		String bairro,
 
-		@NotBlank(message = "cidade e obrigatoria")
-		@Size(max = 100, message = "cidade deve ter no maximo 100 caracteres")
+		@NotBlank(message = "Informe a cidade.")
+		@Size(max = 100, message = "A cidade deve ter no máximo 100 caracteres.")
 		String cidade,
 
-		@NotBlank(message = "uf e obrigatoria")
-		@Pattern(regexp = "[A-Z]{2}", message = "uf deve ter 2 letras maiusculas, ex.: AC")
+		@NotBlank(message = "Informe a UF.")
+		@Pattern(regexp = "[A-Z]{2}", message = "A UF deve ter 2 letras maiúsculas, por exemplo: AC.")
 		String uf
 ) {
 }

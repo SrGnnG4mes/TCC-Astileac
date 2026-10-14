@@ -2,6 +2,8 @@ package br.edu.ifac.astileac.backend.config;
 
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -117,11 +119,8 @@ public class SecurityConfig {
 						// Respostas em JSON: o cliente e uma SPA, nao um
 						// navegador seguindo redirecionamento.
 						.successHandler((req, resp, auth) -> resp.setStatus(HttpServletResponse.SC_OK))
-						.failureHandler((req, resp, ex) -> {
-							resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-							resp.setContentType(MediaType.APPLICATION_JSON_VALUE);
-							resp.getWriter().write("{\"status\":401,\"mensagem\":\"Credenciais invalidas\"}");
-						}))
+						.failureHandler((req, resp, ex) -> responderJson(resp, HttpServletResponse.SC_UNAUTHORIZED,
+								"{\"status\":401,\"mensagem\":\"Login ou senha incorretos.\"}")))
 				.logout(logout -> logout
 						.logoutUrl(API + "/autenticacao/logout")
 						.deleteCookies("JSESSIONID")
@@ -129,11 +128,8 @@ public class SecurityConfig {
 				.exceptionHandling(erros -> erros
 						// Sem isto, o Spring redirecionaria para uma pagina de
 						// login que nao existe. Uma API responde com status.
-						.authenticationEntryPoint((req, resp, ex) -> {
-							resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-							resp.setContentType(MediaType.APPLICATION_JSON_VALUE);
-							resp.getWriter().write("{\"status\":401,\"mensagem\":\"Autenticacao necessaria\"}");
-						})
+						.authenticationEntryPoint((req, resp, ex) -> responderJson(resp, HttpServletResponse.SC_UNAUTHORIZED,
+								"{\"status\":401,\"mensagem\":\"Entre no sistema para continuar.\"}"))
 						// Duas causas muito diferentes chegam aqui como o mesmo
 						// 403: token CSRF ausente/invalido e falta de
 						// permissao. Tratar as duas com a mesma mensagem torna
@@ -143,17 +139,27 @@ public class SecurityConfig {
 						// dado nem estrutura interna, so diz o que corrigir.
 						.accessDeniedHandler((req, resp, ex) -> {
 							boolean falhaDeCsrf = ex instanceof CsrfException;
-							resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
-							resp.setContentType(MediaType.APPLICATION_JSON_VALUE);
-							resp.getWriter().write(falhaDeCsrf
-									? "{\"status\":403,\"mensagem\":\"Token CSRF ausente ou invalido. "
-											+ "Obtenha um novo em GET " + API + "/autenticacao/csrf e envie no cabecalho "
+							responderJson(resp, HttpServletResponse.SC_FORBIDDEN, falhaDeCsrf
+									? "{\"status\":403,\"mensagem\":\"Token CSRF ausente ou inválido. "
+											+ "Obtenha um novo em GET " + API + "/autenticacao/csrf e envie no cabeçalho "
 											+ "X-XSRF-TOKEN.\"}"
-									: "{\"status\":403,\"mensagem\":\"Acesso negado: seu perfil nao permite "
-											+ "esta operacao\"}");
+									: "{\"status\":403,\"mensagem\":\"Acesso negado: seu perfil não permite "
+											+ "esta operação.\"}");
 						}));
 
 		return http.build();
+	}
+
+	/**
+	 * Escreve uma resposta de erro em JSON. O charset vai explicito: sem
+	 * ele o Tomcat usa ISO-8859-1, e o navegador, que le JSON como UTF-8,
+	 * mostraria os acentos das mensagens quebrados.
+	 */
+	private static void responderJson(HttpServletResponse resp, int status, String json) throws IOException {
+		resp.setStatus(status);
+		resp.setContentType(MediaType.APPLICATION_JSON_VALUE);
+		resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
+		resp.getWriter().write(json);
 	}
 
 	/**

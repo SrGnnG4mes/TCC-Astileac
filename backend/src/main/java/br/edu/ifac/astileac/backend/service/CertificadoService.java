@@ -105,7 +105,7 @@ public class CertificadoService {
 		return certificadoRepository.findById(certificadoId)
 				.filter(certificado -> certificado.getProfissional().getId().equals(profissionalId))
 				.orElseThrow(() -> new RecursoNaoEncontradoException(
-						"Certificado nao encontrado para este profissional: id " + certificadoId));
+						"Certificado não encontrado para este profissional: id " + certificadoId));
 	}
 
 	// ---------- documento e reconhecimento (Passo 8 / RF13) ----------
@@ -149,7 +149,7 @@ public class CertificadoService {
 		Certificado certificado = buscarEntidade(profissionalId, certificadoId);
 
 		if (!certificado.temDocumento()) {
-			throw new RecursoNaoEncontradoException("Este certificado nao tem documento anexado");
+			throw new RecursoNaoEncontradoException("Este certificado não tem documento anexado.");
 		}
 
 		return arquivoCertificadoService.resolver(certificado.getArquivoPath());
@@ -170,12 +170,12 @@ public class CertificadoService {
 
 		if (!certificado.temDocumento()) {
 			throw new RegraDeNegocioException(
-					"Nao ha documento anexado para reconhecer. "
-							+ "Peca ao associado que envie o certificado em PDF.");
+					"Não há documento anexado para dar o visto. "
+							+ "Peça ao associado que envie o certificado em PDF.");
 		}
 
 		if (certificado.estaValidado()) {
-			throw new ConflitoException("Este certificado ja foi reconhecido em "
+			throw new ConflitoException("Este documento já recebeu o visto em "
 					+ certificado.getValidadoEm().toLocalDate());
 		}
 

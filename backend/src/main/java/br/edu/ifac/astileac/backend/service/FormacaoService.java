@@ -69,7 +69,7 @@ public class FormacaoService {
 		return formacaoRepository.findById(formacaoId)
 				.filter(formacao -> formacao.getProfissional().getId().equals(profissionalId))
 				.orElseThrow(() -> new RecursoNaoEncontradoException(
-						"Formacao nao encontrada para este profissional: id " + formacaoId));
+						"Formação não encontrada para este profissional: id " + formacaoId));
 	}
 
 	private void aplicar(Formacao formacao, FormacaoRequestDTO dto) {
@@ -87,13 +87,13 @@ public class FormacaoService {
 		int anoAtual = LocalDate.now().getYear();
 		if (anoConclusao > anoAtual) {
 			throw new RegraDeNegocioException(
-					"anoConclusao: formacao concluida nao pode estar no futuro");
+					"O ano de conclusão não pode estar no futuro.");
 		}
 
 		int anoNascimento = profissional.getDataNascimento().getYear();
 		if (anoConclusao < anoNascimento) {
 			throw new RegraDeNegocioException(
-					"anoConclusao: nao pode ser anterior ao ano de nascimento do profissional");
+					"O ano de conclusão não pode ser anterior ao ano de nascimento.");
 		}
 	}
 

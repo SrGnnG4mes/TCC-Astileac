@@ -58,9 +58,9 @@ public class CadastroController {
 		Long id = conviteService.cadastrar(dto);
 		return Map.of(
 				"profissionalId", id,
-				"mensagem", "Cadastro criado. Agora entre no sistema com o login e a senha que voce escolheu.");
+				"mensagem", "Cadastro criado. Agora entre no sistema com o login e a senha que você escolheu.");
 	}
 
-	public record TokenDTO(@NotBlank(message = "token e obrigatorio") String token) {
+	public record TokenDTO(@NotBlank(message = "O código do convite é obrigatório.") String token) {
 	}
 }

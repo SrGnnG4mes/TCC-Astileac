@@ -90,8 +90,8 @@ public class ConviteService {
 				salvo.getEmail(),
 				token,
 				salvo.getDataExpiracao(),
-				"Entregue este codigo a pessoa convidada. Ele serve uma vez so e expira em "
-						+ DIAS_DE_VALIDADE + " dias. Nao e possivel consulta-lo depois: "
+				"Entregue este código à pessoa convidada. Ele serve uma vez só e expira em "
+						+ DIAS_DE_VALIDADE + " dias. Não é possível consultá-lo depois: "
 						+ "se perder, emita um novo convite.");
 	}
 
@@ -121,7 +121,7 @@ public class ConviteService {
 
 		if (encontrado.isEmpty() || !encontrado.get().estaValido()) {
 			return new ConviteValidacaoDTO(false, null,
-					"Convite invalido, ja utilizado ou expirado. Procure a diretoria da associacao.");
+					"Convite inválido, já utilizado ou expirado. Procure a diretoria da associação.");
 		}
 
 		return new ConviteValidacaoDTO(true, encontrado.get().getEmail(), null);
@@ -140,14 +140,14 @@ public class ConviteService {
 		Convite convite = conviteRepository.findByTokenHash(hashDe(dados.token()))
 				.filter(Convite::estaValido)
 				.orElseThrow(() -> new RegraDeNegocioException(
-						"Convite invalido, ja utilizado ou expirado. Procure a diretoria da associacao."));
+						"Convite inválido, já utilizado ou expirado. Procure a diretoria da associação."));
 
 		// Antes de criar qualquer coisa: o banco decide quem ganhou a
 		// corrida por este convite. Zero linhas = outra requisicao
 		// chegou primeiro.
 		LocalDateTime agora = LocalDateTime.now();
 		if (conviteRepository.marcarConsumido(convite.getId(), agora) == 0) {
-			throw new ConflitoException("Este convite ja foi utilizado.");
+			throw new ConflitoException("Este convite já foi utilizado.");
 		}
 
 		// O UPDATE acima e em massa: altera a linha no banco mas NAO a
@@ -167,7 +167,7 @@ public class ConviteService {
 		}
 
 		if (usuarioRepository.existsByLogin(dados.login())) {
-			throw new ConflitoException("Este login ja esta em uso. Escolha outro.");
+			throw new ConflitoException("Este login já está em uso. Escolha outro.");
 		}
 
 		Profissional profissional = new Profissional();
@@ -206,7 +206,7 @@ public class ConviteService {
 		logAcessoService.registrar(
 				br.edu.ifac.astileac.backend.entity.AcaoLog.CRIACAO,
 				LogAcessoService.ENTIDADE_PROFISSIONAL, criado.getId(), null,
-				"Cadastro criado pelo proprio associado via convite " + convite.getId());
+				"Cadastro criado pelo próprio associado, pelo convite " + convite.getId());
 
 		return criado.getId();
 	}

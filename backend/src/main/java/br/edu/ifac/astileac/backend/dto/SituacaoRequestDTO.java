@@ -10,7 +10,7 @@ import jakarta.validation.constraints.NotNull;
  * a mesma coisa em sentidos opostos.
  */
 public record SituacaoRequestDTO(
-		@NotNull(message = "ativo e obrigatorio")
+		@NotNull(message = "Informe a situação: ativo ou inativo.")
 		Boolean ativo
 ) {
 }

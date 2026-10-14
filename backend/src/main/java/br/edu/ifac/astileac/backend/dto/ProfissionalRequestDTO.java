@@ -15,19 +15,19 @@ import java.time.LocalDate;
  * formulario de cadastro.
  */
 public record ProfissionalRequestDTO(
-		@NotBlank(message = "nome e obrigatorio")
-		@Size(max = 150, message = "nome deve ter no maximo 150 caracteres")
+		@NotBlank(message = "Informe o nome.")
+		@Size(max = 150, message = "O nome deve ter no máximo 150 caracteres.")
 		String nome,
 
-		@NotBlank(message = "cpf e obrigatorio")
-		@Cpf(message = "cpf invalido: informe 11 digitos numericos com digitos verificadores corretos")
+		@NotBlank(message = "Informe o CPF.")
+		@Cpf(message = "CPF inválido: informe os 11 dígitos, com os dígitos verificadores corretos.")
 		String cpf,
 
-		@NotNull(message = "data de nascimento e obrigatoria")
-		@Past(message = "data de nascimento deve estar no passado")
+		@NotNull(message = "Informe a data de nascimento.")
+		@Past(message = "A data de nascimento deve estar no passado.")
 		LocalDate dataNascimento,
 
-		@NotNull(message = "data de associacao e obrigatoria")
+		@NotNull(message = "Informe a data de associação.")
 		LocalDate dataAssociacao,
 
 		/**
@@ -41,8 +41,8 @@ public record ProfissionalRequestDTO(
 		 */
 		@Pattern(
 				regexp = "^$|^https?://(www\\.)?lattes\\.cnpq\\.br/.+$",
-				message = "informe o endereco do Lattes (http://lattes.cnpq.br/...)")
-		@Size(max = 255, message = "lattes deve ter no maximo 255 caracteres")
+				message = "Informe o endereço do Lattes (http://lattes.cnpq.br/...).")
+		@Size(max = 255, message = "O endereço do Lattes deve ter no máximo 255 caracteres.")
 		String lattesUrl
 ) {
 }
