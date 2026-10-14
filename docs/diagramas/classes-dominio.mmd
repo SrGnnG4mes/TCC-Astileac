@@ -1,0 +1,160 @@
+classDiagram
+	%% Diagrama de classes do dominio: as entidades JPA do pacote entity e os
+	%% enums que elas usam. Tipos Java, nao do banco.
+	%% As associacoes sao UNIDIRECIONAIS, da filha para Profissional: a
+	%% classe filha conhece o profissional, e Profissional nao tem colecoes.
+	%% Decisao de simplicidade: evita sincronizar os dois lados e carregar
+	%% listas sem necessidade.
+	%% Usuario.perfil e String no mapeamento; os valores aceitos sao os do
+	%% enum Perfil (pacote security), dai a dependencia tracejada.
+	direction TB
+
+	class Profissional {
+		-Long id
+		-String nome
+		-String cpf
+		-LocalDate dataNascimento
+		-LocalDate dataAssociacao
+		-Boolean ativo
+		-String lattesUrl
+		-LocalDateTime dataExclusaoSolicitada
+	}
+
+	class Endereco {
+		-Long id
+		-String cep
+		-String logradouro
+		-String numero
+		-String complemento
+		-String bairro
+		-String cidade
+		-String uf
+	}
+
+	class Contato {
+		-Long id
+		-TipoContato tipo
+		-String valor
+		-Boolean principal
+	}
+
+	class TipoContato {
+		<<enumeration>>
+		EMAIL
+		TELEFONE
+	}
+
+	class AreaAtuacao {
+		-Long id
+		-String nome
+		-String descricao
+	}
+
+	class ProfissionalArea {
+		-ProfissionalAreaId id
+		-LocalDate dataInicio
+	}
+
+	class ProfissionalAreaId {
+		<<embeddable>>
+		-Long profissionalId
+		-Long areaAtuacaoId
+	}
+
+	class Formacao {
+		-Long id
+		-String nivel
+		-String curso
+		-String instituicao
+		-Integer anoConclusao
+	}
+
+	class Certificado {
+		-Long id
+		-String titulo
+		-String instituicaoEmissora
+		-Integer cargaHoraria
+		-LocalDate dataEmissao
+		-String arquivoPath
+		-LocalDateTime validadoEm
+		-String validadoPor
+		+temDocumento() boolean
+		+estaValidado() boolean
+	}
+
+	class VinculoEmpregaticio {
+		-Long id
+		-String instituicao
+		-String cargo
+		-String tipoVinculo
+		-LocalDate dataInicio
+		-LocalDate dataFim
+		-Boolean atual
+	}
+
+	class Usuario {
+		-Long id
+		-String login
+		-String senhaHash
+		-String perfil
+	}
+
+	class Perfil {
+		<<enumeration>>
+		ADMIN
+		PROFISSIONAL
+	}
+
+	class Convite {
+		-Long id
+		-String email
+		-String tokenHash
+		-LocalDateTime dataEmissao
+		-LocalDateTime dataExpiracao
+		-LocalDateTime dataConsumo
+		-String emitidoPor
+		+estaConsumido() boolean
+		+estaExpirado() boolean
+		+estaValido() boolean
+	}
+
+	class LogAcesso {
+		-Long id
+		-LocalDateTime dataHora
+		-String autor
+		-String origem
+		-AcaoLog acao
+		-String entidade
+		-Long registroId
+		-String detalhe
+	}
+
+	class AcaoLog {
+		<<enumeration>>
+		CONSULTA
+		CRIACAO
+		ALTERACAO
+		EXCLUSAO
+		EXPORTACAO
+	}
+
+	%% Acima de Profissional: identificacao e acesso. Abaixo: o registro
+	%% profissional. Quando a relacao esta escrita "Profissional <-- Filha",
+	%% e so para a filha ficar embaixo no desenho; a seta continua apontando
+	%% para Profissional (a filha e quem conhece o pai).
+	Endereco "0..1" --> "1" Profissional : profissional
+	Contato "*" --> "1" Profissional : profissional
+	TipoContato <.. Contato
+	Usuario "0..1" --> "0..1" Profissional : profissional
+	Perfil <.. Usuario
+	Convite "0..1" --> "0..1" Profissional : profissional
+
+	Profissional "1" <-- "*" ProfissionalArea : profissional
+	ProfissionalArea "*" --> "1" AreaAtuacao : areaAtuacao
+	ProfissionalArea *-- ProfissionalAreaId
+	Profissional "1" <-- "*" Formacao : profissional
+	Certificado "*" --> "0..1" Formacao : formacao
+	Profissional "1" <-- "*" Certificado : profissional
+	Profissional "1" <-- "*" VinculoEmpregaticio : profissional
+
+	LogAcesso ..> AcaoLog

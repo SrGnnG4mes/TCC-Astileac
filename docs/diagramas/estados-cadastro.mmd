@@ -1,0 +1,28 @@
+stateDiagram-v2
+	%% Ciclo de vida do cadastro do profissional.
+	%% Duas coisas diferentes, que a diretoria confirmou como diferentes:
+	%% - desativar (diretoria): administracao do quadro, nunca apaga;
+	%% - eliminar (titular, LGPD Art. 18): apaga de verdade, depois de 30
+	%%   dias de arrependimento.
+	%% O pedido de eliminacao nao mexe em "ativo": ao cancelar, o cadastro
+	%% volta exatamente a situacao em que estava.
+
+	state "No quadro da associação" as NoQuadro {
+		state "Ativo" as Ativo
+		state "Inativo" as Inativo
+		[*] --> Ativo
+		Ativo --> Inativo : diretoria desativa
+		Inativo --> Ativo : diretoria reativa
+	}
+
+	state "Eliminação pedida" as Bloqueado
+	state "Eliminado" as Eliminado
+
+	[*] --> NoQuadro : cadastro pelo convite (RF12)<br/>ou pela diretoria
+	NoQuadro --> Bloqueado : titular pede<br/>a eliminação (RF10)
+	Bloqueado --> NoQuadro : titular cancela<br/>dentro do prazo
+	Bloqueado --> Eliminado : 30 dias depois,<br/>rotina das 3h
+	Eliminado --> [*]
+
+	note left of Bloqueado : Fora das consultas<br/>da diretoria (RF08)
+	note right of Eliminado : Apagados os dados,<br/>os PDFs, a conta<br/>e o convite. O registro<br/>de acesso (RF11)<br/>permanece.

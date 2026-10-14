@@ -1,0 +1,35 @@
+sequenceDiagram
+	%% Login (RF09) como o front-end o faz em AutenticacaoService.entrar().
+	%% A segunda leitura do token CSRF, depois do login, corrige um defeito
+	%% encontrado rodando: o Spring troca o token ao autenticar, e o cookie
+	%% so e reescrito quando alguem le o token de novo.
+	autonumber
+	actor U as Usuário
+	participant A as Angular<br/>(AutenticacaoService)
+	participant S as Spring Security
+	participant C as AutenticacaoController
+	participant D as UsuarioDetailsService
+	participant BD as PostgreSQL
+
+	U->>A: informa login e senha
+	A->>C: GET /api/autenticacao/csrf
+	C-->>A: token, gravado no cookie XSRF-TOKEN
+	A->>S: POST /api/autenticacao/login<br/>(formulário, com o<br/>cabeçalho X-XSRF-TOKEN)
+	S->>D: loadUserByUsername(login)
+	D->>BD: busca a conta pelo login
+	BD-->>D: senha_hash, perfil,<br/>profissional_id
+	D-->>S: UsuarioAutenticado
+	S->>S: confere a senha<br/>com o hash BCrypt
+	alt senha correta
+		S->>S: troca o id da sessão<br/>e descarta o token<br/>CSRF anterior
+		S-->>A: 200 + cookie de<br/>sessão (HttpOnly)
+		A->>C: GET /api/autenticacao/csrf
+		C-->>A: token novo no cookie XSRF-TOKEN
+		Note over A,C: Sem esta renovação, a primeira escrita<br/>depois do login falhava com 403.
+		A->>C: GET /api/autenticacao/eu
+		C-->>A: login, perfil e profissionalId
+		A-->>U: diretoria: /profissionais<br/>associado: /painel
+	else login ou senha incorretos
+		S-->>A: 401 "Login ou<br/>senha incorretos."
+		A-->>U: mostra a mensagem
+	end

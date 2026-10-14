@@ -1,0 +1,89 @@
+erDiagram
+	%% Vista parcial do DER: o cadastro do profissional.
+	%% GERADO por gerar.mjs a partir de docs/ASTILEAC-BD-atual.mmd. Nao edite:
+	%% altere o DER completo e rode o script de novo.
+	direction TB
+	PROFISSIONAL {
+		bigint id PK
+		varchar(150) nome
+		varchar(11) cpf UK
+		date data_nascimento
+		date data_associacao
+		boolean ativo "desativar, nunca apagar"
+		varchar(255) lattes_url "opcional (V8)"
+		timestamp data_exclusao_solicitada "opcional: pedido do titular (V4)"
+	}
+
+	ENDERECO {
+		bigint id PK
+		bigint profissional_id FK,UK
+		varchar(8) cep
+		varchar(150) logradouro
+		varchar(20) numero
+		varchar(100) complemento "opcional"
+		varchar(100) bairro
+		varchar(100) cidade
+		char(2) uf
+	}
+
+	CONTATO {
+		bigint id PK
+		bigint profissional_id FK
+		varchar(20) tipo "EMAIL ou TELEFONE"
+		varchar(150) valor
+		boolean principal "um principal por tipo"
+	}
+
+	AREA_ATUACAO {
+		bigint id PK
+		varchar(50) nome UK
+		varchar(255) descricao "opcional"
+	}
+
+	PROFISSIONAL_AREA {
+		bigint profissional_id PK,FK
+		bigint area_atuacao_id PK,FK
+		date data_inicio
+	}
+
+	FORMACAO {
+		bigint id PK
+		bigint profissional_id FK
+		varchar(50) nivel
+		varchar(150) curso
+		varchar(150) instituicao
+		integer ano_conclusao
+	}
+
+	CERTIFICADO {
+		bigint id PK
+		bigint profissional_id FK
+		bigint formacao_id FK "opcional"
+		varchar(150) titulo
+		varchar(150) instituicao_emissora
+		integer carga_horaria
+		date data_emissao
+		varchar(255) arquivo_path "opcional (V5): só o caminho do PDF"
+		timestamp validado_em "opcional: visto da diretoria (V7)"
+		varchar(100) validado_por "quem deu o visto (V7)"
+	}
+
+	VINCULO_EMPREGATICIO {
+		bigint id PK
+		bigint profissional_id FK
+		varchar(150) instituicao
+		varchar(100) cargo
+		varchar(50) tipo_vinculo
+		date data_inicio
+		date data_fim "nula = em andamento"
+		boolean atual "derivado de data_fim"
+	}
+
+	ENDERECO |o..|| PROFISSIONAL : "é endereço de"
+	CONTATO }o..|| PROFISSIONAL : "é contato de"
+	PROFISSIONAL ||--o{ PROFISSIONAL_AREA : "atua em"
+	AREA_ATUACAO ||--o{ PROFISSIONAL_AREA : "classifica"
+	PROFISSIONAL ||..o{ FORMACAO : "concluiu"
+	PROFISSIONAL ||..o{ CERTIFICADO : "declara"
+	FORMACAO |o..o{ CERTIFICADO : "é comprovada por"
+	PROFISSIONAL ||..o{ VINCULO_EMPREGATICIO : "mantém"

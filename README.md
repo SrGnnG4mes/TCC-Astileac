@@ -113,6 +113,10 @@ O diagrama entidade-relacionamento do sistema atual está em
 `docs/ASTILEAC-BD.mmd` é o modelo inicial, de agosto, com as nove tabelas
 de partida, mantido como registro da evolução.
 
+Os demais diagramas (modelo conceitual, casos de uso, classes, arquitetura,
+sequência, estados e navegação) estão em `docs/diagramas/`, com um guia de
+uso no TCC. Para regenerar as imagens: `node docs/diagramas/gerar.mjs`.
+
 ## Licença
 
 Este projeto é de caráter acadêmico. Ver arquivo `LICENSE`.

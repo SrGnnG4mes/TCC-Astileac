@@ -1,0 +1,37 @@
+flowchart LR
+	%% Casos de uso do visitante e do associado.
+	%% O Mermaid nao tem diagrama de casos de uso proprio; este e um
+	%% fluxograma com a notacao da UML: boneco = ator, forma arredondada =
+	%% caso de uso, linha cheia = associacao, tracejada = include/extend.
+	%% A moldura do sistema (opcional na UML) foi omitida: com ela o
+	%% Mermaid posiciona os atores fora do lugar e cruza as linhas.
+
+	VIS@{ shape: person, label: "Visitante" }
+	ASS@{ shape: person, label: "Associado" }
+
+	UC_SITE([Consultar o site<br/>da associação])
+	UC_CONVITE([Cadastrar-se por convite<br/>RF12])
+	UC_ENTRAR([Entrar no sistema<br/>RF09])
+	UC_PROPRIO([Manter o próprio cadastro<br/>RF01 a RF07])
+	UC_DOC([Anexar o documento<br/>do certificado<br/>RF13])
+	UC_EXPORTAR([Exportar os próprios dados<br/>RF10])
+	UC_ELIMINAR([Pedir ou cancelar a<br/>eliminação dos dados<br/>RF10])
+	UC_VER_LOG([Ver quem acessou<br/>os próprios dados<br/>RF11])
+	UC_SENHA([Trocar a própria senha<br/>RF12])
+	UC_REGISTRAR([Registrar o acesso<br/>a dado pessoal<br/>RF11])
+
+	VIS --- UC_SITE
+	VIS --- UC_CONVITE
+
+	ASS --- UC_ENTRAR
+	ASS --- UC_PROPRIO
+	ASS --- UC_EXPORTAR
+	ASS --- UC_ELIMINAR
+	ASS --- UC_VER_LOG
+	ASS --- UC_SENHA
+
+	%% O extend sai do caso estendido e aponta para o caso base. Por isso o
+	%% Mermaid poe "Anexar o documento" na coluna antes do caso base.
+	UC_DOC -. "«extend»" .-> UC_PROPRIO
+	UC_PROPRIO -. "«include»" .-> UC_REGISTRAR
+	UC_EXPORTAR -. "«include»" .-> UC_REGISTRAR

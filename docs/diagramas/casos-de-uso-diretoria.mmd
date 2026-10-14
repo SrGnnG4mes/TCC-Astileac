@@ -1,0 +1,36 @@
+flowchart LR
+	%% Casos de uso da diretoria e da rotina agendada.
+	%% Mesma notacao do diagrama do associado (casos-de-uso-associado.mmd).
+	%% O membro da diretoria tambem e associado: os casos daquele diagrama
+	%% valem para ele sobre o proprio cadastro, e nao se repetem aqui.
+
+	DIR@{ shape: person, label: "Diretoria" }
+	AGENDA@{ shape: person, label: "Rotina agendada<br/>(todo dia às 3h)" }
+
+	UC_ENTRAR([Entrar no sistema<br/>RF09])
+	UC_CONSULTAR([Consultar profissionais<br/>por área de atuação<br/>RF08])
+	UC_FICHA([Manter o cadastro<br/>de um profissional<br/>RF01 a RF07])
+	UC_SITUACAO([Desativar ou reativar<br/>um profissional])
+	UC_VISTO([Dar ou retirar o visto<br/>do documento<br/>RF13])
+	UC_TITULAR([Atender aos direitos<br/>de um titular<br/>RF10])
+	UC_EMITIR([Emitir convite<br/>RF12])
+	UC_PERFIL([Conceder ou retirar<br/>o perfil de diretoria<br/>RF12])
+	UC_AREAS([Manter as áreas<br/>de atuação<br/>RF04])
+	UC_REGISTRAR([Registrar o acesso<br/>a dado pessoal<br/>RF11])
+	UC_EXPURGAR([Eliminar cadastros com<br/>prazo de 30 dias vencido<br/>RF10])
+
+	DIR --- UC_ENTRAR
+	DIR --- UC_CONSULTAR
+	DIR --- UC_FICHA
+	DIR --- UC_SITUACAO
+	DIR --- UC_VISTO
+	DIR --- UC_TITULAR
+	DIR --- UC_EMITIR
+	DIR --- UC_PERFIL
+	DIR --- UC_AREAS
+
+	AGENDA --- UC_EXPURGAR
+
+	UC_CONSULTAR -. "«include»" .-> UC_REGISTRAR
+	UC_FICHA -. "«include»" .-> UC_REGISTRAR
+	UC_TITULAR -. "«include»" .-> UC_REGISTRAR
