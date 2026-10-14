@@ -10,6 +10,8 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -96,8 +98,32 @@ public class ArquivoCertificadoService {
 		return arquivo;
 	}
 
-	/** Remove o arquivo anterior quando um novo o substitui. */
-	public void apagar(String caminhoRelativo) {
+	/**
+	 * Apaga o arquivo so depois que a transacao em curso confirmar.
+	 *
+	 * Arquivo em disco nao participa da transacao do banco. Apagando na
+	 * hora, uma falha posterior desfaria o banco mas nao o disco: o
+	 * registro voltaria apontando para um documento que nao existe mais.
+	 * Esperando a confirmacao, o pior caso se inverte -- um arquivo
+	 * orfao, que e desperdicio de disco, e nao documento perdido.
+	 */
+	public void apagarAoConfirmar(String caminhoRelativo) {
+		if (caminhoRelativo == null) {
+			return;
+		}
+		if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+			apagar(caminhoRelativo);
+			return;
+		}
+		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+			@Override
+			public void afterCommit() {
+				apagar(caminhoRelativo);
+			}
+		});
+	}
+
+	private void apagar(String caminhoRelativo) {
 		if (caminhoRelativo == null) {
 			return;
 		}
@@ -105,8 +131,8 @@ public class ArquivoCertificadoService {
 			Files.deleteIfExists(resolver(caminhoRelativo));
 		} catch (IOException | RegraDeNegocioException e) {
 			// Arquivo orfao e desperdicio de disco, nao falha de
-			// operacao: a troca do documento ja aconteceu no banco.
-			log.warn("Nao foi possivel apagar o documento substituido: {}", caminhoRelativo);
+			// operacao: a alteracao ja foi confirmada no banco.
+			log.warn("Nao foi possivel apagar o documento: {}", caminhoRelativo);
 		}
 	}
 

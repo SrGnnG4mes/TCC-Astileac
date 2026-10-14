@@ -33,7 +33,6 @@ public class UsuarioLogado {
 	}
 
 	/**
-	/**
 	 * Usado em @PreAuthorize, COMPOSTO com hasRole: a expressao fica
 	 * "hasRole(ADMIN) or @autorizacao.eOProprioProfissional(#id)".
 	 *

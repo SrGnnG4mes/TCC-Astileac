@@ -76,6 +76,9 @@ class DadosPessoaisServiceTest {
 	@Mock
 	private LogAcessoService logAcessoService;
 
+	@Mock
+	private ArquivoCertificadoService arquivoCertificadoService;
+
 	@InjectMocks
 	private DadosPessoaisService dadosPessoaisService;
 
