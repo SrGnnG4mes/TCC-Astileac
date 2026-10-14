@@ -1,0 +1,749 @@
+TRUNCATE TABLE
+DELETE 1
+INSERT 0 1
+INSERT 0 100000
+INSERT 0 149511
+INSERT 0 1000
+ANALYZE
+ profissionais 
+---------------
+        100000
+(1 linha)
+
+        area        | profissionais 
+--------------------+---------------
+ outras             |         30010
+ educacional        |         29937
+ juridica           |         29916
+ artistico-cultural |         29847
+ saude              |         29801
+ medicao-area-rara  |          1000
+(6 linhas)
+
+#### COM INDICE
+## area comum (juridica), pagina
+                                                                                QUERY PLAN                                                                                
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=1139448.01..1139448.06 rows=20 width=571) (actual time=101.629..101.641 rows=20.00 loops=1)
+   Buffers: shared hit=2010
+   ->  Sort  (cost=1139448.01..1139573.01 rows=50000 width=571) (actual time=101.627..101.635 rows=20.00 loops=1)
+         Sort Key: p1_0.nome
+         Sort Method: top-N heapsort  Memory: 27kB
+         Buffers: shared hit=2010
+         ->  Seq Scan on profissional p1_0  (cost=0.00..1138117.53 rows=50000 width=571) (actual time=23.196..68.568 rows=29916.00 loops=1)
+               Filter: ((data_exclusao_solicitada IS NULL) AND (ANY (id = (hashed SubPlan 2).col1)))
+               Rows Removed by Filter: 70084
+               Buffers: shared hit=2010
+               SubPlan 2
+                 ->  Nested Loop  (cost=278.70..1803.19 rows=25085 width=8) (actual time=1.718..13.975 rows=29916.00 loops=1)
+                       Buffers: shared hit=979
+                       ->  Seq Scan on area_atuacao aa1_0  (cost=0.00..1.07 rows=1 width=8) (actual time=0.017..0.024 rows=1.00 loops=1)
+                             Filter: ((nome)::text = 'juridica'::text)
+                             Rows Removed by Filter: 5
+                             Buffers: shared hit=1
+                       ->  Bitmap Heap Scan on profissional_area pa1_0  (cost=278.70..1551.27 rows=25085 width=16) (actual time=1.698..9.001 rows=29916.00 loops=1)
+                             Recheck Cond: (area_atuacao_id = aa1_0.id)
+                             Heap Blocks: exact=953
+                             Buffers: shared hit=978
+                             ->  Bitmap Index Scan on idx_profissional_area_area  (cost=0.00..272.43 rows=25085 width=0) (actual time=1.484..1.484 rows=29916.00 loops=1)
+                                   Index Cond: (area_atuacao_id = aa1_0.id)
+                                   Index Searches: 1
+                                   Buffers: shared hit=25
+ Planning:
+   Buffers: shared hit=28
+ Planning Time: 0.988 ms
+ Execution Time: 102.559 ms
+(29 linhas)
+
+                                                                                QUERY PLAN                                                                                
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=1139448.01..1139448.06 rows=20 width=571) (actual time=103.444..103.452 rows=20.00 loops=1)
+   Buffers: shared hit=2010
+   ->  Sort  (cost=1139448.01..1139573.01 rows=50000 width=571) (actual time=103.442..103.447 rows=20.00 loops=1)
+         Sort Key: p1_0.nome
+         Sort Method: top-N heapsort  Memory: 27kB
+         Buffers: shared hit=2010
+         ->  Seq Scan on profissional p1_0  (cost=0.00..1138117.53 rows=50000 width=571) (actual time=23.393..69.699 rows=29916.00 loops=1)
+               Filter: ((data_exclusao_solicitada IS NULL) AND (ANY (id = (hashed SubPlan 2).col1)))
+               Rows Removed by Filter: 70084
+               Buffers: shared hit=2010
+               SubPlan 2
+                 ->  Nested Loop  (cost=278.70..1803.19 rows=25085 width=8) (actual time=1.772..14.053 rows=29916.00 loops=1)
+                       Buffers: shared hit=979
+                       ->  Seq Scan on area_atuacao aa1_0  (cost=0.00..1.07 rows=1 width=8) (actual time=0.013..0.020 rows=1.00 loops=1)
+                             Filter: ((nome)::text = 'juridica'::text)
+                             Rows Removed by Filter: 5
+                             Buffers: shared hit=1
+                       ->  Bitmap Heap Scan on profissional_area pa1_0  (cost=278.70..1551.27 rows=25085 width=16) (actual time=1.755..9.010 rows=29916.00 loops=1)
+                             Recheck Cond: (area_atuacao_id = aa1_0.id)
+                             Heap Blocks: exact=953
+                             Buffers: shared hit=978
+                             ->  Bitmap Index Scan on idx_profissional_area_area  (cost=0.00..272.43 rows=25085 width=0) (actual time=1.548..1.548 rows=29916.00 loops=1)
+                                   Index Cond: (area_atuacao_id = aa1_0.id)
+                                   Index Searches: 1
+                                   Buffers: shared hit=25
+ Planning:
+   Buffers: shared hit=8
+ Planning Time: 0.655 ms
+ Execution Time: 104.105 ms
+(29 linhas)
+
+                                                                                QUERY PLAN                                                                                
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=1139448.01..1139448.06 rows=20 width=571) (actual time=107.548..107.556 rows=20.00 loops=1)
+   Buffers: shared hit=2010
+   ->  Sort  (cost=1139448.01..1139573.01 rows=50000 width=571) (actual time=107.546..107.550 rows=20.00 loops=1)
+         Sort Key: p1_0.nome
+         Sort Method: top-N heapsort  Memory: 27kB
+         Buffers: shared hit=2010
+         ->  Seq Scan on profissional p1_0  (cost=0.00..1138117.53 rows=50000 width=571) (actual time=26.203..73.087 rows=29916.00 loops=1)
+               Filter: ((data_exclusao_solicitada IS NULL) AND (ANY (id = (hashed SubPlan 2).col1)))
+               Rows Removed by Filter: 70084
+               Buffers: shared hit=2010
+               SubPlan 2
+                 ->  Nested Loop  (cost=278.70..1803.19 rows=25085 width=8) (actual time=1.698..15.061 rows=29916.00 loops=1)
+                       Buffers: shared hit=979
+                       ->  Seq Scan on area_atuacao aa1_0  (cost=0.00..1.07 rows=1 width=8) (actual time=0.017..0.023 rows=1.00 loops=1)
+                             Filter: ((nome)::text = 'juridica'::text)
+                             Rows Removed by Filter: 5
+                             Buffers: shared hit=1
+                       ->  Bitmap Heap Scan on profissional_area pa1_0  (cost=278.70..1551.27 rows=25085 width=16) (actual time=1.678..9.587 rows=29916.00 loops=1)
+                             Recheck Cond: (area_atuacao_id = aa1_0.id)
+                             Heap Blocks: exact=953
+                             Buffers: shared hit=978
+                             ->  Bitmap Index Scan on idx_profissional_area_area  (cost=0.00..272.43 rows=25085 width=0) (actual time=1.474..1.474 rows=29916.00 loops=1)
+                                   Index Cond: (area_atuacao_id = aa1_0.id)
+                                   Index Searches: 1
+                                   Buffers: shared hit=25
+ Planning:
+   Buffers: shared hit=8
+ Planning Time: 0.792 ms
+ Execution Time: 108.215 ms
+(29 linhas)
+
+## area comum (juridica), contagem
+                                                                             QUERY PLAN                                                                             
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Aggregate  (cost=1138242.53..1138242.54 rows=1 width=8) (actual time=61.755..61.762 rows=1.00 loops=1)
+   Buffers: shared hit=2010
+   ->  Seq Scan on profissional p1_0  (cost=0.00..1138117.53 rows=50000 width=8) (actual time=23.581..58.357 rows=29916.00 loops=1)
+         Filter: ((data_exclusao_solicitada IS NULL) AND (ANY (id = (hashed SubPlan 2).col1)))
+         Rows Removed by Filter: 70084
+         Buffers: shared hit=2010
+         SubPlan 2
+           ->  Nested Loop  (cost=278.70..1803.19 rows=25085 width=8) (actual time=1.693..14.354 rows=29916.00 loops=1)
+                 Buffers: shared hit=979
+                 ->  Seq Scan on area_atuacao aa1_0  (cost=0.00..1.07 rows=1 width=8) (actual time=0.014..0.020 rows=1.00 loops=1)
+                       Filter: ((nome)::text = 'juridica'::text)
+                       Rows Removed by Filter: 5
+                       Buffers: shared hit=1
+                 ->  Bitmap Heap Scan on profissional_area pa1_0  (cost=278.70..1551.27 rows=25085 width=16) (actual time=1.676..9.288 rows=29916.00 loops=1)
+                       Recheck Cond: (area_atuacao_id = aa1_0.id)
+                       Heap Blocks: exact=953
+                       Buffers: shared hit=978
+                       ->  Bitmap Index Scan on idx_profissional_area_area  (cost=0.00..272.43 rows=25085 width=0) (actual time=1.472..1.472 rows=29916.00 loops=1)
+                             Index Cond: (area_atuacao_id = aa1_0.id)
+                             Index Searches: 1
+                             Buffers: shared hit=25
+ Planning:
+   Buffers: shared hit=11
+ Planning Time: 0.648 ms
+ Execution Time: 62.332 ms
+(25 linhas)
+
+                                                                             QUERY PLAN                                                                             
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Aggregate  (cost=1138242.53..1138242.54 rows=1 width=8) (actual time=60.917..60.920 rows=1.00 loops=1)
+   Buffers: shared hit=2010
+   ->  Seq Scan on profissional p1_0  (cost=0.00..1138117.53 rows=50000 width=8) (actual time=23.534..57.494 rows=29916.00 loops=1)
+         Filter: ((data_exclusao_solicitada IS NULL) AND (ANY (id = (hashed SubPlan 2).col1)))
+         Rows Removed by Filter: 70084
+         Buffers: shared hit=2010
+         SubPlan 2
+           ->  Nested Loop  (cost=278.70..1803.19 rows=25085 width=8) (actual time=1.687..14.058 rows=29916.00 loops=1)
+                 Buffers: shared hit=979
+                 ->  Seq Scan on area_atuacao aa1_0  (cost=0.00..1.07 rows=1 width=8) (actual time=0.013..0.019 rows=1.00 loops=1)
+                       Filter: ((nome)::text = 'juridica'::text)
+                       Rows Removed by Filter: 5
+                       Buffers: shared hit=1
+                 ->  Bitmap Heap Scan on profissional_area pa1_0  (cost=278.70..1551.27 rows=25085 width=16) (actual time=1.671..9.053 rows=29916.00 loops=1)
+                       Recheck Cond: (area_atuacao_id = aa1_0.id)
+                       Heap Blocks: exact=953
+                       Buffers: shared hit=978
+                       ->  Bitmap Index Scan on idx_profissional_area_area  (cost=0.00..272.43 rows=25085 width=0) (actual time=1.462..1.463 rows=29916.00 loops=1)
+                             Index Cond: (area_atuacao_id = aa1_0.id)
+                             Index Searches: 1
+                             Buffers: shared hit=25
+ Planning:
+   Buffers: shared hit=8
+ Planning Time: 0.646 ms
+ Execution Time: 61.541 ms
+(25 linhas)
+
+                                                                             QUERY PLAN                                                                             
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Aggregate  (cost=1138242.53..1138242.54 rows=1 width=8) (actual time=65.233..65.236 rows=1.00 loops=1)
+   Buffers: shared hit=2010
+   ->  Seq Scan on profissional p1_0  (cost=0.00..1138117.53 rows=50000 width=8) (actual time=24.882..61.749 rows=29916.00 loops=1)
+         Filter: ((data_exclusao_solicitada IS NULL) AND (ANY (id = (hashed SubPlan 2).col1)))
+         Rows Removed by Filter: 70084
+         Buffers: shared hit=2010
+         SubPlan 2
+           ->  Nested Loop  (cost=278.70..1803.19 rows=25085 width=8) (actual time=1.206..14.168 rows=29916.00 loops=1)
+                 Buffers: shared hit=979
+                 ->  Seq Scan on area_atuacao aa1_0  (cost=0.00..1.07 rows=1 width=8) (actual time=0.029..0.035 rows=1.00 loops=1)
+                       Filter: ((nome)::text = 'juridica'::text)
+                       Rows Removed by Filter: 5
+                       Buffers: shared hit=1
+                 ->  Bitmap Heap Scan on profissional_area pa1_0  (cost=278.70..1551.27 rows=25085 width=16) (actual time=1.172..9.063 rows=29916.00 loops=1)
+                       Recheck Cond: (area_atuacao_id = aa1_0.id)
+                       Heap Blocks: exact=953
+                       Buffers: shared hit=978
+                       ->  Bitmap Index Scan on idx_profissional_area_area  (cost=0.00..272.43 rows=25085 width=0) (actual time=0.851..0.851 rows=29916.00 loops=1)
+                             Index Cond: (area_atuacao_id = aa1_0.id)
+                             Index Searches: 1
+                             Buffers: shared hit=25
+ Planning:
+   Buffers: shared hit=8
+ Planning Time: 0.436 ms
+ Execution Time: 65.936 ms
+(25 linhas)
+
+## area rara, pagina
+                                                                               QUERY PLAN                                                                                
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=1139448.01..1139448.06 rows=20 width=571) (actual time=28.831..28.839 rows=20.00 loops=1)
+   Buffers: shared hit=1041
+   ->  Sort  (cost=1139448.01..1139573.01 rows=50000 width=571) (actual time=28.828..28.833 rows=20.00 loops=1)
+         Sort Key: p1_0.nome
+         Sort Method: top-N heapsort  Memory: 26kB
+         Buffers: shared hit=1041
+         ->  Seq Scan on profissional p1_0  (cost=0.00..1138117.53 rows=50000 width=571) (actual time=0.636..26.855 rows=1000.00 loops=1)
+               Filter: ((data_exclusao_solicitada IS NULL) AND (ANY (id = (hashed SubPlan 2).col1)))
+               Rows Removed by Filter: 99000
+               Buffers: shared hit=1041
+               SubPlan 2
+                 ->  Nested Loop  (cost=278.70..1803.19 rows=25085 width=8) (actual time=0.066..0.263 rows=1000.00 loops=1)
+                       Buffers: shared hit=10
+                       ->  Seq Scan on area_atuacao aa1_0  (cost=0.00..1.07 rows=1 width=8) (actual time=0.009..0.010 rows=1.00 loops=1)
+                             Filter: ((nome)::text = 'medicao-area-rara'::text)
+                             Rows Removed by Filter: 5
+                             Buffers: shared hit=1
+                       ->  Bitmap Heap Scan on profissional_area pa1_0  (cost=278.70..1551.27 rows=25085 width=16) (actual time=0.054..0.145 rows=1000.00 loops=1)
+                             Recheck Cond: (area_atuacao_id = aa1_0.id)
+                             Heap Blocks: exact=7
+                             Buffers: shared hit=9
+                             ->  Bitmap Index Scan on idx_profissional_area_area  (cost=0.00..272.43 rows=25085 width=0) (actual time=0.040..0.040 rows=1000.00 loops=1)
+                                   Index Cond: (area_atuacao_id = aa1_0.id)
+                                   Index Searches: 1
+                                   Buffers: shared hit=2
+ Planning:
+   Buffers: shared hit=8
+ Planning Time: 0.431 ms
+ Execution Time: 29.075 ms
+(29 linhas)
+
+                                                                               QUERY PLAN                                                                                
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=1139448.01..1139448.06 rows=20 width=571) (actual time=30.067..30.076 rows=20.00 loops=1)
+   Buffers: shared hit=1041
+   ->  Sort  (cost=1139448.01..1139573.01 rows=50000 width=571) (actual time=30.065..30.069 rows=20.00 loops=1)
+         Sort Key: p1_0.nome
+         Sort Method: top-N heapsort  Memory: 26kB
+         Buffers: shared hit=1041
+         ->  Seq Scan on profissional p1_0  (cost=0.00..1138117.53 rows=50000 width=571) (actual time=0.792..28.060 rows=1000.00 loops=1)
+               Filter: ((data_exclusao_solicitada IS NULL) AND (ANY (id = (hashed SubPlan 2).col1)))
+               Rows Removed by Filter: 99000
+               Buffers: shared hit=1041
+               SubPlan 2
+                 ->  Nested Loop  (cost=278.70..1803.19 rows=25085 width=8) (actual time=0.062..0.405 rows=1000.00 loops=1)
+                       Buffers: shared hit=10
+                       ->  Seq Scan on area_atuacao aa1_0  (cost=0.00..1.07 rows=1 width=8) (actual time=0.008..0.010 rows=1.00 loops=1)
+                             Filter: ((nome)::text = 'medicao-area-rara'::text)
+                             Rows Removed by Filter: 5
+                             Buffers: shared hit=1
+                       ->  Bitmap Heap Scan on profissional_area pa1_0  (cost=278.70..1551.27 rows=25085 width=16) (actual time=0.051..0.145 rows=1000.00 loops=1)
+                             Recheck Cond: (area_atuacao_id = aa1_0.id)
+                             Heap Blocks: exact=7
+                             Buffers: shared hit=9
+                             ->  Bitmap Index Scan on idx_profissional_area_area  (cost=0.00..272.43 rows=25085 width=0) (actual time=0.036..0.037 rows=1000.00 loops=1)
+                                   Index Cond: (area_atuacao_id = aa1_0.id)
+                                   Index Searches: 1
+                                   Buffers: shared hit=2
+ Planning:
+   Buffers: shared hit=8
+ Planning Time: 0.433 ms
+ Execution Time: 30.291 ms
+(29 linhas)
+
+                                                                               QUERY PLAN                                                                                
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=1139448.01..1139448.06 rows=20 width=571) (actual time=29.198..29.205 rows=20.00 loops=1)
+   Buffers: shared hit=1041
+   ->  Sort  (cost=1139448.01..1139573.01 rows=50000 width=571) (actual time=29.196..29.200 rows=20.00 loops=1)
+         Sort Key: p1_0.nome
+         Sort Method: top-N heapsort  Memory: 26kB
+         Buffers: shared hit=1041
+         ->  Seq Scan on profissional p1_0  (cost=0.00..1138117.53 rows=50000 width=571) (actual time=0.638..27.300 rows=1000.00 loops=1)
+               Filter: ((data_exclusao_solicitada IS NULL) AND (ANY (id = (hashed SubPlan 2).col1)))
+               Rows Removed by Filter: 99000
+               Buffers: shared hit=1041
+               SubPlan 2
+                 ->  Nested Loop  (cost=278.70..1803.19 rows=25085 width=8) (actual time=0.063..0.268 rows=1000.00 loops=1)
+                       Buffers: shared hit=10
+                       ->  Seq Scan on area_atuacao aa1_0  (cost=0.00..1.07 rows=1 width=8) (actual time=0.008..0.008 rows=1.00 loops=1)
+                             Filter: ((nome)::text = 'medicao-area-rara'::text)
+                             Rows Removed by Filter: 5
+                             Buffers: shared hit=1
+                       ->  Bitmap Heap Scan on profissional_area pa1_0  (cost=278.70..1551.27 rows=25085 width=16) (actual time=0.054..0.146 rows=1000.00 loops=1)
+                             Recheck Cond: (area_atuacao_id = aa1_0.id)
+                             Heap Blocks: exact=7
+                             Buffers: shared hit=9
+                             ->  Bitmap Index Scan on idx_profissional_area_area  (cost=0.00..272.43 rows=25085 width=0) (actual time=0.039..0.039 rows=1000.00 loops=1)
+                                   Index Cond: (area_atuacao_id = aa1_0.id)
+                                   Index Searches: 1
+                                   Buffers: shared hit=2
+ Planning:
+   Buffers: shared hit=8
+ Planning Time: 0.475 ms
+ Execution Time: 29.464 ms
+(29 linhas)
+
+## area comum + nome + ativo, pagina
+                                                                      QUERY PLAN                                                                       
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=1138619.44..1138619.49 rows=20 width=571) (actual time=74.883..74.885 rows=0.00 loops=1)
+   Buffers: shared hit=1031
+   ->  Sort  (cost=1138619.44..1138619.62 rows=72 width=571) (actual time=74.882..74.884 rows=0.00 loops=1)
+         Sort Key: p1_0.nome
+         Sort Method: quicksort  Memory: 25kB
+         Buffers: shared hit=1031
+         ->  Seq Scan on profissional p1_0  (cost=0.00..1138617.53 rows=72 width=571) (actual time=74.874..74.876 rows=0.00 loops=1)
+               Filter: ((data_exclusao_solicitada IS NULL) AND ativo AND (lower((nome)::text) ~~ '%maria%'::text) AND EXISTS(SubPlan 1))
+               Rows Removed by Filter: 100000
+               Buffers: shared hit=1031
+               SubPlan 1
+                 ->  Nested Loop  (cost=0.42..11.36 rows=1 width=0) (never executed)
+                       Join Filter: (pa1_0.area_atuacao_id = aa1_0.id)
+                       ->  Seq Scan on area_atuacao aa1_0  (cost=0.00..1.07 rows=1 width=8) (never executed)
+                             Filter: ((nome)::text = 'juridica'::text)
+                       ->  Index Only Scan using profissional_area_pkey on profissional_area pa1_0  (cost=0.42..10.26 rows=2 width=8) (never executed)
+                             Index Cond: (profissional_id = p1_0.id)
+                             Heap Fetches: 0
+                             Index Searches: 0
+ Planning:
+   Buffers: shared hit=8
+ Planning Time: 0.491 ms
+ Execution Time: 74.925 ms
+(23 linhas)
+
+                                                                      QUERY PLAN                                                                       
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=1138619.44..1138619.49 rows=20 width=571) (actual time=70.292..70.294 rows=0.00 loops=1)
+   Buffers: shared hit=1031
+   ->  Sort  (cost=1138619.44..1138619.62 rows=72 width=571) (actual time=70.291..70.293 rows=0.00 loops=1)
+         Sort Key: p1_0.nome
+         Sort Method: quicksort  Memory: 25kB
+         Buffers: shared hit=1031
+         ->  Seq Scan on profissional p1_0  (cost=0.00..1138617.53 rows=72 width=571) (actual time=70.284..70.286 rows=0.00 loops=1)
+               Filter: ((data_exclusao_solicitada IS NULL) AND ativo AND (lower((nome)::text) ~~ '%maria%'::text) AND EXISTS(SubPlan 1))
+               Rows Removed by Filter: 100000
+               Buffers: shared hit=1031
+               SubPlan 1
+                 ->  Nested Loop  (cost=0.42..11.36 rows=1 width=0) (never executed)
+                       Join Filter: (pa1_0.area_atuacao_id = aa1_0.id)
+                       ->  Seq Scan on area_atuacao aa1_0  (cost=0.00..1.07 rows=1 width=8) (never executed)
+                             Filter: ((nome)::text = 'juridica'::text)
+                       ->  Index Only Scan using profissional_area_pkey on profissional_area pa1_0  (cost=0.42..10.26 rows=2 width=8) (never executed)
+                             Index Cond: (profissional_id = p1_0.id)
+                             Heap Fetches: 0
+                             Index Searches: 0
+ Planning:
+   Buffers: shared hit=8
+ Planning Time: 0.431 ms
+ Execution Time: 70.332 ms
+(23 linhas)
+
+                                                                      QUERY PLAN                                                                       
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=1138619.44..1138619.49 rows=20 width=571) (actual time=71.134..71.136 rows=0.00 loops=1)
+   Buffers: shared hit=1031
+   ->  Sort  (cost=1138619.44..1138619.62 rows=72 width=571) (actual time=71.133..71.134 rows=0.00 loops=1)
+         Sort Key: p1_0.nome
+         Sort Method: quicksort  Memory: 25kB
+         Buffers: shared hit=1031
+         ->  Seq Scan on profissional p1_0  (cost=0.00..1138617.53 rows=72 width=571) (actual time=71.126..71.128 rows=0.00 loops=1)
+               Filter: ((data_exclusao_solicitada IS NULL) AND ativo AND (lower((nome)::text) ~~ '%maria%'::text) AND EXISTS(SubPlan 1))
+               Rows Removed by Filter: 100000
+               Buffers: shared hit=1031
+               SubPlan 1
+                 ->  Nested Loop  (cost=0.42..11.36 rows=1 width=0) (never executed)
+                       Join Filter: (pa1_0.area_atuacao_id = aa1_0.id)
+                       ->  Seq Scan on area_atuacao aa1_0  (cost=0.00..1.07 rows=1 width=8) (never executed)
+                             Filter: ((nome)::text = 'juridica'::text)
+                       ->  Index Only Scan using profissional_area_pkey on profissional_area pa1_0  (cost=0.42..10.26 rows=2 width=8) (never executed)
+                             Index Cond: (profissional_id = p1_0.id)
+                             Heap Fetches: 0
+                             Index Searches: 0
+ Planning:
+   Buffers: shared hit=8
+ Planning Time: 0.438 ms
+ Execution Time: 71.171 ms
+(23 linhas)
+
+BEGIN
+DROP INDEX
+#### SEM INDICE
+## area comum (juridica), pagina
+                                                                         QUERY PLAN                                                                          
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=1139448.01..1139448.06 rows=20 width=571) (actual time=133.314..133.321 rows=20.00 loops=1)
+   Buffers: shared hit=1991
+   ->  Sort  (cost=1139448.01..1139573.01 rows=50000 width=571) (actual time=133.312..133.316 rows=20.00 loops=1)
+         Sort Key: p1_0.nome
+         Sort Method: top-N heapsort  Memory: 27kB
+         Buffers: shared hit=1991
+         ->  Seq Scan on profissional p1_0  (cost=0.00..1138117.53 rows=50000 width=571) (actual time=53.084..98.885 rows=29916.00 loops=1)
+               Filter: ((data_exclusao_solicitada IS NULL) AND (ANY (id = (hashed SubPlan 2).col1)))
+               Rows Removed by Filter: 70084
+               Buffers: shared hit=1991
+               SubPlan 2
+                 ->  Hash Join  (cost=1.09..3139.36 rows=25085 width=8) (actual time=0.036..43.039 rows=29916.00 loops=1)
+                       Hash Cond: (pa1_0.area_atuacao_id = aa1_0.id)
+                       Buffers: shared hit=960
+                       ->  Seq Scan on profissional_area pa1_0  (cost=0.00..2464.11 rows=150511 width=16) (actual time=0.007..16.514 rows=150511.00 loops=1)
+                             Buffers: shared hit=959
+                       ->  Hash  (cost=1.07..1.07 rows=1 width=8) (actual time=0.016..0.017 rows=1.00 loops=1)
+                             Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                             Buffers: shared hit=1
+                             ->  Seq Scan on area_atuacao aa1_0  (cost=0.00..1.07 rows=1 width=8) (actual time=0.011..0.012 rows=1.00 loops=1)
+                                   Filter: ((nome)::text = 'juridica'::text)
+                                   Rows Removed by Filter: 5
+                                   Buffers: shared hit=1
+ Planning:
+   Buffers: shared hit=16
+ Planning Time: 1.876 ms
+ Execution Time: 133.956 ms
+(27 linhas)
+
+                                                                         QUERY PLAN                                                                          
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=1139448.01..1139448.06 rows=20 width=571) (actual time=131.612..131.620 rows=20.00 loops=1)
+   Buffers: shared hit=1991
+   ->  Sort  (cost=1139448.01..1139573.01 rows=50000 width=571) (actual time=131.610..131.615 rows=20.00 loops=1)
+         Sort Key: p1_0.nome
+         Sort Method: top-N heapsort  Memory: 27kB
+         Buffers: shared hit=1991
+         ->  Seq Scan on profissional p1_0  (cost=0.00..1138117.53 rows=50000 width=571) (actual time=53.995..99.294 rows=29916.00 loops=1)
+               Filter: ((data_exclusao_solicitada IS NULL) AND (ANY (id = (hashed SubPlan 2).col1)))
+               Rows Removed by Filter: 70084
+               Buffers: shared hit=1991
+               SubPlan 2
+                 ->  Hash Join  (cost=1.09..3139.36 rows=25085 width=8) (actual time=0.028..43.383 rows=29916.00 loops=1)
+                       Hash Cond: (pa1_0.area_atuacao_id = aa1_0.id)
+                       Buffers: shared hit=960
+                       ->  Seq Scan on profissional_area pa1_0  (cost=0.00..2464.11 rows=150511 width=16) (actual time=0.008..16.913 rows=150511.00 loops=1)
+                             Buffers: shared hit=959
+                       ->  Hash  (cost=1.07..1.07 rows=1 width=8) (actual time=0.009..0.011 rows=1.00 loops=1)
+                             Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                             Buffers: shared hit=1
+                             ->  Seq Scan on area_atuacao aa1_0  (cost=0.00..1.07 rows=1 width=8) (actual time=0.006..0.007 rows=1.00 loops=1)
+                                   Filter: ((nome)::text = 'juridica'::text)
+                                   Rows Removed by Filter: 5
+                                   Buffers: shared hit=1
+ Planning:
+   Buffers: shared hit=8
+ Planning Time: 0.402 ms
+ Execution Time: 132.486 ms
+(27 linhas)
+
+                                                                         QUERY PLAN                                                                          
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=1139448.01..1139448.06 rows=20 width=571) (actual time=129.348..129.356 rows=20.00 loops=1)
+   Buffers: shared hit=1991
+   ->  Sort  (cost=1139448.01..1139573.01 rows=50000 width=571) (actual time=129.346..129.352 rows=20.00 loops=1)
+         Sort Key: p1_0.nome
+         Sort Method: top-N heapsort  Memory: 27kB
+         Buffers: shared hit=1991
+         ->  Seq Scan on profissional p1_0  (cost=0.00..1138117.53 rows=50000 width=571) (actual time=50.971..96.090 rows=29916.00 loops=1)
+               Filter: ((data_exclusao_solicitada IS NULL) AND (ANY (id = (hashed SubPlan 2).col1)))
+               Rows Removed by Filter: 70084
+               Buffers: shared hit=1991
+               SubPlan 2
+                 ->  Hash Join  (cost=1.09..3139.36 rows=25085 width=8) (actual time=0.030..40.870 rows=29916.00 loops=1)
+                       Hash Cond: (pa1_0.area_atuacao_id = aa1_0.id)
+                       Buffers: shared hit=960
+                       ->  Seq Scan on profissional_area pa1_0  (cost=0.00..2464.11 rows=150511 width=16) (actual time=0.008..16.188 rows=150511.00 loops=1)
+                             Buffers: shared hit=959
+                       ->  Hash  (cost=1.07..1.07 rows=1 width=8) (actual time=0.011..0.013 rows=1.00 loops=1)
+                             Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                             Buffers: shared hit=1
+                             ->  Seq Scan on area_atuacao aa1_0  (cost=0.00..1.07 rows=1 width=8) (actual time=0.008..0.009 rows=1.00 loops=1)
+                                   Filter: ((nome)::text = 'juridica'::text)
+                                   Rows Removed by Filter: 5
+                                   Buffers: shared hit=1
+ Planning:
+   Buffers: shared hit=8
+ Planning Time: 0.407 ms
+ Execution Time: 130.316 ms
+(27 linhas)
+
+## area comum (juridica), contagem
+                                                                      QUERY PLAN                                                                       
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+ Aggregate  (cost=1138242.53..1138242.54 rows=1 width=8) (actual time=92.962..92.967 rows=1.00 loops=1)
+   Buffers: shared hit=1991
+   ->  Seq Scan on profissional p1_0  (cost=0.00..1138117.53 rows=50000 width=8) (actual time=55.125..89.492 rows=29916.00 loops=1)
+         Filter: ((data_exclusao_solicitada IS NULL) AND (ANY (id = (hashed SubPlan 2).col1)))
+         Rows Removed by Filter: 70084
+         Buffers: shared hit=1991
+         SubPlan 2
+           ->  Hash Join  (cost=1.09..3139.36 rows=25085 width=8) (actual time=0.050..44.352 rows=29916.00 loops=1)
+                 Hash Cond: (pa1_0.area_atuacao_id = aa1_0.id)
+                 Buffers: shared hit=960
+                 ->  Seq Scan on profissional_area pa1_0  (cost=0.00..2464.11 rows=150511 width=16) (actual time=0.015..17.264 rows=150511.00 loops=1)
+                       Buffers: shared hit=959
+                 ->  Hash  (cost=1.07..1.07 rows=1 width=8) (actual time=0.019..0.022 rows=1.00 loops=1)
+                       Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                       Buffers: shared hit=1
+                       ->  Seq Scan on area_atuacao aa1_0  (cost=0.00..1.07 rows=1 width=8) (actual time=0.011..0.013 rows=1.00 loops=1)
+                             Filter: ((nome)::text = 'juridica'::text)
+                             Rows Removed by Filter: 5
+                             Buffers: shared hit=1
+ Planning:
+   Buffers: shared hit=8
+ Planning Time: 0.586 ms
+ Execution Time: 93.480 ms
+(23 linhas)
+
+                                                                      QUERY PLAN                                                                       
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+ Aggregate  (cost=1138242.53..1138242.54 rows=1 width=8) (actual time=91.289..91.294 rows=1.00 loops=1)
+   Buffers: shared hit=1991
+   ->  Seq Scan on profissional p1_0  (cost=0.00..1138117.53 rows=50000 width=8) (actual time=51.393..87.845 rows=29916.00 loops=1)
+         Filter: ((data_exclusao_solicitada IS NULL) AND (ANY (id = (hashed SubPlan 2).col1)))
+         Rows Removed by Filter: 70084
+         Buffers: shared hit=1991
+         SubPlan 2
+           ->  Hash Join  (cost=1.09..3139.36 rows=25085 width=8) (actual time=0.019..41.808 rows=29916.00 loops=1)
+                 Hash Cond: (pa1_0.area_atuacao_id = aa1_0.id)
+                 Buffers: shared hit=960
+                 ->  Seq Scan on profissional_area pa1_0  (cost=0.00..2464.11 rows=150511 width=16) (actual time=0.006..16.335 rows=150511.00 loops=1)
+                       Buffers: shared hit=959
+                 ->  Hash  (cost=1.07..1.07 rows=1 width=8) (actual time=0.008..0.010 rows=1.00 loops=1)
+                       Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                       Buffers: shared hit=1
+                       ->  Seq Scan on area_atuacao aa1_0  (cost=0.00..1.07 rows=1 width=8) (actual time=0.005..0.005 rows=1.00 loops=1)
+                             Filter: ((nome)::text = 'juridica'::text)
+                             Rows Removed by Filter: 5
+                             Buffers: shared hit=1
+ Planning:
+   Buffers: shared hit=8
+ Planning Time: 0.283 ms
+ Execution Time: 91.794 ms
+(23 linhas)
+
+                                                                      QUERY PLAN                                                                       
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+ Aggregate  (cost=1138242.53..1138242.54 rows=1 width=8) (actual time=98.707..98.713 rows=1.00 loops=1)
+   Buffers: shared hit=1991
+   ->  Seq Scan on profissional p1_0  (cost=0.00..1138117.53 rows=50000 width=8) (actual time=54.148..94.919 rows=29916.00 loops=1)
+         Filter: ((data_exclusao_solicitada IS NULL) AND (ANY (id = (hashed SubPlan 2).col1)))
+         Rows Removed by Filter: 70084
+         Buffers: shared hit=1991
+         SubPlan 2
+           ->  Hash Join  (cost=1.09..3139.36 rows=25085 width=8) (actual time=0.029..43.799 rows=29916.00 loops=1)
+                 Hash Cond: (pa1_0.area_atuacao_id = aa1_0.id)
+                 Buffers: shared hit=960
+                 ->  Seq Scan on profissional_area pa1_0  (cost=0.00..2464.11 rows=150511 width=16) (actual time=0.008..17.540 rows=150511.00 loops=1)
+                       Buffers: shared hit=959
+                 ->  Hash  (cost=1.07..1.07 rows=1 width=8) (actual time=0.011..0.014 rows=1.00 loops=1)
+                       Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                       Buffers: shared hit=1
+                       ->  Seq Scan on area_atuacao aa1_0  (cost=0.00..1.07 rows=1 width=8) (actual time=0.007..0.009 rows=1.00 loops=1)
+                             Filter: ((nome)::text = 'juridica'::text)
+                             Rows Removed by Filter: 5
+                             Buffers: shared hit=1
+ Planning:
+   Buffers: shared hit=8
+ Planning Time: 0.374 ms
+ Execution Time: 99.224 ms
+(23 linhas)
+
+## area rara, pagina
+                                                                         QUERY PLAN                                                                          
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=1139448.01..1139448.06 rows=20 width=571) (actual time=66.227..66.236 rows=20.00 loops=1)
+   Buffers: shared hit=1991
+   ->  Sort  (cost=1139448.01..1139573.01 rows=50000 width=571) (actual time=66.224..66.230 rows=20.00 loops=1)
+         Sort Key: p1_0.nome
+         Sort Method: top-N heapsort  Memory: 26kB
+         Buffers: shared hit=1991
+         ->  Seq Scan on profissional p1_0  (cost=0.00..1138117.53 rows=50000 width=571) (actual time=37.871..64.367 rows=1000.00 loops=1)
+               Filter: ((data_exclusao_solicitada IS NULL) AND (ANY (id = (hashed SubPlan 2).col1)))
+               Rows Removed by Filter: 99000
+               Buffers: shared hit=1991
+               SubPlan 2
+                 ->  Hash Join  (cost=1.09..3139.36 rows=25085 width=8) (actual time=36.826..37.224 rows=1000.00 loops=1)
+                       Hash Cond: (pa1_0.area_atuacao_id = aa1_0.id)
+                       Buffers: shared hit=960
+                       ->  Seq Scan on profissional_area pa1_0  (cost=0.00..2464.11 rows=150511 width=16) (actual time=0.017..16.492 rows=150511.00 loops=1)
+                             Buffers: shared hit=959
+                       ->  Hash  (cost=1.07..1.07 rows=1 width=8) (actual time=0.020..0.021 rows=1.00 loops=1)
+                             Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                             Buffers: shared hit=1
+                             ->  Seq Scan on area_atuacao aa1_0  (cost=0.00..1.07 rows=1 width=8) (actual time=0.015..0.016 rows=1.00 loops=1)
+                                   Filter: ((nome)::text = 'medicao-area-rara'::text)
+                                   Rows Removed by Filter: 5
+                                   Buffers: shared hit=1
+ Planning:
+   Buffers: shared hit=8
+ Planning Time: 0.736 ms
+ Execution Time: 66.470 ms
+(27 linhas)
+
+                                                                         QUERY PLAN                                                                          
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=1139448.01..1139448.06 rows=20 width=571) (actual time=66.296..66.305 rows=20.00 loops=1)
+   Buffers: shared hit=1991
+   ->  Sort  (cost=1139448.01..1139573.01 rows=50000 width=571) (actual time=66.294..66.299 rows=20.00 loops=1)
+         Sort Key: p1_0.nome
+         Sort Method: top-N heapsort  Memory: 26kB
+         Buffers: shared hit=1991
+         ->  Seq Scan on profissional p1_0  (cost=0.00..1138117.53 rows=50000 width=571) (actual time=37.655..64.387 rows=1000.00 loops=1)
+               Filter: ((data_exclusao_solicitada IS NULL) AND (ANY (id = (hashed SubPlan 2).col1)))
+               Rows Removed by Filter: 99000
+               Buffers: shared hit=1991
+               SubPlan 2
+                 ->  Hash Join  (cost=1.09..3139.36 rows=25085 width=8) (actual time=36.588..36.972 rows=1000.00 loops=1)
+                       Hash Cond: (pa1_0.area_atuacao_id = aa1_0.id)
+                       Buffers: shared hit=960
+                       ->  Seq Scan on profissional_area pa1_0  (cost=0.00..2464.11 rows=150511 width=16) (actual time=0.008..16.226 rows=150511.00 loops=1)
+                             Buffers: shared hit=959
+                       ->  Hash  (cost=1.07..1.07 rows=1 width=8) (actual time=0.014..0.016 rows=1.00 loops=1)
+                             Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                             Buffers: shared hit=1
+                             ->  Seq Scan on area_atuacao aa1_0  (cost=0.00..1.07 rows=1 width=8) (actual time=0.009..0.009 rows=1.00 loops=1)
+                                   Filter: ((nome)::text = 'medicao-area-rara'::text)
+                                   Rows Removed by Filter: 5
+                                   Buffers: shared hit=1
+ Planning:
+   Buffers: shared hit=8
+ Planning Time: 0.399 ms
+ Execution Time: 66.522 ms
+(27 linhas)
+
+                                                                         QUERY PLAN                                                                          
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=1139448.01..1139448.06 rows=20 width=571) (actual time=68.715..68.724 rows=20.00 loops=1)
+   Buffers: shared hit=1991
+   ->  Sort  (cost=1139448.01..1139573.01 rows=50000 width=571) (actual time=68.712..68.718 rows=20.00 loops=1)
+         Sort Key: p1_0.nome
+         Sort Method: top-N heapsort  Memory: 26kB
+         Buffers: shared hit=1991
+         ->  Seq Scan on profissional p1_0  (cost=0.00..1138117.53 rows=50000 width=571) (actual time=39.380..66.786 rows=1000.00 loops=1)
+               Filter: ((data_exclusao_solicitada IS NULL) AND (ANY (id = (hashed SubPlan 2).col1)))
+               Rows Removed by Filter: 99000
+               Buffers: shared hit=1991
+               SubPlan 2
+                 ->  Hash Join  (cost=1.09..3139.36 rows=25085 width=8) (actual time=38.227..38.714 rows=1000.00 loops=1)
+                       Hash Cond: (pa1_0.area_atuacao_id = aa1_0.id)
+                       Buffers: shared hit=960
+                       ->  Seq Scan on profissional_area pa1_0  (cost=0.00..2464.11 rows=150511 width=16) (actual time=0.015..17.019 rows=150511.00 loops=1)
+                             Buffers: shared hit=959
+                       ->  Hash  (cost=1.07..1.07 rows=1 width=8) (actual time=0.026..0.027 rows=1.00 loops=1)
+                             Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                             Buffers: shared hit=1
+                             ->  Seq Scan on area_atuacao aa1_0  (cost=0.00..1.07 rows=1 width=8) (actual time=0.015..0.016 rows=1.00 loops=1)
+                                   Filter: ((nome)::text = 'medicao-area-rara'::text)
+                                   Rows Removed by Filter: 5
+                                   Buffers: shared hit=1
+ Planning:
+   Buffers: shared hit=8
+ Planning Time: 0.647 ms
+ Execution Time: 68.944 ms
+(27 linhas)
+
+## area comum + nome + ativo, pagina
+                                                                      QUERY PLAN                                                                       
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=1138619.44..1138619.49 rows=20 width=571) (actual time=73.128..73.130 rows=0.00 loops=1)
+   Buffers: shared hit=1031
+   ->  Sort  (cost=1138619.44..1138619.62 rows=72 width=571) (actual time=73.127..73.128 rows=0.00 loops=1)
+         Sort Key: p1_0.nome
+         Sort Method: quicksort  Memory: 25kB
+         Buffers: shared hit=1031
+         ->  Seq Scan on profissional p1_0  (cost=0.00..1138617.53 rows=72 width=571) (actual time=73.121..73.122 rows=0.00 loops=1)
+               Filter: ((data_exclusao_solicitada IS NULL) AND ativo AND (lower((nome)::text) ~~ '%maria%'::text) AND EXISTS(SubPlan 1))
+               Rows Removed by Filter: 100000
+               Buffers: shared hit=1031
+               SubPlan 1
+                 ->  Nested Loop  (cost=0.42..11.36 rows=1 width=0) (never executed)
+                       Join Filter: (pa1_0.area_atuacao_id = aa1_0.id)
+                       ->  Seq Scan on area_atuacao aa1_0  (cost=0.00..1.07 rows=1 width=8) (never executed)
+                             Filter: ((nome)::text = 'juridica'::text)
+                       ->  Index Only Scan using profissional_area_pkey on profissional_area pa1_0  (cost=0.42..10.26 rows=2 width=8) (never executed)
+                             Index Cond: (profissional_id = p1_0.id)
+                             Heap Fetches: 0
+                             Index Searches: 0
+ Planning:
+   Buffers: shared hit=8
+ Planning Time: 0.437 ms
+ Execution Time: 73.167 ms
+(23 linhas)
+
+                                                                      QUERY PLAN                                                                       
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=1138619.44..1138619.49 rows=20 width=571) (actual time=73.732..73.734 rows=0.00 loops=1)
+   Buffers: shared hit=1031
+   ->  Sort  (cost=1138619.44..1138619.62 rows=72 width=571) (actual time=73.731..73.733 rows=0.00 loops=1)
+         Sort Key: p1_0.nome
+         Sort Method: quicksort  Memory: 25kB
+         Buffers: shared hit=1031
+         ->  Seq Scan on profissional p1_0  (cost=0.00..1138617.53 rows=72 width=571) (actual time=73.725..73.727 rows=0.00 loops=1)
+               Filter: ((data_exclusao_solicitada IS NULL) AND ativo AND (lower((nome)::text) ~~ '%maria%'::text) AND EXISTS(SubPlan 1))
+               Rows Removed by Filter: 100000
+               Buffers: shared hit=1031
+               SubPlan 1
+                 ->  Nested Loop  (cost=0.42..11.36 rows=1 width=0) (never executed)
+                       Join Filter: (pa1_0.area_atuacao_id = aa1_0.id)
+                       ->  Seq Scan on area_atuacao aa1_0  (cost=0.00..1.07 rows=1 width=8) (never executed)
+                             Filter: ((nome)::text = 'juridica'::text)
+                       ->  Index Only Scan using profissional_area_pkey on profissional_area pa1_0  (cost=0.42..10.26 rows=2 width=8) (never executed)
+                             Index Cond: (profissional_id = p1_0.id)
+                             Heap Fetches: 0
+                             Index Searches: 0
+ Planning:
+   Buffers: shared hit=8
+ Planning Time: 0.338 ms
+ Execution Time: 73.770 ms
+(23 linhas)
+
+                                                                      QUERY PLAN                                                                       
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=1138619.44..1138619.49 rows=20 width=571) (actual time=74.427..74.430 rows=0.00 loops=1)
+   Buffers: shared hit=1031
+   ->  Sort  (cost=1138619.44..1138619.62 rows=72 width=571) (actual time=74.426..74.428 rows=0.00 loops=1)
+         Sort Key: p1_0.nome
+         Sort Method: quicksort  Memory: 25kB
+         Buffers: shared hit=1031
+         ->  Seq Scan on profissional p1_0  (cost=0.00..1138617.53 rows=72 width=571) (actual time=74.419..74.421 rows=0.00 loops=1)
+               Filter: ((data_exclusao_solicitada IS NULL) AND ativo AND (lower((nome)::text) ~~ '%maria%'::text) AND EXISTS(SubPlan 1))
+               Rows Removed by Filter: 100000
+               Buffers: shared hit=1031
+               SubPlan 1
+                 ->  Nested Loop  (cost=0.42..11.36 rows=1 width=0) (never executed)
+                       Join Filter: (pa1_0.area_atuacao_id = aa1_0.id)
+                       ->  Seq Scan on area_atuacao aa1_0  (cost=0.00..1.07 rows=1 width=8) (never executed)
+                             Filter: ((nome)::text = 'juridica'::text)
+                       ->  Index Only Scan using profissional_area_pkey on profissional_area pa1_0  (cost=0.42..10.26 rows=2 width=8) (never executed)
+                             Index Cond: (profissional_id = p1_0.id)
+                             Heap Fetches: 0
+                             Index Searches: 0
+ Planning:
+   Buffers: shared hit=8
+ Planning Time: 0.399 ms
+ Execution Time: 74.469 ms
+(23 linhas)
+
+ROLLBACK
