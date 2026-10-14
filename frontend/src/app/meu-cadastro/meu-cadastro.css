@@ -11,7 +11,7 @@ h1 {
 .ajuda {
 	margin: 0 0 20px;
 	font-size: 0.85rem;
-	color: #5c6470;
+	color: var(--cor-texto-suave);
 	line-height: 1.6;
 }
 
@@ -40,34 +40,34 @@ form {
 label {
 	font-size: 0.78rem;
 	font-weight: 600;
-	color: #39404a;
+	color: var(--cor-texto);
 }
 
 input {
 	padding: 8px 9px;
-	border: 1px solid #c8ccd4;
+	border: 1px solid var(--cor-borda-campo);
 	border-radius: 6px;
 	font: inherit;
-	background: #fff;
+	background: var(--cor-superficie);
 }
 
 input:disabled {
-	background: #f1f2f5;
-	color: #5c6470;
+	background: var(--cor-superficie-realce);
+	color: var(--cor-texto-suave);
 }
 
 input:focus-visible {
-	outline: 2px solid #2c5aa0;
+	outline: 2px solid var(--cor-foco);
 	outline-offset: 1px;
 }
 
 .falha {
-	color: #8f2018;
+	color: var(--cor-erro);
 	font-size: 0.76rem;
 }
 
 .nota {
-	color: #5c6470;
+	color: var(--cor-texto-suave);
 	font-size: 0.74rem;
 	line-height: 1.4;
 }
@@ -77,22 +77,22 @@ button[type="submit"] {
 	padding: 10px 20px;
 	border: 0;
 	border-radius: 6px;
-	background: #2c5aa0;
-	color: #fff;
+	background: var(--cor-primaria);
+	color: var(--cor-sobre-primaria);
 	font: inherit;
 	font-weight: 600;
 	cursor: pointer;
 }
 
 button[type="submit"]:disabled {
-	background: #8b9cb8;
+	background: var(--cor-desabilitado);
 	cursor: default;
 }
 
 .senha {
 	margin-top: 32px;
 	padding-top: 22px;
-	border-top: 1px solid #e3e6ea;
+	border-top: 1px solid var(--cor-borda);
 }
 
 .senha h2 {
@@ -103,21 +103,21 @@ button[type="submit"]:disabled {
 .ajuda-senha {
 	margin: 0 0 16px;
 	font-size: 0.82rem;
-	color: #5c6470;
+	color: var(--cor-texto-suave);
 	line-height: 1.5;
 }
 
 .rodape {
 	margin-top: 32px;
 	padding-top: 18px;
-	border-top: 1px solid #e3e6ea;
+	border-top: 1px solid var(--cor-borda);
 	font-size: 0.84rem;
-	color: #5c6470;
+	color: var(--cor-texto-suave);
 	line-height: 1.6;
 }
 
 .rodape a {
-	color: #2c5aa0;
+	color: var(--cor-primaria);
 }
 
 .erro,
@@ -130,22 +130,22 @@ button[type="submit"]:disabled {
 }
 
 .erro {
-	background: #fdecea;
-	color: #8f2018;
+	background: var(--cor-erro-fundo);
+	color: var(--cor-erro);
 }
 
 .aviso {
-	background: #e4f1e4;
-	color: #22642a;
+	background: var(--cor-ok-fundo);
+	color: var(--cor-ok);
 }
 
 .opcional {
 	font-weight: 400;
-	color: #5c6470;
+	color: var(--cor-texto-suave);
 }
 
 .nota {
-	color: #5c6470;
+	color: var(--cor-texto-suave);
 	font-size: 0.74rem;
 	line-height: 1.4;
 }

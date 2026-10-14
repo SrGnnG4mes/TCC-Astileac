@@ -16,7 +16,7 @@ h2 {
 .ajuda {
 	margin: 0 0 20px;
 	font-size: 0.85rem;
-	color: #5c6470;
+	color: var(--cor-texto-suave);
 	line-height: 1.6;
 }
 
@@ -30,7 +30,7 @@ th,
 td {
 	padding: 9px 10px;
 	text-align: left;
-	border-bottom: 1px solid #e3e6ea;
+	border-bottom: 1px solid var(--cor-borda);
 	vertical-align: top;
 }
 
@@ -38,7 +38,7 @@ th {
 	font-size: 0.78rem;
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
-	color: #5c6470;
+	color: var(--cor-texto-suave);
 }
 
 td.nome {
@@ -47,11 +47,11 @@ td.nome {
 }
 
 td.descricao {
-	color: #5c6470;
+	color: var(--cor-texto-suave);
 }
 
 tr.emedicao {
-	background: #eef3fb;
+	background: var(--cor-primaria-fundo);
 }
 
 .acoes-linha {
@@ -64,7 +64,7 @@ tr.emedicao {
 	padding: 0;
 	border: 0;
 	background: none;
-	color: #2c5aa0;
+	color: var(--cor-primaria);
 	font: inherit;
 	font-size: 0.86rem;
 	text-decoration: underline;
@@ -72,7 +72,7 @@ tr.emedicao {
 }
 
 .link.perigo {
-	color: #9d2a20;
+	color: var(--cor-erro-escura);
 }
 
 .oculto {
@@ -88,7 +88,7 @@ tr.emedicao {
 .formulario {
 	margin-top: 32px;
 	padding: 18px;
-	border: 1px solid #d6dae0;
+	border: 1px solid var(--cor-borda);
 	border-radius: 8px;
 }
 
@@ -113,24 +113,24 @@ form {
 label {
 	font-size: 0.78rem;
 	font-weight: 600;
-	color: #39404a;
+	color: var(--cor-texto);
 }
 
 input {
 	padding: 8px 9px;
-	border: 1px solid #c8ccd4;
+	border: 1px solid var(--cor-borda-campo);
 	border-radius: 6px;
 	font: inherit;
-	background: #fff;
+	background: var(--cor-superficie);
 }
 
 input:focus-visible {
-	outline: 2px solid #2c5aa0;
+	outline: 2px solid var(--cor-foco);
 	outline-offset: 1px;
 }
 
 .falha {
-	color: #8f2018;
+	color: var(--cor-erro);
 	font-size: 0.76rem;
 }
 
@@ -143,8 +143,8 @@ input:focus-visible {
 	padding: 9px 16px;
 	border: 0;
 	border-radius: 6px;
-	background: #2c5aa0;
-	color: #fff;
+	background: var(--cor-primaria);
+	color: var(--cor-sobre-primaria);
 	font: inherit;
 	font-weight: 600;
 	cursor: pointer;
@@ -152,8 +152,8 @@ input:focus-visible {
 
 .acoes .secundario {
 	background: transparent;
-	border: 1px solid #c8ccd4;
-	color: #39404a;
+	border: 1px solid var(--cor-borda-campo);
+	color: var(--cor-texto);
 	font-weight: 500;
 }
 
@@ -169,11 +169,11 @@ input:focus-visible {
 }
 
 .erro {
-	background: #fdecea;
-	color: #8f2018;
+	background: var(--cor-erro-fundo);
+	color: var(--cor-erro);
 }
 
 .aviso {
-	background: #e4f1e4;
-	color: #22642a;
+	background: var(--cor-ok-fundo);
+	color: var(--cor-ok);
 }
