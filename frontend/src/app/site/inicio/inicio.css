@@ -1,0 +1,123 @@
+.destaque {
+	background: var(--cor-primaria-escura);
+	color: var(--cor-sobre-primaria);
+}
+
+.destaque-conteudo {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 24px 40px;
+	max-width: 960px;
+	margin: 0 auto;
+	padding: 40px clamp(16px, 4vw, 48px) 48px;
+}
+
+.destaque img {
+	flex-shrink: 0;
+	padding: 6px;
+	border-radius: 50%;
+	background: var(--cor-superficie);
+}
+
+.destaque-conteudo > div {
+	flex: 1;
+	min-width: 240px;
+}
+
+h1 {
+	margin: 0 0 8px;
+	font-size: clamp(1.6rem, 4vw, 2.3rem);
+	line-height: 1.2;
+}
+
+.subtitulo {
+	margin: 0 0 22px;
+	font-size: 1rem;
+	opacity: 0.92;
+}
+
+.acoes {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+}
+
+.botao {
+	display: inline-block;
+	padding: 11px 20px;
+	border-radius: 6px;
+	background: var(--marca-amarelo);
+	color: var(--cor-texto);
+	font-weight: 700;
+	text-decoration: none;
+}
+
+.botao:hover {
+	background: var(--cor-superficie);
+}
+
+.botao.secundario {
+	border: 2px solid var(--cor-sobre-primaria);
+	background: transparent;
+	color: var(--cor-sobre-primaria);
+}
+
+.botao.secundario:hover {
+	background: rgb(255 255 255 / 12%);
+}
+
+.destaque :focus-visible {
+	outline-color: var(--marca-amarelo);
+}
+
+.secoes {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+	gap: 24px;
+	max-width: 960px;
+	margin: 0 auto;
+	padding: 40px clamp(16px, 4vw, 48px) 56px;
+}
+
+section h2 {
+	margin: 0 0 10px;
+	font-size: 1.3rem;
+	color: var(--cor-primaria-escura);
+}
+
+section p {
+	margin: 0 0 12px;
+	line-height: 1.65;
+}
+
+.cartao-contratar,
+.cartao-associar {
+	padding: 22px;
+	border-radius: 10px;
+	background: var(--cor-superficie);
+	box-shadow: var(--sombra);
+}
+
+.cartao-contratar {
+	border-top: 4px solid var(--marca-verde);
+}
+
+.cartao-associar {
+	border-top: 4px solid var(--marca-vermelho);
+}
+
+/* Nos cartoes claros, o botao volta ao verde da interface. */
+.cartao-associar .botao {
+	background: var(--cor-primaria);
+	color: var(--cor-sobre-primaria);
+}
+
+.cartao-associar .botao:hover {
+	background: var(--cor-primaria-escura);
+}
+
+.nota {
+	font-size: 0.88rem;
+	color: var(--cor-texto-suave);
+}

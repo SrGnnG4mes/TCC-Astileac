@@ -105,3 +105,10 @@ h1 {
 .subtitulo {
 	text-align: center;
 }
+
+.voltar {
+	margin-top: 14px;
+	text-align: center;
+	font-size: 0.86rem;
+	color: var(--cor-primaria);
+}

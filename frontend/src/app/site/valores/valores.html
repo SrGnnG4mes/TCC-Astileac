@@ -1,0 +1,53 @@
+<div class="pagina">
+	<h1>Valores de referência</h1>
+	<p class="introducao">
+		Valores de referência para os serviços de tradução e interpretação de Libras, para
+		orientar quem contrata e quem presta o serviço.
+		@if (vigencia) {
+			Tabela vigente em {{ vigencia }}.
+		}
+	</p>
+
+	@if (grupos.length === 0) {
+		<p class="em-breve">
+			A tabela de valores de referência está sendo definida pela diretoria e será publicada
+			em breve.
+		</p>
+	} @else {
+		@for (grupo of grupos; track grupo.titulo) {
+			<section>
+				<h2>{{ grupo.titulo }}</h2>
+				<div class="tabela-rolavel" role="region" [attr.aria-label]="grupo.titulo" tabindex="0">
+					<table>
+						<thead>
+							<tr>
+								<th scope="col">Serviço</th>
+								<th scope="col">Valor</th>
+								<th scope="col">Unidade</th>
+							</tr>
+						</thead>
+						<tbody>
+							@for (item of grupo.itens; track item.servico) {
+								<tr>
+									<td>
+										{{ item.servico }}
+										@if (item.observacao) {
+											<span class="observacao">{{ item.observacao }}</span>
+										}
+									</td>
+									<td class="valor">{{ item.valor }}</td>
+									<td>{{ item.unidade }}</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+			</section>
+		}
+	}
+
+	<p class="contato">
+		Precisa de um intérprete? Veja como falar com a diretoria na
+		<a routerLink="/">página inicial</a>.
+	</p>
+</div>

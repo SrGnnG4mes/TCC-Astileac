@@ -1,0 +1,35 @@
+<button type="button" class="pular" (click)="irParaConteudo(conteudo)">Pular para o conteúdo</button>
+
+<header class="cabecalho">
+	<a class="marca" routerLink="/">
+		<!-- alt vazio: o nome vem escrito ao lado. -->
+		<img src="logo-astileac.webp" alt="" width="48" height="46" />
+		<span>ASTILEAC</span>
+	</a>
+
+	<nav aria-label="Site da associação">
+		<a routerLink="/" routerLinkActive="ativo" [routerLinkActiveOptions]="{ exact: true }">Início</a>
+		<a routerLink="/valores-de-referencia" routerLinkActive="ativo">Valores de referência</a>
+		<a routerLink="/associe-se" routerLinkActive="ativo">Associe-se</a>
+	</nav>
+
+	<a class="area-do-associado" routerLink="/login">Área do associado</a>
+</header>
+
+<main id="conteudo" #conteudo tabindex="-1">
+	<router-outlet />
+</main>
+
+<footer class="rodape">
+	<div class="rodape-conteudo">
+		<p class="nome">
+			Associação dos Profissionais Tradutores e Intérpretes de Libras do Estado do Acre
+		</p>
+		<p>Fundada em 19 de abril de 2008.</p>
+		<p>
+			Os dados dos associados são tratados conforme a Lei Geral de Proteção de Dados
+			(Lei 13.709/2018) e não ficam expostos publicamente.
+		</p>
+		<p class="direitos">&copy; {{ anoAtual }} ASTILEAC</p>
+	</div>
+</footer>

@@ -1,0 +1,72 @@
+.pagina {
+	max-width: 960px;
+	margin: 0 auto;
+	padding: 36px clamp(16px, 4vw, 48px) 56px;
+}
+
+h1 {
+	margin: 0 0 10px;
+	color: var(--cor-primaria-escura);
+}
+
+.introducao {
+	margin: 0 0 24px;
+	line-height: 1.65;
+	color: var(--cor-texto-suave);
+}
+
+.em-breve {
+	margin: 0 0 24px;
+	padding: 14px 16px;
+	border-left: 4px solid var(--cor-aviso-borda);
+	background: var(--cor-aviso-fundo);
+	color: var(--cor-aviso);
+}
+
+section {
+	margin-bottom: 28px;
+}
+
+h2 {
+	margin: 0 0 10px;
+	font-size: 1.2rem;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	background: var(--cor-superficie);
+}
+
+th,
+td {
+	padding: 10px 12px;
+	border-bottom: 1px solid var(--cor-borda);
+	text-align: left;
+	vertical-align: top;
+}
+
+thead th {
+	background: var(--cor-primaria-escura);
+	color: var(--cor-sobre-primaria);
+	font-size: 0.86rem;
+}
+
+.valor {
+	font-weight: 700;
+	white-space: nowrap;
+}
+
+.observacao {
+	display: block;
+	font-size: 0.82rem;
+	color: var(--cor-texto-suave);
+}
+
+.contato {
+	margin-top: 32px;
+}
+
+.contato a {
+	color: var(--cor-primaria);
+}
