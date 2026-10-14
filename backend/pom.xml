@@ -147,6 +147,23 @@
 					</excludes>
 				</configuration>
 			</plugin>
+			<!-- O application-local.properties guarda a senha do banco e fica
+			     fora do Git, mas o Maven o copiava para dentro do .jar: quem
+			     recebesse o pacote para instalar extrairia as credenciais com
+			     um unzip. Aqui ele sai do pacote. Continua em target/classes,
+			     entao o spring-boot:run e os testes seguem lendo; na
+			     implantacao, o arquivo fica AO LADO do .jar, onde o Spring
+			     Boot tambem procura, ou as credenciais vem de variavel de
+			     ambiente. -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>application-local.properties</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
