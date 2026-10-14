@@ -247,6 +247,22 @@ tbody tr:hover {
 	margin: 0;
 }
 
+.contatos {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.contatos li + li {
+	margin-top: 4px;
+}
+
+.contatos .detalhe {
+	margin-left: 6px;
+	color: var(--cor-texto-suave);
+	font-size: 0.8rem;
+}
+
 .nota {
 	margin: 16px 0 0;
 	font-size: 0.78rem;
