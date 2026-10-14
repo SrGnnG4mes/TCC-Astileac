@@ -118,7 +118,7 @@ export const routes: Routes = [
 			{
 				path: '',
 				pathMatch: 'full',
-				title: 'ASTILEAC | Tradutores e intérpretes de Libras do Acre',
+				title: 'ASTILEAC | Tradutores, intérpretes e guias-intérpretes de Língua Brasileira de Sinais do Acre',
 				loadComponent: () => import('./site/inicio/inicio').then(m => m.Inicio)
 			},
 			{
