@@ -14,7 +14,7 @@ import {
 	Vinculo
 } from '../modelos';
 import { naoFutura, DATA_MINIMA, hoje } from '../validadores';
-import { DataBrPipe } from '../formatos';
+import { ContatoPipe, DataBrPipe } from '../formatos';
 
 /**
  * Tudo que pende de um profissional: contatos, endereco, areas de
@@ -41,7 +41,7 @@ import { DataBrPipe } from '../formatos';
  */
 @Component({
 	selector: 'app-ficha-vinculos',
-	imports: [ReactiveFormsModule, DataBrPipe],
+	imports: [ReactiveFormsModule, ContatoPipe, DataBrPipe],
 	templateUrl: './ficha-vinculos.html',
 	styleUrl: './ficha-vinculos.css'
 })
@@ -293,21 +293,6 @@ export class FichaVinculos implements OnInit {
 			next: () => this.recarregar(),
 			error: (falha: HttpErrorResponse) => this.erro.set(this.mensagemDe(falha))
 		});
-	}
-
-	/** Telefone para exibicao: "68999998888" vira "(68) 99999-8888". */
-	valorFormatado(contato: Contato): string {
-		const v = contato.valor;
-		if (contato.tipo !== 'TELEFONE') {
-			return v;
-		}
-		if (v.length === 11) {
-			return `(${v.slice(0, 2)}) ${v.slice(2, 7)}-${v.slice(7)}`;
-		}
-		if (v.length === 10) {
-			return `(${v.slice(0, 2)}) ${v.slice(2, 6)}-${v.slice(6)}`;
-		}
-		return v;
 	}
 
 	// ---------- vinculos empregaticios (RF07) ----------

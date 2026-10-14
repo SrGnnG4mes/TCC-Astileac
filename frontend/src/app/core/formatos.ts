@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { AcaoLog, Perfil } from './modelos';
+import { AcaoLog, Contato, Perfil } from './modelos';
 
 /**
  * Data no formato brasileiro: "2026-10-20" vira "20/10/2026", e
@@ -75,5 +75,31 @@ export class EntidadePipe implements PipeTransform {
 
 	transform(entidade: string): string {
 		return ENTIDADES[entidade] ?? entidade;
+	}
+}
+
+/**
+ * Valor do contato para exibicao. O telefone e guardado so com digitos
+ * (o back-end exige DDD + 8 ou 9): "68999998888" vira "(68) 99999-8888".
+ * E-mail passa como esta.
+ *
+ * Fica aqui, e nao numa tela, porque duas telas mostram contatos: a ficha
+ * completa e a ficha rapida da consulta.
+ */
+@Pipe({ name: 'contato' })
+export class ContatoPipe implements PipeTransform {
+
+	transform(contato: Contato): string {
+		const v = contato.valor;
+		if (contato.tipo !== 'TELEFONE') {
+			return v;
+		}
+		if (v.length === 11) {
+			return `(${v.slice(0, 2)}) ${v.slice(2, 7)}-${v.slice(7)}`;
+		}
+		if (v.length === 10) {
+			return `(${v.slice(0, 2)}) ${v.slice(2, 6)}-${v.slice(6)}`;
+		}
+		return v;
 	}
 }
