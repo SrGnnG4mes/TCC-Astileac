@@ -331,6 +331,7 @@ cd ../backend && ./mvnw spring-boot:run      # http://localhost:8080
 # Testes
 ./mvnw test                     # unidade
 ./mvnw verify -Pintegracao      # unidade + integração (banco astileac_teste)
+cd frontend && npx ng test --watch=false     # front-end (Vitest)
 ```
 
 Banco: `CREATE DATABASE astileac;` e credenciais em `application-local.properties`.
@@ -797,6 +798,27 @@ Testes de integração: `CREATE DATABASE astileac_teste;` (o Flyway aplica as mi
 >   `FORMACAO`–`CERTIFICADO` dizia "no máximo um certificado por formação", quando podem
 >   ser vários e a formação é opcional; e `USUARIO` exigia profissional, mas a conta de
 >   instalação não tem.
+
+> **Testes do front-end** (Vitest, pelo builder `@angular/build:unit-test`, 35 testes).
+> Antes havia só o teste gerado pelo Angular. Escolhidos pelo que já deu errado, não por
+> cobertura: cada defeito encontrado rodando o front-end virou um caso.
+> - **Ordem das requisições do login:** CSRF antes, POST como formulário, CSRF de novo
+>   depois, e só então `/autenticacao/eu`. Login recusado não segue adiante.
+> - **Visitante do convite:** validação e cadastro renovam o CSRF dentro da própria
+>   operação, e o token vai no corpo, nunca na URL.
+> - **CEP com hífen e UF minúscula** passam no formulário e chegam ao servidor
+>   normalizados; CEP incompleto não sai do cliente.
+> - **403 mostra a mensagem do servidor**, não um texto genérico.
+> - **Paginação aninhada em `page`**: a consulta mostra a contagem, sem `NaN`.
+> - Os três selos do certificado; botão de visto só para a diretoria e só em documento
+>   ainda não visto; endereço 404 como "não informado"; `ativo=false` enviado como
+>   filtro (é *falsy*, e um `if` descuidado o descartaria); validador de CPF; guardas.
+> - **Conferido que pegam os defeitos:** reintroduzindo cada um — sem o CSRF depois do
+>   login, sem o CSRF do convite, o CEP no formato do banco e a mensagem genérica no
+>   403 — o teste correspondente falha.
+> - Os testes usam `HttpTestingController`: conferem as requisições que o front-end
+>   faria, sem servidor. O que só o servidor de verdade mostra continua com os testes de
+>   integração do back-end e com a coleção do Postman.
 
 ### Próximos passos (nesta ordem)
 1. ~~Migrations Flyway `V1` — criar as 9 tabelas + carga inicial das áreas de atuação~~ ✅
