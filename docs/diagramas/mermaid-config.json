@@ -1,0 +1,28 @@
+{
+  "theme": "neutral",
+  "fontFamily": "Arial, Helvetica, sans-serif",
+  "flowchart": {
+    "curve": "basis",
+    "nodeSpacing": 30,
+    "rankSpacing": 40,
+    "padding": 10
+  },
+  "er": {
+    "nodeSpacing": 30,
+    "rankSpacing": 60
+  },
+  "sequence": {
+    "mirrorActors": false,
+    "actorMargin": 30,
+    "width": 120,
+    "boxMargin": 8
+  },
+  "class": {
+    "nodeSpacing": 30,
+    "rankSpacing": 40
+  },
+  "state": {
+    "nodeSpacing": 30,
+    "rankSpacing": 40
+  }
+}

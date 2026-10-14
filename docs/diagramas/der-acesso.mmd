@@ -1,0 +1,40 @@
+erDiagram
+	%% Vista parcial do DER: acesso e protecao de dados.
+	%% GERADO por gerar.mjs a partir de docs/ASTILEAC-BD-atual.mmd. Nao edite:
+	%% altere o DER completo e rode o script de novo.
+	direction TB
+	USUARIO {
+		bigint id PK
+		bigint profissional_id FK,UK "nulo na conta de instalação"
+		varchar(100) login UK
+		varchar(255) senha_hash "BCrypt"
+		varchar(30) perfil "ADMIN ou PROFISSIONAL"
+	}
+
+	CONVITE {
+		bigint id PK
+		varchar(150) email
+		char(64) token_hash UK "SHA-256 do token (V6)"
+		timestamp data_emissao
+		timestamp data_expiracao "emissão + 7 dias"
+		timestamp data_consumo "nula = ainda não utilizado"
+		bigint profissional_id FK,UK "preenchido no cadastro"
+		varchar(100) emitido_por "login de quem emitiu"
+	}
+
+	LOG_ACESSO {
+		bigint id PK
+		timestamp data_hora
+		varchar(100) autor "login, ou nao-autenticado"
+		varchar(45) origem "IP, opcional"
+		varchar(20) acao "CONSULTA, CRIACAO, ALTERACAO..."
+		varchar(50) entidade
+		bigint registro_id "sem FK, de propósito (V4)"
+		varchar(255) detalhe "opcional"
+	}
+
+	PROFISSIONAL {
+		bigint id PK "demais colunas na vista do cadastro"
+	}
+	CONVITE |o..o| PROFISSIONAL : "originou"
+	PROFISSIONAL |o..o| USUARIO : "acessa por"

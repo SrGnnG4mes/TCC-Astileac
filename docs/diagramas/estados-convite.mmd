@@ -1,0 +1,19 @@
+stateDiagram-v2
+	direction LR
+	%% Estados do convite (RF12). Derivados de data_consumo e
+	%% data_expiracao; sao os rotulos da tela Convites.
+	%% Tentativa recusada = CPF ou login ja usados: a transacao e desfeita
+	%% e o convite continua pendente.
+
+	state "Pendente" as Pendente
+	state "Utilizado" as Utilizado
+	state "Expirado" as Expirado
+
+	[*] --> Pendente : diretoria emite<br/>(token mostrado uma vez)
+	Pendente --> Pendente : tentativa recusada<br/>não consome
+	Pendente --> Utilizado : cadastro<br/>concluído
+	Pendente --> Expirado : 7 dias<br/>sem uso
+	Utilizado --> [*]
+	Expirado --> [*]
+
+	note right of Utilizado : Inválido, utilizado<br/>e expirado recebem<br/>a mesma mensagem.

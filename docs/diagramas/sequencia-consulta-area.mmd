@@ -1,0 +1,36 @@
+sequenceDiagram
+	%% Consulta por area de atuacao (RF08): o caso de uso que justifica o
+	%% sistema. A listagem devolve o resumo com CPF mascarado; a ficha, com
+	%% CPF inteiro, e outra chamada. O registro de acesso (RF11) e gravado
+	%% pelo interceptor depois da resposta, em transacao propria.
+	%% O Spring Security aparece como nota, e nao como participante, para o
+	%% diagrama caber na largura da pagina; pelo mesmo motivo o
+	%% ProfissionalRepository aparece no rotulo da consulta ao banco.
+	autonumber
+	actor D as Diretoria
+	participant A as Angular<br/>(tela Profissionais)
+	participant C as Profissional<br/>Controller
+	participant SV as Profissional<br/>Service
+	participant BD as PostgreSQL
+	participant L as LogAcesso<br/>Interceptor
+
+	D->>A: escolhe a área<br/>e a situação
+	A->>C: GET /api/profissionais<br/>?area=juridica&ativo=true
+	Note over A,C: Spring Security: sessão<br/>válida e perfil ADMIN<br/>(senão, 401 ou 403)
+	C->>SV: consultar(nome, ativo,<br/>área, página)
+	SV->>BD: ProfissionalRepository:<br/>SELECT com EXISTS<br/>na área, sem quem<br/>pediu exclusão
+	BD-->>SV: página de profissionais
+	SV-->>C: Page de<br/>ProfissionalResumoDTO<br/>(CPF mascarado)
+	C-->>A: 200 {content, page}
+	C-)L: afterCompletion<br/>(só se status < 400)
+	L->>BD: grava CONSULTA,<br/>autor = login<br/>da sessão
+	A-->>D: nomes, CPF<br/>mascarado e situação
+
+	D->>A: abre a ficha<br/>de um profissional
+	A->>C: GET /api/profissionais/{id}
+	Note over A,C: @PreAuthorize: diretoria<br/>ou o próprio titular
+	C-->>A: 200, ficha completa<br/>(CPF inteiro)
+	C-)L: afterCompletion
+	L->>BD: grava CONSULTA,<br/>registro_id = {id}
+	A-->>D: ficha do profissional
+	Note over D: o contato com o profissional<br/>acontece fora do sistema

@@ -1,0 +1,29 @@
+stateDiagram-v2
+	%% Estados do documento do certificado (RF06 e RF13). Nao ha campo de
+	%% situacao no banco: o estado e derivado de arquivo_path e validado_em,
+	%% e os nomes abaixo sao os selos que a tela mostra.
+	%% Registrar, anexar e trocar: o associado ou a diretoria. Dar e retirar
+	%% o visto: so a diretoria.
+	%% Regra central do RF13: trocar o arquivo derruba o visto. Sem isso,
+	%% um documento poderia ficar com visto sem nunca ter sido visto.
+	%% "Sem documento" vale do mesmo jeito: a diretoria decidiu confiar em
+	%% quem declara. O visto diz que o documento confere com o declarado,
+	%% e nao atesta autenticidade junto a instituicao emissora.
+	%% Remover o certificado vale para os tres estados, por isso sai do
+	%% estado composto; o PDF e apagado so depois do commit.
+
+	state "Certificado registrado (RF06)" as Registrado {
+		direction LR
+		state "Sem documento (opcional)" as SemDocumento
+		state "Documento anexado" as Anexado
+		state "Documento visto" as Visto
+
+		[*] --> SemDocumento
+		SemDocumento --> Anexado : PDF anexado
+		Anexado --> Anexado : PDF trocado
+		Anexado --> Visto : diretoria<br/>dá o visto
+		Visto --> Anexado : diretoria retira o visto,<br/>ou PDF trocado (o visto cai)
+	}
+
+	[*] --> Registrado
+	Registrado --> [*] : certificado removido<br/>(PDF apagado após o commit)

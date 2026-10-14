@@ -73,6 +73,7 @@ astileac/
 │   ├── ASTILEAC-BD-atual.png   ← DER atual exportado como imagem
 │   ├── ASTILEAC-BD.mmd         ← DER inicial (ago/2026), 9 tabelas, registro histórico
 │   ├── ASTILEAC-BDimage.png    ← DER inicial exportado como imagem
+│   ├── diagramas/              ← demais diagramas do TCC (Mermaid + PNG) e gerar.mjs
 │   ├── medicao/                ← medição do índice do RF08 (script, saídas, conclusão)
 │   └── ASTILEAC_Projeto_TCC.pdf ← documento do TCC compilado
 ├── Postman/      Coleção de demonstração da API (importar no Postman)
@@ -900,6 +901,23 @@ Testes de integração: `CREATE DATABASE astileac_teste;` (o Flyway aplica as mi
 >   fim do "Meu cadastro", que só existe para quem tem cadastro de associado: a conta da
 >   diretoria criada na instalação não tinha onde trocar a senha. Pede a senha atual e a
 >   nova duas vezes.
+
+> **Diagramas do TCC** (`docs/diagramas/`, out/2026). Guia de uso no `README.md` da pasta.
+> - **DER atualizado:** tipos com tamanho, colunas opcionais indicadas, linha cheia só no
+>   relacionamento identificador (`PROFISSIONAL_AREA`) e tracejada nos demais. A ligação
+>   `PROFISSIONAL`–`LOG_ACESSO` foi **retirada**: não existe chave estrangeira, e
+>   `registro_id` aponta também para áreas de atuação (o interceptor cobre
+>   `/api/areas-atuacao/**`), então a linha afirmava uma relação que o banco não tem.
+> - Novos: modelo conceitual (Chen, com (mín,máx)), casos de uso (dois, por ator),
+>   classes do domínio, arquitetura, três sequências (login, convite, consulta do RF08),
+>   três de estados (cadastro, certificado, convite) e mapa de navegação.
+> - **O DER inteiro não cabe legível numa página A4** (cerca de 3 pt impresso). Daí as
+>   duas vistas, `der-cadastro` e `der-acesso`, **geradas** pelo `gerar.mjs` a partir do
+>   DER completo. Nunca edite as vistas: altere o completo e rode o script.
+> - Armadilhas do Mermaid encontradas: linha `%%` vazia quebra o parser do ER; `;` ou um
+>   segundo `:` numa nota de estado também; bloco (`subgraph`) com ligação saindo de um nó
+>   interno ignora a própria direção; num bloco `LR`, nós sem ligação ficam empilhados;
+>   e o fluxograma não tem seta só à esquerda (`<-.-` sai sem ponta).
 
 ### Próximos passos (nesta ordem)
 1. ~~Migrations Flyway `V1` — criar as 9 tabelas + carga inicial das áreas de atuação~~ ✅

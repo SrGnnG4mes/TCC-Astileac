@@ -1,0 +1,55 @@
+flowchart TB
+	%% Modelo conceitual em notacao de Peter Chen, com cardinalidade (min,max).
+	%% Retangulo = entidade; losango = relacionamento; forma arredondada = atributo.
+	%% A cardinalidade junto a cada entidade diz com quantas ocorrencias dela
+	%% uma ocorrencia da outra ponta se relaciona.
+	%% So os atributos que mudam a leitura do modelo aparecem aqui; a lista
+	%% completa esta no modelo logico (docs/ASTILEAC-BD-atual.mmd).
+
+	CONTA[Conta de acesso]
+	CONVITE[Convite]
+	ENDER[Endereço]
+	CONT[Contato]
+
+	R_ACESSA{acessa por}
+	R_ORIGINA{originou}
+	R_RESIDE{reside em}
+	R_POSSUI{possui}
+
+	P[Profissional]
+
+	R_ATUA{atua em}
+	R_CONCLUI{concluiu}
+	R_DECLARA{declara}
+	R_MANTEM{mantém}
+	R_COMPROVA{comprova}
+
+	AREA[Área de atuação]
+	FORM[Formação]
+	CERT[Certificado]
+	VINC[Vínculo empregatício]
+
+	A_INICIO([data de início])
+	LOG[Registro de acesso]
+	NOTA_LOG@{ shape: braces, label: "Sem relacionamento,<br/>de propósito: o registro<br/>sobrevive à eliminação<br/>do dado a que se refere" }
+
+	CONTA ---|"(0,1)"| R_ACESSA ---|"(0,1)"| P
+	CONVITE ---|"(0,1)"| R_ORIGINA ---|"(0,1)"| P
+	ENDER ---|"(0,1)"| R_RESIDE ---|"(1,1)"| P
+	CONT ---|"(0,N)"| R_POSSUI ---|"(1,1)"| P
+
+	P ---|"(0,N)"| R_ATUA ---|"(0,N)"| AREA
+	R_ATUA --- A_INICIO
+	P ---|"(1,1)"| R_CONCLUI ---|"(0,N)"| FORM
+	P ---|"(1,1)"| R_DECLARA ---|"(0,N)"| CERT
+	FORM ---|"(0,1)"| R_COMPROVA ---|"(0,N)"| CERT
+	P ---|"(1,1)"| R_MANTEM ---|"(0,N)"| VINC
+
+	LOG ~~~ NOTA_LOG
+
+	classDef entidade fill:#ffffff,stroke:#333333,stroke-width:1.5px
+	classDef relacao fill:#f2f2f2,stroke:#333333
+	classDef atributo fill:#ffffff,stroke:#666666
+	class CONTA,CONVITE,ENDER,CONT,P,AREA,FORM,CERT,VINC,LOG entidade
+	class R_ACESSA,R_ORIGINA,R_RESIDE,R_POSSUI,R_ATUA,R_CONCLUI,R_DECLARA,R_MANTEM,R_COMPROVA relacao
+	class A_INICIO atributo

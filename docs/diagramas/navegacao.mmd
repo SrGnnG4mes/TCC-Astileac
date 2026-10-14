@@ -1,0 +1,56 @@
+flowchart TB
+	%% Mapa de navegacao do front-end (app.routes.ts, barra e painel).
+	%% As guardas (autenticadoGuard, adminGuard) so evitam navegacao que vai
+	%% falhar; quem autoriza de verdade e o back-end.
+	%% Um diretor com cadastro de associado ve os dois menus.
+	%% As ligacoes saem dos blocos, e nao das telas de dentro deles: e o que
+	%% faz o Mermaid respeitar a direcao declarada em cada bloco. Num bloco
+	%% "LR", telas sem ligacao entre si ficam uma embaixo da outra.
+
+	subgraph PUB["Site público"]
+		direction TB
+		INICIO["/<br/>Início"]
+		VALORES["/valores-de-referencia<br/>Valores de referência"]
+		ASSOCIE["/associe-se<br/>Associe-se"]
+		INICIO --- VALORES
+		INICIO --- ASSOCIE
+	end
+
+	CONVITE["/cadastro?convite=...<br/>Cadastro por convite"]
+	LOGIN["/login<br/>Entrar"]
+
+	subgraph ADM["Diretoria (perfil ADMIN)"]
+		direction LR
+		subgraph MENU_ADM["Menu"]
+			direction LR
+			PROF["/profissionais<br/>Consulta por área (RF08)"]
+			AREAS["/areas-atuacao<br/>Áreas de atuação"]
+			CONVITES["/convites<br/>Convites"]
+			CONTAS["/contas<br/>Contas de acesso"]
+		end
+		subgraph DA_CONSULTA["A partir da consulta"]
+			direction LR
+			NOVO["/profissionais/novo<br/>Novo profissional"]
+			FICHA["/profissionais/:id/editar<br/>Ficha completa"]
+			TITULAR["/profissionais/:id/dados-pessoais<br/>Dados do titular (LGPD)"]
+		end
+		MENU_ADM --> DA_CONSULTA
+	end
+
+	subgraph ASSOC["Associado (conta com cadastro)"]
+		direction TB
+		PAINEL["/painel<br/>Painel"]
+		MEU["/meu-cadastro<br/>Meu cadastro"]
+		DADOS["/dados-pessoais<br/>Meus dados (LGPD)"]
+		PAINEL --> MEU
+		PAINEL --> DADOS
+	end
+
+	SENHA["/minha-senha<br/>Alterar senha"]
+
+	PUB -- "Área do<br/>associado" --> LOGIN
+	PUB -. "link do convite,<br/>por e-mail" .-> CONVITE
+	CONVITE -- "cadastro<br/>concluído" --> LOGIN
+	LOGIN -- "perfil ADMIN" --> ADM
+	LOGIN -- "perfil<br/>PROFISSIONAL" --> ASSOC
+	LOGIN -- "qualquer conta" --> SENHA

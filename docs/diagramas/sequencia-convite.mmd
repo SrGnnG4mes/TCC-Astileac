@@ -1,0 +1,47 @@
+sequenceDiagram
+	%% Cadastro por convite (RF12), de ConviteService.emitir() a
+	%% ConviteService.cadastrar(). O e-mail e o pagamento acontecem fora do
+	%% sistema. O UPDATE condicional e o que torna o convite de
+	%% uso unico mesmo com duas tentativas simultaneas; qualquer falha depois
+	%% dele desfaz a transacao inteira, e o convite continua valido.
+	autonumber
+	actor D as Diretoria
+	participant A as Angular
+	participant API as API<br/>(ConviteService)
+	participant BD as PostgreSQL
+	actor P as Pessoa convidada
+
+	D->>A: e-mail da pessoa,<br/>depois de confirmar<br/>o pagamento (fora<br/>do sistema)
+	A->>API: POST /api/convites
+	API->>API: gera token<br/>aleatório de 256 bits
+	API->>BD: grava o SHA-256<br/>do token, validade de<br/>7 dias e quem emitiu
+	API-->>A: 201 com o token (única vez)
+	A-->>D: link /cadastro?convite=...
+	D-)P: envia o link por e-mail (fora do sistema)
+
+	P->>A: abre o link
+	A->>API: GET /api/autenticacao/csrf
+	A->>API: POST /api/cadastro/validacao<br/>(token no corpo,<br/>nunca na URL)
+	API->>BD: busca pelo<br/>SHA-256 do token
+	API-->>A: válido, com o<br/>e-mail do convite
+	P->>A: nome, CPF, nascimento, login e senha
+	A->>API: GET /api/autenticacao/csrf
+	A->>API: POST /api/cadastro (token e dados)
+	API->>BD: busca o convite<br/>pelo SHA-256 do token
+
+	alt convite inválido, utilizado ou expirado
+		API-->>A: 400, mesma mensagem<br/>nos três casos
+	else convite válido
+		API->>BD: UPDATE convite<br/>SET data_consumo = agora<br/>WHERE id = ? AND<br/>data_consumo IS NULL
+		alt UPDATE não alterou linha<br/>(outra tentativa chegou antes)
+			API-->>A: 409 "Este convite<br/>já foi utilizado."
+		else CPF ou login já cadastrados
+			API->>BD: rollback: o convite<br/>não é consumido
+			API-->>A: 409 com o motivo
+		else dados aceitos
+			API->>BD: cria o profissional,<br/>o e-mail do convite como<br/>contato principal e a conta<br/>PROFISSIONAL (BCrypt)
+			API->>BD: liga o convite ao<br/>profissional e grava o<br/>registro de acesso (RF11)
+			API-->>A: 201
+			A-->>P: segue para o login
+		end
+	end

@@ -1,0 +1,36 @@
+flowchart TB
+	%% Arquitetura da implantacao em processo unico: o back-end serve o
+	%% Angular compilado e publica a API sob /api (WebConfig.PREFIXO_API).
+	%% Em desenvolvimento, o ng serve (porta 4200) faz o papel do bloco
+	%% "Arquivos do Angular" e repassa /api ao back-end pelo proxy
+	%% (proxy.conf.json); o resto e igual.
+
+	subgraph NAV["Navegador"]
+		SPA["Aplicação Angular<br/>site público e telas do sistema"]
+	end
+
+	subgraph SRV["Servidor: Spring Boot (um processo)"]
+		EST["Arquivos do Angular<br/>fora de /api, só GET,<br/>sem dado nenhum"]
+		SEG["Spring Security<br/>sessão por cookie, CSRF,<br/>perfil exigido por rota"]
+		CTRL["Controllers REST em /api<br/>recebem e devolvem DTO;<br/>@PreAuthorize confere<br/>o dono do registro"]
+		SVC["Services<br/>regras de negócio,<br/>@Transactional"]
+		REPO["Repositories<br/>Spring Data JPA"]
+		INT["LogAcessoInterceptor<br/>RF11, após resposta<br/>bem-sucedida"]
+		ARQ["ArquivoCertificadoService<br/>PDF com nome gerado,<br/>apagado após o commit"]
+		AGD["ExpurgoAgendado<br/>todo dia às 3h (RF10)"]
+	end
+
+	BD[("PostgreSQL<br/>schema pelo Flyway<br/>(V1 a V8)")]
+	UP[("Pasta de uploads<br/>PDFs dos certificados")]
+
+	SPA -- "HTML, JS e CSS" --> EST
+	SPA -- "JSON em /api<br/>cookie de sessão<br/>e token CSRF" --> SEG
+	SEG --> CTRL
+	CTRL --> SVC
+	SVC --> REPO
+	REPO -- "JPA / JDBC" --> BD
+	CTRL -. "ao concluir" .-> INT
+	INT -. "grava registro<br/>(transação própria)" .-> BD
+	SVC --> ARQ
+	ARQ --> UP
+	AGD --> SVC
