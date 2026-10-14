@@ -99,6 +99,13 @@ caso e se recusam a rodar em qualquer outro:
 CREATE DATABASE astileac_teste;
 ```
 
+Front-end (Vitest, pelo próprio Angular):
+```bash
+cd frontend
+npx ng test --watch=false      # roda uma vez
+npm test                       # fica observando e roda de novo a cada alteração
+```
+
 ## Modelo de dados
 
 O diagrama entidade-relacionamento do sistema atual está em
