@@ -1,6 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Area } from '../areas';
 import { AutenticacaoService } from '../autenticacao.service';
 import { Certificado, Endereco, Perfil } from '../modelos';
 import { FichaVinculos } from './ficha-vinculos';
@@ -48,6 +49,7 @@ describe('FichaVinculos', () => {
 		endereco?: Endereco | 404 | 500;
 		certificados?: Certificado[];
 		perfil?: Perfil;
+		area?: Area;
 	} = {}): void {
 		if (opcoes.perfil) {
 			TestBed.inject(AutenticacaoService).carregarUsuario().subscribe();
@@ -57,6 +59,7 @@ describe('FichaVinculos', () => {
 		fixture = TestBed.createComponent(FichaVinculos);
 		ficha = fixture.componentInstance;
 		fixture.componentRef.setInput('profissionalId', ID);
+		fixture.componentRef.setInput('area', opcoes.area ?? 'diretoria');
 		fixture.detectChanges();
 
 		http.expectOne('/api/areas-atuacao').flush([]);
@@ -158,7 +161,16 @@ describe('FichaVinculos', () => {
 	});
 
 	it('o associado nao ve botao de visto nem no proprio documento', () => {
-		abrir({ certificados: [semDocumento, anexado, visto], perfil: 'PROFISSIONAL' });
+		abrir({ certificados: [semDocumento, anexado, visto], perfil: 'PROFISSIONAL', area: 'associado' });
+
+		expect(botoes('Dar visto no documento')).toHaveLength(0);
+		expect(botoes('Retirar o visto')).toHaveLength(0);
+	});
+
+	it('diretor no proprio "Meu cadastro" nao ve o botao de visto', () => {
+		// Antes a ficha decidia pelo perfil da conta, e o diretor via o botao
+		// de visto nos proprios certificados: as duas areas se misturavam.
+		abrir({ certificados: [semDocumento, anexado, visto], perfil: 'ADMIN', area: 'associado' });
 
 		expect(botoes('Dar visto no documento')).toHaveLength(0);
 		expect(botoes('Retirar o visto')).toHaveLength(0);

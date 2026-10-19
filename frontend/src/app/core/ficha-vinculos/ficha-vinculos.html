@@ -310,12 +310,12 @@
 								(change)="anexarDocumento(certificado.id, $event)" />
 						</label>
 
-						@if (eAdmin() && certificado.temDocumento && !certificado.validadoEm) {
+						@if (podeDarVisto() && certificado.temDocumento && !certificado.validadoEm) {
 							<button type="button" class="link destaque" (click)="reconhecer(certificado.id)">
 								Dar visto no documento
 							</button>
 						}
-						@if (eAdmin() && certificado.validadoEm) {
+						@if (podeDarVisto() && certificado.validadoEm) {
 							<button
 								type="button"
 								class="link"

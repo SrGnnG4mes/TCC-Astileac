@@ -13,6 +13,12 @@ import { adminGuard, autenticadoGuard } from './core/guardas';
  * de segmentos.
  */
 /*
+ * Cada tela do sistema declara a area a que pertence (data.area):
+ * 'diretoria' ou 'associado'. A barra mostra so o menu da area da tela, e
+ * as telas compartilhadas decidem o que mostrar pela area, nao pelo perfil
+ * da conta -- ver core/areas.ts.
+ */
+/*
  * Cada rota tem titulo proprio (WCAG 2.4.2): e o que aparece na aba e o
  * que o leitor de tela anuncia ao trocar de pagina. Antes, toda tela se
  * chamava "Frontend".
@@ -35,36 +41,42 @@ export const routes: Routes = [
 	},
 	{
 		path: 'profissionais',
+		data: { area: 'diretoria' },
 		title: 'Profissionais | ASTILEAC',
 		canActivate: [autenticadoGuard, adminGuard],
 		loadComponent: () => import('./profissionais/profissionais').then(m => m.Profissionais)
 	},
 	{
 		path: 'areas-atuacao',
+		data: { area: 'diretoria' },
 		title: 'Áreas de atuação | ASTILEAC',
 		canActivate: [autenticadoGuard, adminGuard],
 		loadComponent: () => import('./areas/areas').then(m => m.Areas)
 	},
 	{
 		path: 'convites',
+		data: { area: 'diretoria' },
 		title: 'Convites | ASTILEAC',
 		canActivate: [autenticadoGuard, adminGuard],
 		loadComponent: () => import('./convites/convites').then(m => m.Convites)
 	},
 	{
 		path: 'contas',
+		data: { area: 'diretoria' },
 		title: 'Contas de acesso | ASTILEAC',
 		canActivate: [autenticadoGuard, adminGuard],
 		loadComponent: () => import('./contas/contas').then(m => m.Contas)
 	},
 	{
 		path: 'profissionais/novo',
+		data: { area: 'diretoria' },
 		title: 'Novo profissional | ASTILEAC',
 		canActivate: [autenticadoGuard, adminGuard],
 		loadComponent: () => import('./cadastro/cadastro').then(m => m.Cadastro)
 	},
 	{
 		path: 'profissionais/:id/editar',
+		data: { area: 'diretoria' },
 		title: 'Ficha do profissional | ASTILEAC',
 		canActivate: [autenticadoGuard, adminGuard],
 		loadComponent: () => import('./cadastro/cadastro').then(m => m.Cadastro)
@@ -73,6 +85,7 @@ export const routes: Routes = [
 		// Autoatendimento. Sem id na rota: o profissional e o que a
 		// sessao diz, nunca o que a URL pede.
 		path: 'meu-cadastro',
+		data: { area: 'associado' },
 		title: 'Meu cadastro | ASTILEAC',
 		canActivate: [autenticadoGuard],
 		loadComponent: () => import('./meu-cadastro/meu-cadastro').then(m => m.MeuCadastro)
@@ -80,6 +93,7 @@ export const routes: Routes = [
 	{
 		// Sem id: usa o profissional vinculado a quem esta logado.
 		path: 'dados-pessoais',
+		data: { area: 'associado' },
 		title: 'Meus dados | ASTILEAC',
 		canActivate: [autenticadoGuard],
 		loadComponent: () =>
@@ -89,8 +103,9 @@ export const routes: Routes = [
 		// Com id: o back-end permite a ADMIN ou ao proprio titular, e e
 		// ele quem decide -- por isso aqui so se exige estar logado.
 		path: 'profissionais/:id/dados-pessoais',
+		data: { area: 'diretoria' },
 		title: 'Dados pessoais do titular | ASTILEAC',
-		canActivate: [autenticadoGuard],
+		canActivate: [autenticadoGuard, adminGuard],
 		loadComponent: () =>
 			import('./dados-pessoais/dados-pessoais').then(m => m.DadosPessoaisTela)
 	},
@@ -104,6 +119,7 @@ export const routes: Routes = [
 	},
 	{
 		path: 'painel',
+		data: { area: 'associado' },
 		title: 'Painel | ASTILEAC',
 		canActivate: [autenticadoGuard],
 		loadComponent: () => import('./painel/painel').then(m => m.Painel)
