@@ -50,7 +50,11 @@ describe('FichaVinculos', () => {
 		certificados?: Certificado[];
 		perfil?: Perfil;
 		area?: Area;
+		/** Id da ficha aberta; o usuario de teste e o profissional 1. */
+		idDaFicha?: number;
 	} = {}): void {
+		const id = opcoes.idDaFicha ?? ID;
+
 		if (opcoes.perfil) {
 			TestBed.inject(AutenticacaoService).carregarUsuario().subscribe();
 			http.expectOne('/api/autenticacao/eu').flush({ login: 'alguem', perfil: opcoes.perfil, profissionalId: 1 });
@@ -58,12 +62,12 @@ describe('FichaVinculos', () => {
 
 		fixture = TestBed.createComponent(FichaVinculos);
 		ficha = fixture.componentInstance;
-		fixture.componentRef.setInput('profissionalId', ID);
+		fixture.componentRef.setInput('profissionalId', id);
 		fixture.componentRef.setInput('area', opcoes.area ?? 'diretoria');
 		fixture.detectChanges();
 
 		http.expectOne('/api/areas-atuacao').flush([]);
-		const endereco = http.expectOne(`/api/profissionais/${ID}/endereco`);
+		const endereco = http.expectOne(`/api/profissionais/${id}/endereco`);
 		const resposta = opcoes.endereco ?? 404;
 		if (resposta === 404) {
 			endereco.flush(null, { status: 404, statusText: 'Not Found' });
@@ -72,11 +76,11 @@ describe('FichaVinculos', () => {
 		} else {
 			endereco.flush(resposta);
 		}
-		http.expectOne(`/api/profissionais/${ID}/contatos`).flush([]);
-		http.expectOne(`/api/profissionais/${ID}/vinculos`).flush([]);
-		http.expectOne(`/api/profissionais/${ID}/areas`).flush([]);
-		http.expectOne(`/api/profissionais/${ID}/formacoes`).flush([]);
-		http.expectOne(`/api/profissionais/${ID}/certificados`).flush(opcoes.certificados ?? []);
+		http.expectOne(`/api/profissionais/${id}/contatos`).flush([]);
+		http.expectOne(`/api/profissionais/${id}/vinculos`).flush([]);
+		http.expectOne(`/api/profissionais/${id}/areas`).flush([]);
+		http.expectOne(`/api/profissionais/${id}/formacoes`).flush([]);
+		http.expectOne(`/api/profissionais/${id}/certificados`).flush(opcoes.certificados ?? []);
 		fixture.detectChanges();
 	}
 
@@ -171,6 +175,15 @@ describe('FichaVinculos', () => {
 		// Antes a ficha decidia pelo perfil da conta, e o diretor via o botao
 		// de visto nos proprios certificados: as duas areas se misturavam.
 		abrir({ certificados: [semDocumento, anexado, visto], perfil: 'ADMIN', area: 'associado' });
+
+		expect(botoes('Dar visto no documento')).toHaveLength(0);
+		expect(botoes('Retirar o visto')).toHaveLength(0);
+	});
+
+	it('diretor na propria ficha, aberta pela consulta, tambem nao ve o botao de visto', () => {
+		// A ficha aberta e a do proprio diretor (o usuario de teste e o
+		// profissional 1). O servidor recusaria com 403.
+		abrir({ certificados: [semDocumento, anexado, visto], perfil: 'ADMIN', area: 'diretoria', idDaFicha: 1 });
 
 		expect(botoes('Dar visto no documento')).toHaveLength(0);
 		expect(botoes('Retirar o visto')).toHaveLength(0);

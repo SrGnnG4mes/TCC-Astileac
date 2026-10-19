@@ -436,12 +436,16 @@ export class FichaVinculos implements OnInit {
 	// ---------- documento e reconhecimento (Passo 8 / RF13) ----------
 
 	/**
-	 * So a diretoria da o visto, e so na area da diretoria: no "Meu
-	 * cadastro" de um diretor o botao nao aparece, porque ali ele e o
-	 * associado, dono do documento. O titular anexa e baixa o proprio.
+	 * So a diretoria da o visto, so na area da diretoria e nunca no proprio
+	 * documento: no "Meu cadastro" de um diretor, ou na ficha dele aberta
+	 * pela consulta, o botao nao aparece. O back-end recusa o mesmo (403);
+	 * a tela so nao oferece o que o servidor vai negar.
 	 */
-	readonly podeDarVisto = computed(() =>
-		this.area() === 'diretoria' && this.autenticacao.usuario()?.perfil === 'ADMIN');
+	readonly podeDarVisto = computed(() => {
+		const eu = this.autenticacao.usuario();
+		return this.area() === 'diretoria' && eu?.perfil === 'ADMIN'
+			&& eu.profissionalId !== this.profissionalId();
+	});
 
 	urlDoDocumento(certificadoId: number): string {
 		return this.profissionais.urlDoDocumento(this.profissionalId(), certificadoId);

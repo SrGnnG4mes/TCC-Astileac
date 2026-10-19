@@ -42,6 +42,10 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class CertificadoController {
 
+	/** Quem pode dar ou retirar o visto: a diretoria, fora do proprio cadastro. */
+	private static final String SO_DIRETORIA_E_NAO_O_PROPRIO =
+			"hasRole('ADMIN') and !@autorizacao.eOProprioProfissional(#profissionalId)";
+
 	private final CertificadoService certificadoService;
 	private final UsuarioLogado usuarioLogado;
 
@@ -122,19 +126,25 @@ public class CertificadoController {
 	/**
 	 * Reconhece o documento.
 	 *
-	 * SOMENTE a diretoria: a anotacao de classe permitiria tambem o
-	 * titular, e deixar alguem validar o proprio documento esvaziaria o
-	 * reconhecimento. O @PreAuthorize de metodo substitui o da classe.
+	 * SOMENTE a diretoria, e nunca sobre o proprio cadastro. A anotacao de
+	 * classe permitiria tambem o titular, e deixar alguem validar o proprio
+	 * documento esvaziaria o reconhecimento -- o que vale tambem para o
+	 * membro da diretoria, que e associado e tem certificados como qualquer
+	 * outro: o visto no documento dele precisa vir de outro diretor. O
+	 * @PreAuthorize de metodo substitui o da classe.
 	 */
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize(SO_DIRETORIA_E_NAO_O_PROPRIO)
 	@PostMapping("/{certificadoId}/validacao")
 	public CertificadoResponseDTO validar(
 			@PathVariable Long profissionalId, @PathVariable Long certificadoId) {
 		return certificadoService.validar(profissionalId, certificadoId, usuarioLogado.loginAtual());
 	}
 
-	/** Desfaz o reconhecimento feito por engano. Tambem so a diretoria. */
-	@PreAuthorize("hasRole('ADMIN')")
+	/**
+	 * Desfaz o reconhecimento feito por engano. Mesma regra: so a diretoria,
+	 * e nao sobre o proprio documento.
+	 */
+	@PreAuthorize(SO_DIRETORIA_E_NAO_O_PROPRIO)
 	@DeleteMapping("/{certificadoId}/validacao")
 	public CertificadoResponseDTO invalidar(
 			@PathVariable Long profissionalId, @PathVariable Long certificadoId) {

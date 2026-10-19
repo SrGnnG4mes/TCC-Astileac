@@ -937,8 +937,16 @@ Testes de integração: `CREATE DATABASE astileac_teste;` (o Flyway aplica as mi
 >   rota**, e não o perfil, que decide: o `FichaVinculos` recebe a área, e a tela de dados
 >   pessoais fala do titular em terceira pessoa na área da diretoria. A rota
 >   `/profissionais/:id/dados-pessoais` ganhou o `adminGuard`, como as demais da área.
->   **Em aberto:** o back-end ainda deixa um diretor dar visto no próprio documento pela
->   API; a tela não oferece mais, mas a regra de negócio é decisão a confirmar.
+> - **Diretor não dá nem retira o visto do próprio documento** (decisão do autor, out/2026).
+>   É a mesma razão pela qual o associado não dá visto no próprio: um visto dado por quem
+>   é dono do documento não confere nada. O back-end recusa com 403
+>   (`hasRole('ADMIN') and !@autorizacao.eOProprioProfissional(#profissionalId)` no
+>   `CertificadoController`), e a tela não mostra o botão nem na ficha do próprio diretor
+>   aberta pela consulta. `VistoDoDocumentoAutorizacaoTest` (95 testes de unidade) importa
+>   o `SecurityConfig` de verdade; conferido que falha com a regra antiga e conferido no
+>   servidor rodando, com duas contas de diretoria. A mensagem genérica do 403 do method
+>   security deixou de dizer "seu perfil não permite": ali chegam também as recusas por
+>   posse do registro, em que o perfil não é o motivo.
 
 > **Diagramas do TCC** (`docs/diagramas/`, out/2026). Guia de uso no `README.md` da pasta.
 > - **DER atualizado:** tipos com tamanho, colunas opcionais indicadas, linha cheia só no
