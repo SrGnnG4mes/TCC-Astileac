@@ -14,7 +14,9 @@ import {
 	Vinculo
 } from '../modelos';
 import { naoFutura, DATA_MINIMA, hoje } from '../validadores';
-import { ContatoPipe, DataBrPipe } from '../formatos';
+import {
+	CepPipe, ContatoPipe, DataBrPipe, SeloCertificadoPipe, SituacaoDoCertificado, situacaoDoCertificado
+} from '../formatos';
 
 /**
  * Tudo que pende de um profissional: contatos, endereco, areas de
@@ -41,7 +43,7 @@ import { ContatoPipe, DataBrPipe } from '../formatos';
  */
 @Component({
 	selector: 'app-ficha-vinculos',
-	imports: [ReactiveFormsModule, ContatoPipe, DataBrPipe],
+	imports: [ReactiveFormsModule, CepPipe, ContatoPipe, DataBrPipe, SeloCertificadoPipe],
 	templateUrl: './ficha-vinculos.html',
 	styleUrl: './ficha-vinculos.css'
 })
@@ -243,10 +245,6 @@ export class FichaVinculos implements OnInit {
 	}
 
 	/** CEP para exibicao: "69900000" vira "69900-000". */
-	cepFormatado(cep: string): string {
-		return cep.length === 8 ? `${cep.slice(0, 5)}-${cep.slice(5)}` : cep;
-	}
-
 	// ---------- contatos (RF03) ----------
 
 	adicionarContato(): void {
@@ -435,16 +433,9 @@ export class FichaVinculos implements OnInit {
 		return this.profissionais.urlDoDocumento(this.profissionalId(), certificadoId);
 	}
 
-	/**
-	 * Estado do certificado, derivado -- nao ha campo de situacao no
-	 * back-end, e nao deveria haver: seria estado duplicado, podendo
-	 * divergir de `temDocumento` e `validadoEm`.
-	 */
-	situacao(certificado: Certificado): 'declarado' | 'enviado' | 'reconhecido' {
-		if (!certificado.temDocumento) {
-			return 'declarado';
-		}
-		return certificado.validadoEm ? 'reconhecido' : 'enviado';
+	/** Estado do certificado, que da a cor do selo (ver core/formatos). */
+	situacao(certificado: Certificado): SituacaoDoCertificado {
+		return situacaoDoCertificado(certificado);
 	}
 
 	anexarDocumento(certificadoId: number, evento: Event): void {

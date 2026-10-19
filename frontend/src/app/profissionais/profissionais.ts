@@ -1,12 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, viewChild } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import { forkJoin } from 'rxjs';
 import { Barra } from '../core/barra/barra';
 import { ProfissionalService } from '../core/profissional.service';
-import { AreaAtuacao, Contato, Pagina, ProfissionalFicha, ProfissionalResumo } from '../core/modelos';
-import { ContatoPipe, DataBrPipe } from '../core/formatos';
+import { AreaAtuacao, Pagina, ProfissionalResumo } from '../core/modelos';
+import { FichaRapida } from './ficha-rapida/ficha-rapida';
 
 /**
  * Consulta do quadro de associados (RF08).
@@ -22,7 +21,7 @@ import { ContatoPipe, DataBrPipe } from '../core/formatos';
  */
 @Component({
 	selector: 'app-profissionais',
-	imports: [ReactiveFormsModule, RouterLink, Barra, ContatoPipe, DataBrPipe],
+	imports: [ReactiveFormsModule, RouterLink, Barra, FichaRapida],
 	templateUrl: './profissionais.html',
 	styleUrl: './profissionais.css'
 })
@@ -30,6 +29,9 @@ export class Profissionais {
 
 	private readonly formBuilder = inject(FormBuilder);
 	private readonly profissionais = inject(ProfissionalService);
+
+	/** A ficha rapida, aberta pelo "Ver ficha" de cada linha. */
+	readonly fichaRapida = viewChild.required(FichaRapida);
 
 	readonly filtros = this.formBuilder.nonNullable.group({
 		nome: '',
@@ -39,8 +41,6 @@ export class Profissionais {
 
 	readonly areas = signal<AreaAtuacao[]>([]);
 	readonly pagina = signal<Pagina<ProfissionalResumo> | null>(null);
-	readonly ficha = signal<ProfissionalFicha | null>(null);
-	readonly contatosDaFicha = signal<Contato[]>([]);
 	readonly buscando = signal(false);
 	readonly erro = signal<string | null>(null);
 
@@ -89,30 +89,6 @@ export class Profissionais {
 				this.erro.set(this.mensagemDe(falha));
 			}
 		});
-	}
-
-	/**
-	 * A ficha rapida traz os contatos porque e para isso que a diretoria
-	 * abre a consulta: achou quem atua na area, precisa falar com a pessoa.
-	 * Sem eles, o caminho era sair da consulta e abrir a ficha completa.
-	 */
-	abrirFicha(id: number): void {
-		this.ficha.set(null);
-		forkJoin({
-			ficha: this.profissionais.buscarPorId(id),
-			contatos: this.profissionais.listarContatos(id)
-		}).subscribe({
-			next: ({ ficha, contatos }) => {
-				// O principal de cada tipo primeiro: e por ele que se tenta antes.
-				this.contatosDaFicha.set([...contatos].sort((a, b) => Number(b.principal) - Number(a.principal)));
-				this.ficha.set(ficha);
-			},
-			error: (falha: HttpErrorResponse) => this.erro.set(this.mensagemDe(falha))
-		});
-	}
-
-	fecharFicha(): void {
-		this.ficha.set(null);
 	}
 
 	limpar(): void {

@@ -2,7 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { Contato, Pagina, ProfissionalFicha, ProfissionalResumo } from '../core/modelos';
+import { Pagina, ProfissionalResumo } from '../core/modelos';
 import { Profissionais } from './profissionais';
 
 /**
@@ -58,39 +58,16 @@ describe('Profissionais', () => {
 		consulta.flush(resposta);
 	});
 
-	it('ver ficha mostra os contatos, o principal primeiro e o e-mail como link', () => {
-		const ficha: ProfissionalFicha = {
-			id: 1, nome: 'Maria Silva', cpf: '52998224725', dataNascimento: '1990-05-10',
-			dataAssociacao: '2026-10-01', ativo: true, dataExclusaoSolicitada: null, lattesUrl: null
-		};
-		const contatos: Contato[] = [
-			{ id: 7, tipo: 'TELEFONE', valor: '68999998888', principal: false },
-			{ id: 8, tipo: 'EMAIL', valor: 'maria@exemplo.org', principal: true }
-		];
+	it('o "Ver ficha" da linha abre a ficha rapida daquele profissional', () => {
+		const verFicha = (fixture.nativeElement as HTMLElement).querySelector('tbody tr button') as HTMLButtonElement;
+		verFicha.click();
 
-		fixture.componentInstance.abrirFicha(1);
-		http.expectOne('/api/profissionais/1').flush(ficha);
-		http.expectOne('/api/profissionais/1/contatos').flush(contatos);
-		fixture.detectChanges();
-
-		const tela = fixture.nativeElement as HTMLElement;
-		const itens = Array.from(tela.querySelectorAll('.ficha .contatos li')).map(li => li.textContent ?? '');
-		expect(itens.length).toBe(2);
-		expect(itens[0]).toContain('maria@exemplo.org');
-		expect(itens[0]).toContain('principal');
-		expect(itens[1]).toContain('(68) 99999-8888');
-		expect(tela.querySelector('.ficha a[href="mailto:maria@exemplo.org"]')).not.toBeNull();
-	});
-
-	it('ficha sem contato diz que nao ha nenhum registrado', () => {
-		fixture.componentInstance.abrirFicha(2);
-		http.expectOne('/api/profissionais/2').flush({
-			id: 2, nome: 'Joao Pereira', cpf: '11144477735', dataNascimento: '1985-01-20',
-			dataAssociacao: '2026-10-01', ativo: true, dataExclusaoSolicitada: null, lattesUrl: null
-		});
-		http.expectOne('/api/profissionais/2/contatos').flush([]);
-		fixture.detectChanges();
-
-		expect((fixture.nativeElement as HTMLElement).querySelector('.ficha')?.textContent).toContain('nenhum registrado');
+		// As sete leituras da ficha, todas do profissional da primeira linha.
+		const pedidos = http.match(r => r.url.startsWith('/api/profissionais/1'));
+		expect(pedidos.map(p => p.request.url).sort()).toEqual([
+			'/api/profissionais/1', '/api/profissionais/1/areas', '/api/profissionais/1/certificados',
+			'/api/profissionais/1/contatos', '/api/profissionais/1/endereco', '/api/profissionais/1/formacoes',
+			'/api/profissionais/1/vinculos'
+		]);
 	});
 });

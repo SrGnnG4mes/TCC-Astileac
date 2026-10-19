@@ -1,0 +1,179 @@
+<!--
+  Janela nativa (dialog aberto com showModal): o proprio navegador prende o
+  foco dentro dela, fecha com Esc, escurece o fundo e, ao fechar, devolve o
+  foco ao botao "Ver ficha" de onde a pessoa veio.
+-->
+<dialog #janela class="ficha" aria-labelledby="titulo-ficha"
+	(close)="aoFechar()" (click)="fecharSeClicouFora($event)">
+	@if (ficha(); as f) {
+		<div class="ficha-conteudo">
+			<header>
+				<h2 id="titulo-ficha">{{ f.nome }}</h2>
+				<button type="button" class="link" (click)="fechar()">Fechar</button>
+			</header>
+
+			@if (f.dataExclusaoSolicitada) {
+				<p class="aviso">
+					Este cadastro tem pedido de eliminação registrado em
+					{{ f.dataExclusaoSolicitada | dataBr }} e está bloqueado.
+				</p>
+			}
+
+			<!-- Mesma ordem da ficha completa: quem e e como achar, o que faz,
+			     o que comprova, onde trabalhou. -->
+			<section>
+				<h3>Identificação</h3>
+				<dl>
+					<dt>CPF</dt>
+					<dd class="mono">{{ f.cpf }}</dd>
+					<dt>Nascimento</dt>
+					<dd>{{ f.dataNascimento | dataBr }}</dd>
+					<dt>Associação</dt>
+					<dd>{{ f.dataAssociacao | dataBr }}</dd>
+					<dt>Situação</dt>
+					<dd>{{ f.ativo ? 'ativo' : 'inativo' }}</dd>
+					<dt>Currículo Lattes</dt>
+					<dd>
+						@if (f.lattesUrl) {
+							<a [href]="f.lattesUrl" target="_blank" rel="noopener">{{ f.lattesUrl }}</a>
+						} @else {
+							não informado
+						}
+					</dd>
+				</dl>
+				<p class="nota">
+					O CPF aparece completo aqui, e mascarado na listagem: a consulta individual
+					tem finalidade que justifica o dado inteiro, a listagem não.
+				</p>
+			</section>
+
+			<section>
+				<h3>Contatos</h3>
+				@if (contatos().length === 0) {
+					<p class="vazio-ficha">Nenhum contato registrado.</p>
+				} @else {
+					<ul class="lista-ficha contatos">
+						@for (contato of contatos(); track contato.id) {
+							<li>
+								@if (contato.tipo === 'EMAIL') {
+									<a [href]="'mailto:' + contato.valor">{{ contato | contato }}</a>
+								} @else {
+									{{ contato | contato }}
+								}
+								<span class="detalhe">
+									{{ contato.tipo === 'EMAIL' ? 'e-mail' : 'telefone' }}{{ contato.principal ? ', principal' : '' }}
+								</span>
+							</li>
+						}
+					</ul>
+				}
+			</section>
+
+			<section>
+				<h3>Endereço</h3>
+				@if (endereco(); as e) {
+					<p class="endereco">
+						{{ e.logradouro }}, {{ e.numero }}
+						@if (e.complemento) { &middot; {{ e.complemento }} }
+						<br />
+						{{ e.bairro }} &middot; {{ e.cidade }}/{{ e.uf }} &middot; CEP {{ e.cep | cep }}
+					</p>
+				} @else {
+					<p class="vazio-ficha">Nenhum endereço informado.</p>
+				}
+			</section>
+
+			<section>
+				<h3>Áreas de atuação</h3>
+				@if (areas().length === 0) {
+					<p class="vazio-ficha">Nenhuma área vinculada.</p>
+				} @else {
+					<ul class="lista-ficha areas">
+						@for (area of areas(); track area.areaAtuacaoId) {
+							<li>
+								<strong>{{ area.nome }}</strong>
+								<span class="detalhe">desde {{ area.dataInicio | dataBr }}</span>
+							</li>
+						}
+					</ul>
+				}
+			</section>
+
+			<section>
+				<h3>Formações</h3>
+				@if (formacoes().length === 0) {
+					<p class="vazio-ficha">Nenhuma formação registrada.</p>
+				} @else {
+					<ul class="lista-ficha formacoes">
+						@for (formacao of formacoes(); track formacao.id) {
+							<li>
+								<strong>{{ formacao.curso }}</strong>
+								<span class="detalhe">
+									{{ formacao.nivel }} &middot; {{ formacao.instituicao }} &middot;
+									{{ formacao.anoConclusao }}
+								</span>
+							</li>
+						}
+					</ul>
+				}
+			</section>
+
+			<section>
+				<h3>Certificados</h3>
+				@if (certificados().length === 0) {
+					<p class="vazio-ficha">Nenhum certificado registrado.</p>
+				} @else {
+					<ul class="lista-ficha certificados">
+						@for (certificado of certificados(); track certificado.id) {
+							<li>
+								<strong>{{ certificado.titulo }}</strong>
+								<span [class]="'selo ' + situacao(certificado)">{{ certificado | seloCertificado }}</span>
+								<span class="detalhe">
+									{{ certificado.instituicaoEmissora }} &middot;
+									{{ certificado.cargaHoraria }}h &middot;
+									{{ certificado.dataEmissao | dataBr }}
+									@if (nomeDaFormacao(certificado.formacaoId); as curso) {
+										&middot; comprova {{ curso }}
+									}
+									@if (certificado.validadoEm) {
+										&middot; visto por {{ certificado.validadoPor }} em
+										{{ certificado.validadoEm | dataBr }}
+									}
+								</span>
+								@if (certificado.temDocumento) {
+									<a [href]="urlDoDocumento(f.id, certificado.id)" target="_blank" rel="noopener">
+										ver documento
+									</a>
+								}
+							</li>
+						}
+					</ul>
+				}
+			</section>
+
+			<section>
+				<h3>Vínculos empregatícios</h3>
+				@if (vinculos().length === 0) {
+					<p class="vazio-ficha">Nenhum vínculo registrado.</p>
+				} @else {
+					<ul class="lista-ficha vinculos">
+						@for (vinculo of vinculos(); track vinculo.id) {
+							<li>
+								<strong>{{ vinculo.cargo }}</strong>
+								<span class="detalhe">
+									{{ vinculo.instituicao }} &middot; {{ vinculo.tipoVinculo }} &middot;
+									desde {{ vinculo.dataInicio | dataBr }}
+									@if (vinculo.atual) {
+										&middot; em andamento
+									} @else {
+										até {{ vinculo.dataFim | dataBr }}
+									}
+								</span>
+							</li>
+						}
+					</ul>
+				}
+			</section>
+		</div>
+	}
+</dialog>

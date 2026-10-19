@@ -94,3 +94,29 @@ body {
 	max-width: 100%;
 	overflow-x: auto;
 }
+
+/*
+ * Selo do certificado (RF13). Global porque aparece em duas telas: a ficha
+ * completa e a ficha rapida da consulta.
+ */
+.selo {
+	padding: 2px 8px;
+	border-radius: 10px;
+	font-size: 0.72rem;
+	white-space: nowrap;
+}
+
+.selo.declarado {
+	background: var(--cor-superficie-realce);
+	color: var(--cor-texto-suave);
+}
+
+.selo.enviado {
+	background: var(--cor-aviso-fundo);
+	color: var(--cor-aviso);
+}
+
+.selo.reconhecido {
+	background: var(--cor-ok-fundo);
+	color: var(--cor-ok);
+}
