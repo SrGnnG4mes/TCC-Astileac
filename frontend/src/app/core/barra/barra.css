@@ -31,34 +31,52 @@
 	background: var(--cor-superficie);
 }
 
-nav {
+/* --- seletor de area: so para quem e diretor e associado --- */
+
+.areas {
 	display: flex;
-	gap: 14px;
+	border: 1px solid rgb(255 255 255 / 55%);
+	border-radius: 6px;
+	overflow: hidden;
 }
 
-nav a {
-	padding: 4px 2px;
-	border-bottom: 2px solid transparent;
+.areas a {
+	padding: 5px 12px;
 	color: var(--cor-sobre-primaria);
-	font-size: 0.86rem;
+	font-size: 0.84rem;
 	text-decoration: none;
-	opacity: 0.85;
 }
 
-nav a:hover {
-	opacity: 1;
+.areas a + a {
+	border-left: 1px solid rgb(255 255 255 / 55%);
 }
 
-nav a.ativo {
-	border-bottom-color: var(--cor-sobre-primaria);
-	opacity: 1;
+.areas a:hover {
+	background: rgb(255 255 255 / 12%);
+}
+
+/* Amarelo da logo com o verde escuro por cima: 7,3:1. */
+.areas a.ativa {
+	background: var(--marca-amarelo);
+	color: var(--cor-primaria-escura);
 	font-weight: 600;
 }
+
+/* --- conta --- */
 
 .identidade {
 	margin-left: auto;
 	font-size: 0.82rem;
 	opacity: 0.9;
+}
+
+.conta {
+	color: var(--cor-sobre-primaria);
+	font-size: 0.82rem;
+}
+
+.conta.ativo {
+	font-weight: 600;
 }
 
 button {
@@ -74,4 +92,58 @@ button {
 
 button:hover {
 	background: rgb(255 255 255 / 12%);
+}
+
+/*
+ * --- faixa da area ---
+ * Nome da area escrito, e nao so a cor, para quem nao distingue cores
+ * (WCAG 1.4.1). Links no verde de interface: 5,5:1 no fundo verde-claro e
+ * 5,8:1 no amarelo-claro.
+ */
+
+.faixa-area {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 6px 18px;
+	padding: 8px 20px;
+	border-bottom: 1px solid var(--cor-borda);
+	font-size: 0.86rem;
+}
+
+.faixa-area.diretoria {
+	background: var(--cor-primaria-fundo);
+	border-bottom-color: var(--cor-ok-borda);
+}
+
+.faixa-area.associado {
+	background: var(--cor-aviso-fundo);
+	border-bottom-color: var(--cor-aviso-borda);
+}
+
+.faixa-area strong {
+	color: var(--cor-texto);
+}
+
+.faixa-area nav {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px 16px;
+}
+
+.faixa-area nav a {
+	padding: 2px 0;
+	border-bottom: 2px solid transparent;
+	color: var(--cor-primaria);
+	text-decoration: none;
+}
+
+.faixa-area nav a:hover {
+	border-bottom-color: var(--cor-primaria);
+}
+
+.faixa-area nav a.ativo {
+	border-bottom-color: var(--cor-primaria);
+	color: var(--cor-texto);
+	font-weight: 600;
 }

@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { AcaoLog, Contato, Perfil } from './modelos';
+import { AcaoLog, Certificado, Contato, Perfil } from './modelos';
 
 /**
  * Data no formato brasileiro: "2026-10-20" vira "20/10/2026", e
@@ -101,5 +101,49 @@ export class ContatoPipe implements PipeTransform {
 			return `(${v.slice(0, 2)}) ${v.slice(2, 6)}-${v.slice(6)}`;
 		}
 		return v;
+	}
+}
+
+/** CEP para exibicao: o back-end guarda so os 8 digitos; "69900000" vira "69900-000". */
+@Pipe({ name: 'cep' })
+export class CepPipe implements PipeTransform {
+
+	transform(cep: string): string {
+		return cep.length === 8 ? `${cep.slice(0, 5)}-${cep.slice(5)}` : cep;
+	}
+}
+
+/**
+ * Os tres estados do certificado (RF06 e RF13), derivados -- nao ha campo
+ * de situacao no back-end, e nao deveria haver: seria estado duplicado,
+ * podendo divergir de `temDocumento` e `validadoEm`.
+ */
+export type SituacaoDoCertificado = 'declarado' | 'enviado' | 'reconhecido';
+
+export function situacaoDoCertificado(certificado: Certificado): SituacaoDoCertificado {
+	if (!certificado.temDocumento) {
+		return 'declarado';
+	}
+	return certificado.validadoEm ? 'reconhecido' : 'enviado';
+}
+
+const SELOS: Record<SituacaoDoCertificado, string> = {
+	declarado: 'sem documento (opcional)',
+	enviado: 'documento anexado',
+	reconhecido: 'documento visto'
+};
+
+/**
+ * Selo do certificado, com as palavras acertadas com a diretoria: "visto",
+ * e nunca "reconhecido", porque a diretoria confere com o declarado mas nao
+ * atesta autenticidade; e "opcional" no sem documento, porque o certificado
+ * vale do mesmo jeito. Fica aqui porque a ficha completa e a ficha rapida
+ * da consulta mostram o mesmo selo.
+ */
+@Pipe({ name: 'seloCertificado' })
+export class SeloCertificadoPipe implements PipeTransform {
+
+	transform(certificado: Certificado): string {
+		return SELOS[situacaoDoCertificado(certificado)];
 	}
 }

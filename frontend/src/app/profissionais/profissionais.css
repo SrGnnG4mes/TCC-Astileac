@@ -205,71 +205,6 @@ tbody tr:hover {
 	cursor: default;
 }
 
-/* --- ficha --- */
-
-.ficha {
-	margin-top: 28px;
-	padding: 18px;
-	border: 1px solid var(--cor-borda);
-	border-radius: 8px;
-}
-
-.ficha header {
-	display: flex;
-	align-items: baseline;
-	gap: 12px;
-	margin-bottom: 14px;
-}
-
-.ficha h2 {
-	margin: 0;
-	font-size: 1.05rem;
-}
-
-.ficha header .link {
-	margin-left: auto;
-}
-
-.ficha dl {
-	display: grid;
-	grid-template-columns: auto 1fr;
-	gap: 6px 18px;
-	margin: 0;
-	font-size: 0.9rem;
-}
-
-.ficha dt {
-	font-weight: 600;
-	color: var(--cor-texto-suave);
-}
-
-.ficha dd {
-	margin: 0;
-}
-
-.contatos {
-	margin: 0;
-	padding: 0;
-	list-style: none;
-}
-
-.contatos li + li {
-	margin-top: 4px;
-}
-
-.contatos .detalhe {
-	margin-left: 6px;
-	color: var(--cor-texto-suave);
-	font-size: 0.8rem;
-}
-
-.nota {
-	margin: 16px 0 0;
-	font-size: 0.78rem;
-	color: var(--cor-texto-suave);
-	line-height: 1.5;
-}
-
 /* --- mensagens --- */
 
 .erro {
@@ -279,16 +214,6 @@ tbody tr:hover {
 	background: var(--cor-erro-fundo);
 	color: var(--cor-erro);
 	font-size: 0.85rem;
-}
-
-.aviso {
-	margin: 0 0 14px;
-	padding: 9px 10px;
-	border-radius: 6px;
-	background: var(--cor-aviso-fundo);
-	color: var(--cor-aviso);
-	font-size: 0.82rem;
-	line-height: 1.5;
 }
 
 .vazio {

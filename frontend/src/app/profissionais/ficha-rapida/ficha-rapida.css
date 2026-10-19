@@ -1,0 +1,151 @@
+/* --- ficha rapida, em janela sobre a consulta --- */
+
+.ficha {
+	width: min(720px, calc(100vw - 32px));
+	max-height: calc(100vh - 48px);
+	padding: 0;
+	border: none;
+	border-radius: 10px;
+	background: var(--cor-superficie);
+	box-shadow: 0 12px 40px rgb(0 0 0 / 28%);
+	color: var(--cor-texto);
+	/* Com muitas formacoes e certificados, rola por dentro da janela. */
+	overflow-y: auto;
+}
+
+.ficha::backdrop {
+	background: rgb(0 0 0 / 45%);
+}
+
+.ficha-conteudo {
+	padding: 20px;
+}
+
+.ficha section {
+	margin-top: 16px;
+	padding-top: 14px;
+	border-top: 1px solid var(--cor-borda);
+}
+
+.ficha h3 {
+	margin: 0 0 8px;
+	color: var(--cor-texto-suave);
+	font-size: 0.8rem;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+}
+
+.ficha .endereco {
+	margin: 0;
+	font-size: 0.9rem;
+	line-height: 1.5;
+}
+
+.vazio-ficha {
+	margin: 0;
+	color: var(--cor-texto-suave);
+	font-size: 0.86rem;
+}
+
+.ficha header {
+	display: flex;
+	align-items: baseline;
+	gap: 12px;
+	margin-bottom: 14px;
+}
+
+.ficha h2 {
+	margin: 0;
+	font-size: 1.05rem;
+}
+
+.ficha header .link {
+	margin-left: auto;
+}
+
+.ficha dl {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	gap: 6px 18px;
+	margin: 0;
+	font-size: 0.9rem;
+}
+
+.ficha dt {
+	font-weight: 600;
+	color: var(--cor-texto-suave);
+}
+
+.ficha dd {
+	margin: 0;
+}
+
+.lista-ficha {
+	margin: 0;
+	padding: 0;
+	font-size: 0.9rem;
+	list-style: none;
+}
+
+.lista-ficha li + li {
+	margin-top: 6px;
+}
+
+.lista-ficha strong {
+	font-weight: 600;
+}
+
+.lista-ficha .selo {
+	margin-left: 6px;
+}
+
+.lista-ficha .detalhe {
+	margin-left: 6px;
+	color: var(--cor-texto-suave);
+	font-size: 0.8rem;
+}
+
+/* Detalhe longo vai para a linha de baixo. */
+.formacoes .detalhe,
+.certificados .detalhe,
+.vinculos .detalhe {
+	display: block;
+	margin-left: 0;
+}
+
+.certificados a {
+	font-size: 0.8rem;
+}
+
+.nota {
+	margin: 16px 0 0;
+	font-size: 0.78rem;
+	color: var(--cor-texto-suave);
+	line-height: 1.5;
+}
+
+.mono {
+	font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+
+.link {
+	padding: 0;
+	border: 0;
+	background: none;
+	color: var(--cor-primaria);
+	font: inherit;
+	font-size: 0.86rem;
+	text-decoration: underline;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.aviso {
+	margin: 0 0 14px;
+	padding: 9px 10px;
+	border-radius: 6px;
+	background: var(--cor-aviso-fundo);
+	color: var(--cor-aviso);
+	font-size: 0.82rem;
+	line-height: 1.5;
+}

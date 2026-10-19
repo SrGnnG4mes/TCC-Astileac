@@ -14,7 +14,10 @@ import {
 	Vinculo
 } from '../modelos';
 import { naoFutura, DATA_MINIMA, hoje } from '../validadores';
-import { ContatoPipe, DataBrPipe } from '../formatos';
+import {
+	CepPipe, ContatoPipe, DataBrPipe, SeloCertificadoPipe, SituacaoDoCertificado, situacaoDoCertificado
+} from '../formatos';
+import { Area } from '../areas';
 
 /**
  * Tudo que pende de um profissional: contatos, endereco, areas de
@@ -41,7 +44,7 @@ import { ContatoPipe, DataBrPipe } from '../formatos';
  */
 @Component({
 	selector: 'app-ficha-vinculos',
-	imports: [ReactiveFormsModule, ContatoPipe, DataBrPipe],
+	imports: [ReactiveFormsModule, CepPipe, ContatoPipe, DataBrPipe, SeloCertificadoPipe],
 	templateUrl: './ficha-vinculos.html',
 	styleUrl: './ficha-vinculos.css'
 })
@@ -56,6 +59,14 @@ export class FichaVinculos implements OnInit {
 
 	/** Dono dos registros. Vem da rota (diretoria) ou da sessao (associado). */
 	readonly profissionalId = input.required<number>();
+
+	/**
+	 * Area da tela que usa a ficha: a ficha da diretoria ou o "Meu cadastro"
+	 * do associado. E ela, e nao o perfil da conta, que decide se aparecem as
+	 * acoes da diretoria -- um diretor no proprio cadastro esta ali como
+	 * associado.
+	 */
+	readonly area = input.required<Area>();
 
 	private readonly formBuilder = inject(FormBuilder);
 	private readonly profissionais = inject(ProfissionalService);
@@ -243,10 +254,6 @@ export class FichaVinculos implements OnInit {
 	}
 
 	/** CEP para exibicao: "69900000" vira "69900-000". */
-	cepFormatado(cep: string): string {
-		return cep.length === 8 ? `${cep.slice(0, 5)}-${cep.slice(5)}` : cep;
-	}
-
 	// ---------- contatos (RF03) ----------
 
 	adicionarContato(): void {
@@ -428,23 +435,21 @@ export class FichaVinculos implements OnInit {
 
 	// ---------- documento e reconhecimento (Passo 8 / RF13) ----------
 
-	/** Só a diretoria reconhece; o titular anexa e baixa o próprio. */
-	readonly eAdmin = computed(() => this.autenticacao.usuario()?.perfil === 'ADMIN');
+	/**
+	 * So a diretoria da o visto, e so na area da diretoria: no "Meu
+	 * cadastro" de um diretor o botao nao aparece, porque ali ele e o
+	 * associado, dono do documento. O titular anexa e baixa o proprio.
+	 */
+	readonly podeDarVisto = computed(() =>
+		this.area() === 'diretoria' && this.autenticacao.usuario()?.perfil === 'ADMIN');
 
 	urlDoDocumento(certificadoId: number): string {
 		return this.profissionais.urlDoDocumento(this.profissionalId(), certificadoId);
 	}
 
-	/**
-	 * Estado do certificado, derivado -- nao ha campo de situacao no
-	 * back-end, e nao deveria haver: seria estado duplicado, podendo
-	 * divergir de `temDocumento` e `validadoEm`.
-	 */
-	situacao(certificado: Certificado): 'declarado' | 'enviado' | 'reconhecido' {
-		if (!certificado.temDocumento) {
-			return 'declarado';
-		}
-		return certificado.validadoEm ? 'reconhecido' : 'enviado';
+	/** Estado do certificado, que da a cor do selo (ver core/formatos). */
+	situacao(certificado: Certificado): SituacaoDoCertificado {
+		return situacaoDoCertificado(certificado);
 	}
 
 	anexarDocumento(certificadoId: number, evento: Event): void {

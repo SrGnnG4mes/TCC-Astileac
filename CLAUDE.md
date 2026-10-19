@@ -801,7 +801,7 @@ Testes de integração: `CREATE DATABASE astileac_teste;` (o Flyway aplica as mi
 >   ser vários e a formação é opcional; e `USUARIO` exigia profissional, mas a conta de
 >   instalação não tem.
 
-> **Testes do front-end** (Vitest, pelo builder `@angular/build:unit-test`; 35 nesta rodada, 56 depois do site e dos ajustes, 61 com os contatos na ficha rápida).
+> **Testes do front-end** (Vitest, pelo builder `@angular/build:unit-test`; 35 nesta rodada, 56 depois do site e dos ajustes, 61 com os contatos na ficha rápida, 72 com a janela, as áreas separadas e a ficha completa na janela).
 > Antes havia só o teste gerado pelo Angular. Escolhidos pelo que já deu errado, não por
 > cobertura: cada defeito encontrado rodando o front-end virou um caso.
 > - **Ordem das requisições do login:** CSRF antes, POST como formulário, CSRF de novo
@@ -909,6 +909,36 @@ Testes de integração: `CREATE DATABASE astileac_teste;` (o Flyway aplica as mi
 >   (`core/formatos.ts`), usado pelas duas telas. Sem mudança no back-end: a tela chama o
 >   endpoint de contatos que já existia, e esse acesso entra no registro do RF11 como
 >   qualquer outro.
+> - **A ficha rápida abre numa janela sobre a consulta**, e não mais no fim da página.
+>   Usa o `<dialog>` nativo com `showModal()`: o navegador já prende o foco na janela,
+>   fecha com Esc, escurece o fundo e devolve o foco ao "Ver ficha" — sem biblioteca. O
+>   jsdom dos testes não implementa `showModal`; o teste põe um substituto mínimo.
+> - **A ficha rápida mostra tudo o que é cadastrado**, só para leitura, na ordem da ficha
+>   completa: identificação (com o Lattes), contatos, endereço, áreas, formações,
+>   certificados (selo, formação que comprova, quem deu o visto, link do documento) e
+>   vínculos. Virou componente próprio (`profissionais/ficha-rapida/`): era uma tela
+>   dentro da outra, e o CSS da consulta já passava do limite de 4 kB por componente.
+>   Lê cada parte pelo próprio endpoint, e **não** pela exportação do RF10: exportar é
+>   ato distinto de consultar e ficaria registrado como exportação no registro de acesso
+>   do titular. O selo do certificado e o CEP formatado viraram pipes em `core/formatos.ts`
+>   (`SeloCertificadoPipe`, `CepPipe`), usados pelas duas fichas — as palavras dos selos
+>   foram acertadas com a diretoria e não podem divergir entre telas.
+> - **Áreas da diretoria e do associado separadas** (o autor teve dificuldade real de
+>   usar: um diretor, que também é associado, via os dois menus misturados numa linha só).
+>   Cada rota declara a sua área (`data.area`, `core/areas.ts`); a barra mostra no topo a
+>   conta e, para quem tem as duas áreas, o seletor "Diretoria | Minha área", e abaixo uma
+>   faixa com o nome da área e **só o menu dela**, com cor própria (verde-claro e
+>   amarelo-claro; nome escrito, não só cor). Na troca de senha, que não é de área
+>   nenhuma, a faixa continua na última área visitada.
+>   **A mesma mistura existia dentro das telas compartilhadas, decidida pelo perfil da
+>   conta:** um diretor via "Dar visto no documento" nos **próprios** certificados, no
+>   "Meu cadastro"; e a diretoria, ao abrir os dados de um titular pela consulta, lia
+>   "Meus dados pessoais" e "Baixar meus dados" sobre outra pessoa. Agora é a **área da
+>   rota**, e não o perfil, que decide: o `FichaVinculos` recebe a área, e a tela de dados
+>   pessoais fala do titular em terceira pessoa na área da diretoria. A rota
+>   `/profissionais/:id/dados-pessoais` ganhou o `adminGuard`, como as demais da área.
+>   **Em aberto:** o back-end ainda deixa um diretor dar visto no próprio documento pela
+>   API; a tela não oferece mais, mas a regra de negócio é decisão a confirmar.
 
 > **Diagramas do TCC** (`docs/diagramas/`, out/2026). Guia de uso no `README.md` da pasta.
 > - **DER atualizado:** tipos com tamanho, colunas opcionais indicadas, linha cheia só no

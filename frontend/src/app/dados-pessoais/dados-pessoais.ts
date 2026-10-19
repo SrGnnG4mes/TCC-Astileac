@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { areaDaRota } from '../core/areas';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AutenticacaoService } from '../core/autenticacao.service';
 import { Barra } from '../core/barra/barra';
@@ -32,6 +33,14 @@ export class DadosPessoaisTela {
 	private readonly router = inject(Router);
 
 	readonly usuario = this.autenticacao.usuario;
+
+	/**
+	 * A mesma tela serve ao associado ("Meus dados") e a diretoria, que a
+	 * abre pela consulta para atender ao pedido de um titular. A area da
+	 * rota decide o texto: a diretoria nao le "meus dados" sobre outra
+	 * pessoa, e o diretor nos proprios dados nao ve "voltar a consulta".
+	 */
+	readonly daDiretoria = areaDaRota(this.rota) === 'diretoria';
 
 	readonly profissionalId = signal<number | null>(null);
 	readonly dados = signal<DadosPessoais | null>(null);

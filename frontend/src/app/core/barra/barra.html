@@ -7,22 +7,39 @@
 	</span>
 
 	@if (usuario(); as eu) {
-		<nav>
-			@if (eu.perfil === 'ADMIN') {
-				<a routerLink="/profissionais" routerLinkActive="ativo">Profissionais</a>
-				<a routerLink="/areas-atuacao" routerLinkActive="ativo">Áreas</a>
-				<a routerLink="/convites" routerLinkActive="ativo">Convites</a>
-				<a routerLink="/contas" routerLinkActive="ativo">Contas</a>
-			}
-			@if (eu.profissionalId) {
-				<a routerLink="/meu-cadastro" routerLinkActive="ativo">Meu cadastro</a>
-				<a routerLink="/dados-pessoais" routerLinkActive="ativo">Meus dados</a>
-			}
-			<a routerLink="/minha-senha" routerLinkActive="ativo">Alterar senha</a>
-		</nav>
+		@if (temAsDuasAreas()) {
+			<nav class="areas" aria-label="Área do sistema">
+				<a routerLink="/profissionais" [class.ativa]="area() === 'diretoria'"
+					[attr.aria-current]="area() === 'diretoria' ? 'true' : null">Diretoria</a>
+				<a routerLink="/painel" [class.ativa]="area() === 'associado'"
+					[attr.aria-current]="area() === 'associado' ? 'true' : null">Minha área</a>
+			</nav>
+		}
 
 		<span class="identidade">{{ eu.login }} &middot; {{ eu.perfil | perfil }}</span>
+		<a class="conta" routerLink="/minha-senha" routerLinkActive="ativo">Alterar senha</a>
 	}
 
 	<button type="button" (click)="sair()">Sair</button>
 </header>
+
+@if (usuario()) {
+	<div class="faixa-area" [class.diretoria]="area() === 'diretoria'" [class.associado]="area() === 'associado'">
+		@if (area() === 'diretoria') {
+			<strong>Área da diretoria</strong>
+			<nav aria-label="Menu da diretoria">
+				<a routerLink="/profissionais" routerLinkActive="ativo">Consulta de profissionais</a>
+				<a routerLink="/areas-atuacao" routerLinkActive="ativo">Áreas de atuação</a>
+				<a routerLink="/convites" routerLinkActive="ativo">Convites</a>
+				<a routerLink="/contas" routerLinkActive="ativo">Contas de acesso</a>
+			</nav>
+		} @else {
+			<strong>Minha área de associado</strong>
+			<nav aria-label="Menu do associado">
+				<a routerLink="/painel" routerLinkActive="ativo">Início</a>
+				<a routerLink="/meu-cadastro" routerLinkActive="ativo">Meu cadastro</a>
+				<a routerLink="/dados-pessoais" routerLinkActive="ativo">Meus dados pessoais</a>
+			</nav>
+		}
+	</div>
+}

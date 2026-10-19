@@ -2,16 +2,23 @@
 
 
 <main class="conteudo">
-	@if (usuario()?.perfil === 'ADMIN') {
+	@if (daDiretoria) {
 		<a class="voltar" routerLink="/profissionais">&larr; Voltar à consulta</a>
-	}
 
-	<h1>Meus dados pessoais</h1>
-	<p class="ajuda">
-		A Lei Geral de Proteção de Dados (Lei 13.709/2018, art. 18) garante a você
-		o direito de acessar os dados que a associação guarda a seu respeito, levá-los
-		consigo, corrigi-los e pedir que sejam eliminados.
-	</p>
+		<h1>Dados pessoais do titular</h1>
+		<p class="ajuda">
+			Atendimento aos direitos do titular (Lei 13.709/2018, art. 18): quando o próprio
+			associado pede à diretoria, daqui se exporta tudo o que a associação guarda sobre
+			ele e se registra o pedido de eliminação.
+		</p>
+	} @else {
+		<h1>Meus dados pessoais</h1>
+		<p class="ajuda">
+			A Lei Geral de Proteção de Dados (Lei 13.709/2018, art. 18) garante a você
+			o direito de acessar os dados que a associação guarda a seu respeito, levá-los
+			consigo, corrigi-los e pedir que sejam eliminados.
+		</p>
+	}
 
 	@if (erro()) {
 		<p class="erro" role="alert">{{ erro() }}</p>
@@ -39,7 +46,9 @@
 		<section class="bloco">
 			<header>
 				<h2>Identificação</h2>
-				<button type="button" (click)="baixar()">Baixar meus dados (JSON)</button>
+				<button type="button" (click)="baixar()">
+					{{ daDiretoria ? 'Baixar os dados do titular (JSON)' : 'Baixar meus dados (JSON)' }}
+				</button>
 			</header>
 
 			<dl>
@@ -56,8 +65,13 @@
 			</dl>
 
 			<p class="nota">
-				O CPF aparece inteiro porque quem recebe esta página é o próprio titular —
-				mascará-lo aqui não protegeria ninguém. Na listagem da diretoria ele vem mascarado.
+				@if (daDiretoria) {
+					O CPF aparece inteiro porque esta página serve para atender ao próprio
+					titular. Na listagem da consulta ele vem mascarado.
+				} @else {
+					O CPF aparece inteiro porque quem recebe esta página é o próprio titular —
+					mascará-lo aqui não protegeria ninguém. Na listagem da diretoria ele vem mascarado.
+				}
 			</p>
 		</section>
 
@@ -80,10 +94,10 @@
 
 	@if (registro(); as r) {
 		<section class="bloco">
-			<h2>Quem acessou os seus dados</h2>
+			<h2>{{ daDiretoria ? 'Quem acessou os dados deste titular' : 'Quem acessou os seus dados' }}</h2>
 			<p class="ajuda">
-				Toda operação bem-sucedida sobre os seus dados fica registrada, com autor,
-				data e ação (art. 46).
+				Toda operação bem-sucedida sobre {{ daDiretoria ? 'os dados dele' : 'os seus dados' }}
+				fica registrada, com autor, data e ação (art. 46).
 			</p>
 
 			@if (r.content.length === 0) {
@@ -120,22 +134,32 @@
 
 	@if (dados() && !exclusao()) {
 		<section class="bloco perigo">
-			<h2>Pedir a eliminação dos meus dados</h2>
+			<h2>{{ daDiretoria ? 'Registrar o pedido de eliminação do titular' : 'Pedir a eliminação dos meus dados' }}</h2>
 
 			@if (!confirmando()) {
-				<p>
-					O pedido não apaga nada de imediato: o cadastro é bloqueado e deixa de
-					aparecer nas consultas, e os dados ficam guardados por 30 dias, caso você
-					mude de ideia ou a associação precise fazer alguma consulta nesse período.
-					Depois desse prazo a exclusão é definitiva e não há como desfazer.
-				</p>
+				@if (daDiretoria) {
+					<p>
+						Use só quando o próprio titular pedir a eliminação à diretoria. O pedido não
+						apaga nada de imediato: o cadastro é bloqueado e deixa de aparecer nas
+						consultas, e os dados ficam guardados por 30 dias, em que o pedido pode ser
+						cancelado. Depois desse prazo a exclusão é definitiva.
+					</p>
+				} @else {
+					<p>
+						O pedido não apaga nada de imediato: o cadastro é bloqueado e deixa de
+						aparecer nas consultas, e os dados ficam guardados por 30 dias, caso você
+						mude de ideia ou a associação precise fazer alguma consulta nesse período.
+						Depois desse prazo a exclusão é definitiva e não há como desfazer.
+					</p>
+				}
 				<button type="button" class="perigoso" (click)="pedirConfirmacao()">
-					Quero pedir a eliminação
+					{{ daDiretoria ? 'Registrar o pedido do titular' : 'Quero pedir a eliminação' }}
 				</button>
 			} @else {
 				<p class="confirma">
 					Confirma o pedido de eliminação? O cadastro será bloqueado imediatamente.
-					Você ainda poderá cancelar durante os 30 dias.
+					{{ daDiretoria ? 'O pedido ainda poderá ser cancelado' : 'Você ainda poderá cancelar' }}
+					durante os 30 dias.
 				</p>
 				<div class="acoes">
 					<button type="button" class="perigoso" (click)="solicitarExclusao()">

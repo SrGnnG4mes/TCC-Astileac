@@ -74,7 +74,7 @@
 					{{ e.logradouro }}, {{ e.numero }}
 					@if (e.complemento) { &middot; {{ e.complemento }} }
 					<br />
-					{{ e.bairro }} &middot; {{ e.cidade }}/{{ e.uf }} &middot; CEP {{ cepFormatado(e.cep) }}
+					{{ e.bairro }} &middot; {{ e.cidade }}/{{ e.uf }} &middot; CEP {{ e.cep | cep }}
 				</p>
 				<div class="acoes-linha">
 					<button type="button" class="link" (click)="abrirEndereco()">Alterar</button>
@@ -267,17 +267,7 @@
 					<div class="cabecalho">
 						<span class="nome">{{ certificado.titulo }}</span>
 
-						@switch (situacao(certificado)) {
-							@case ('declarado') {
-								<span class="selo declarado">sem documento (opcional)</span>
-							}
-							@case ('enviado') {
-								<span class="selo enviado">documento anexado</span>
-							}
-							@case ('reconhecido') {
-								<span class="selo reconhecido">documento visto</span>
-							}
-						}
+						<span [class]="'selo ' + situacao(certificado)">{{ certificado | seloCertificado }}</span>
 
 						<button type="button" class="link" (click)="removerCertificado(certificado.id)">
 							Remover
@@ -320,12 +310,12 @@
 								(change)="anexarDocumento(certificado.id, $event)" />
 						</label>
 
-						@if (eAdmin() && certificado.temDocumento && !certificado.validadoEm) {
+						@if (podeDarVisto() && certificado.temDocumento && !certificado.validadoEm) {
 							<button type="button" class="link destaque" (click)="reconhecer(certificado.id)">
 								Dar visto no documento
 							</button>
 						}
-						@if (eAdmin() && certificado.validadoEm) {
+						@if (podeDarVisto() && certificado.validadoEm) {
 							<button
 								type="button"
 								class="link"

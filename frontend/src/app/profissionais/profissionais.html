@@ -79,7 +79,7 @@
 								</span>
 							</td>
 							<td class="acoes-linha">
-								<button type="button" class="link" (click)="abrirFicha(profissional.id)">
+								<button type="button" class="link" (click)="fichaRapida().abrir(profissional.id)">
 									Ver ficha
 								</button>
 								<a class="link" [routerLink]="['/profissionais', profissional.id, 'editar']">
@@ -110,56 +110,5 @@
 		}
 	}
 
-	@if (ficha(); as f) {
-		<section class="ficha">
-			<header>
-				<h2>{{ f.nome }}</h2>
-				<button type="button" class="link" (click)="fecharFicha()">Fechar</button>
-			</header>
-
-			@if (f.dataExclusaoSolicitada) {
-				<p class="aviso">
-					Este cadastro tem pedido de eliminação registrado em
-					{{ f.dataExclusaoSolicitada | dataBr }} e está bloqueado.
-				</p>
-			}
-
-			<dl>
-				<dt>CPF</dt>
-				<dd class="mono">{{ f.cpf }}</dd>
-				<dt>Nascimento</dt>
-				<dd>{{ f.dataNascimento | dataBr }}</dd>
-				<dt>Associação</dt>
-				<dd>{{ f.dataAssociacao | dataBr }}</dd>
-				<dt>Situação</dt>
-				<dd>{{ f.ativo ? 'ativo' : 'inativo' }}</dd>
-				<dt>Contatos</dt>
-				<dd>
-					@if (contatosDaFicha().length === 0) {
-						nenhum registrado
-					} @else {
-						<ul class="contatos">
-							@for (contato of contatosDaFicha(); track contato.id) {
-								<li>
-									@if (contato.tipo === 'EMAIL') {
-										<a [href]="'mailto:' + contato.valor">{{ contato | contato }}</a>
-									} @else {
-										{{ contato | contato }}
-									}
-									<span class="detalhe">
-										{{ contato.tipo === 'EMAIL' ? 'e-mail' : 'telefone' }}{{ contato.principal ? ', principal' : '' }}
-									</span>
-								</li>
-							}
-						</ul>
-					}
-				</dd>
-			</dl>
-
-			<p class="nota">
-				O CPF aparece completo aqui, e mascarado na listagem: a consulta individual
-				tem finalidade que justifica o dado inteiro, a listagem não.
-			</p>
-		</section>
-	}
+	<app-ficha-rapida (falhou)="erro.set($event)" />
 </main>
