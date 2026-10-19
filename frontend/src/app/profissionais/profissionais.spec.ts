@@ -2,7 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { Pagina, ProfissionalResumo } from '../core/modelos';
+import { Contato, Pagina, ProfissionalFicha, ProfissionalResumo } from '../core/modelos';
 import { Profissionais } from './profissionais';
 
 /**
@@ -56,5 +56,41 @@ describe('Profissionais', () => {
 		expect(consulta.request.params.get('area')).toBe('juridica');
 		expect(consulta.request.params.has('ativo')).toBe(false);
 		consulta.flush(resposta);
+	});
+
+	it('ver ficha mostra os contatos, o principal primeiro e o e-mail como link', () => {
+		const ficha: ProfissionalFicha = {
+			id: 1, nome: 'Maria Silva', cpf: '52998224725', dataNascimento: '1990-05-10',
+			dataAssociacao: '2026-10-01', ativo: true, dataExclusaoSolicitada: null, lattesUrl: null
+		};
+		const contatos: Contato[] = [
+			{ id: 7, tipo: 'TELEFONE', valor: '68999998888', principal: false },
+			{ id: 8, tipo: 'EMAIL', valor: 'maria@exemplo.org', principal: true }
+		];
+
+		fixture.componentInstance.abrirFicha(1);
+		http.expectOne('/api/profissionais/1').flush(ficha);
+		http.expectOne('/api/profissionais/1/contatos').flush(contatos);
+		fixture.detectChanges();
+
+		const tela = fixture.nativeElement as HTMLElement;
+		const itens = Array.from(tela.querySelectorAll('.ficha .contatos li')).map(li => li.textContent ?? '');
+		expect(itens.length).toBe(2);
+		expect(itens[0]).toContain('maria@exemplo.org');
+		expect(itens[0]).toContain('principal');
+		expect(itens[1]).toContain('(68) 99999-8888');
+		expect(tela.querySelector('.ficha a[href="mailto:maria@exemplo.org"]')).not.toBeNull();
+	});
+
+	it('ficha sem contato diz que nao ha nenhum registrado', () => {
+		fixture.componentInstance.abrirFicha(2);
+		http.expectOne('/api/profissionais/2').flush({
+			id: 2, nome: 'Joao Pereira', cpf: '11144477735', dataNascimento: '1985-01-20',
+			dataAssociacao: '2026-10-01', ativo: true, dataExclusaoSolicitada: null, lattesUrl: null
+		});
+		http.expectOne('/api/profissionais/2/contatos').flush([]);
+		fixture.detectChanges();
+
+		expect((fixture.nativeElement as HTMLElement).querySelector('.ficha')?.textContent).toContain('nenhum registrado');
 	});
 });

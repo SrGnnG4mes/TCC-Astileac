@@ -15,7 +15,7 @@
 		<ul class="itens">
 			@for (contato of contatos(); track contato.id) {
 				<li>
-					<span class="nome">{{ valorFormatado(contato) }}</span>
+					<span class="nome">{{ contato | contato }}</span>
 					<span class="detalhe">
 						{{ contato.tipo === 'EMAIL' ? 'e-mail' : 'telefone' }}
 						@if (contato.principal) {

@@ -801,7 +801,7 @@ Testes de integração: `CREATE DATABASE astileac_teste;` (o Flyway aplica as mi
 >   ser vários e a formação é opcional; e `USUARIO` exigia profissional, mas a conta de
 >   instalação não tem.
 
-> **Testes do front-end** (Vitest, pelo builder `@angular/build:unit-test`; 35 nesta rodada, 56 depois do site e dos ajustes).
+> **Testes do front-end** (Vitest, pelo builder `@angular/build:unit-test`; 35 nesta rodada, 56 depois do site e dos ajustes, 61 com os contatos na ficha rápida).
 > Antes havia só o teste gerado pelo Angular. Escolhidos pelo que já deu errado, não por
 > cobertura: cada defeito encontrado rodando o front-end virou um caso.
 > - **Ordem das requisições do login:** CSRF antes, POST como formulário, CSRF de novo
@@ -901,6 +901,14 @@ Testes de integração: `CREATE DATABASE astileac_teste;` (o Flyway aplica as mi
 >   fim do "Meu cadastro", que só existe para quem tem cadastro de associado: a conta da
 >   diretoria criada na instalação não tinha onde trocar a senha. Pede a senha atual e a
 >   nova duas vezes.
+> - **A ficha rápida da consulta mostra os contatos** (achado ao montar o roteiro de
+>   validação). Quem encontrava o profissional na consulta do RF08 precisava sair dela e
+>   abrir "Editar" para saber como falar com ele, justamente o passo que dá sentido à
+>   consulta. Agora o "Ver ficha" traz os contatos, o principal primeiro, e o e-mail é
+>   link. A formatação do telefone saiu da ficha completa para o `ContatoPipe`
+>   (`core/formatos.ts`), usado pelas duas telas. Sem mudança no back-end: a tela chama o
+>   endpoint de contatos que já existia, e esse acesso entra no registro do RF11 como
+>   qualquer outro.
 
 > **Diagramas do TCC** (`docs/diagramas/`, out/2026). Guia de uso no `README.md` da pasta.
 > - **DER atualizado:** tipos com tamanho, colunas opcionais indicadas, linha cheia só no

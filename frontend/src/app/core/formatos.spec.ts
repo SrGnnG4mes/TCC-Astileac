@@ -1,4 +1,4 @@
-import { AcaoPipe, DataBrPipe, EntidadePipe, PerfilPipe } from './formatos';
+import { AcaoPipe, ContatoPipe, DataBrPipe, EntidadePipe, PerfilPipe } from './formatos';
 
 describe('DataBrPipe', () => {
 	const formatar = (valor: string | null) => new DataBrPipe().transform(valor);
@@ -35,5 +35,22 @@ describe('rotulos', () => {
 
 	it('a entidade do registro de acesso aparece pelo nome', () => {
 		expect(new EntidadePipe().transform('PROFISSIONAIS')).toBe('Cadastro do profissional');
+	});
+});
+
+describe('ContatoPipe', () => {
+	const formatar = (tipo: 'EMAIL' | 'TELEFONE', valor: string) =>
+		new ContatoPipe().transform({ id: 1, tipo, valor, principal: false });
+
+	it('celular com DDD aparece com parenteses e hifen', () => {
+		expect(formatar('TELEFONE', '68999998888')).toBe('(68) 99999-8888');
+	});
+
+	it('fixo com DDD tambem', () => {
+		expect(formatar('TELEFONE', '6832231234')).toBe('(68) 3223-1234');
+	});
+
+	it('e-mail passa como esta', () => {
+		expect(formatar('EMAIL', 'maria@exemplo.org')).toBe('maria@exemplo.org');
 	});
 });

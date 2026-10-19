@@ -133,6 +133,27 @@
 				<dd>{{ f.dataAssociacao | dataBr }}</dd>
 				<dt>Situação</dt>
 				<dd>{{ f.ativo ? 'ativo' : 'inativo' }}</dd>
+				<dt>Contatos</dt>
+				<dd>
+					@if (contatosDaFicha().length === 0) {
+						nenhum registrado
+					} @else {
+						<ul class="contatos">
+							@for (contato of contatosDaFicha(); track contato.id) {
+								<li>
+									@if (contato.tipo === 'EMAIL') {
+										<a [href]="'mailto:' + contato.valor">{{ contato | contato }}</a>
+									} @else {
+										{{ contato | contato }}
+									}
+									<span class="detalhe">
+										{{ contato.tipo === 'EMAIL' ? 'e-mail' : 'telefone' }}{{ contato.principal ? ', principal' : '' }}
+									</span>
+								</li>
+							}
+						</ul>
+					}
+				</dd>
 			</dl>
 
 			<p class="nota">
