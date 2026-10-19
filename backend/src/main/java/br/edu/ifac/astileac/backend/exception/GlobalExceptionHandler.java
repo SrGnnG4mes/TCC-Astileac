@@ -80,7 +80,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 
 	/**
-	/**
 	 * Acesso negado pelo method security (@PreAuthorize).
 	 *
 	 * Precisa vir ANTES do catch-all: sem este handler, a negacao
@@ -88,10 +87,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	 * transformando uma recusa de seguranca em erro interno, e
 	 * escondendo do cliente que o problema era permissao.
 	 * Descoberto por teste, nao por leitura.
+	 *
+	 * A mensagem nao fala em perfil: aqui chegam tambem as recusas por
+	 * posse do registro (o associado nos dados de outro, o diretor no visto
+	 * do proprio documento), em que o perfil nao e o motivo.
 	 */
 	@ExceptionHandler(AccessDeniedException.class)
 	public ResponseEntity<ErroRespostaDTO> tratarAcessoNegado(AccessDeniedException ex) {
-		return resposta(HttpStatus.FORBIDDEN, "Acesso negado: seu perfil não permite esta operação.");
+		return resposta(HttpStatus.FORBIDDEN, "Acesso negado: você não tem permissão para esta operação.");
 	}
 
 	/**
