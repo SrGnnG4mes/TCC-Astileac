@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ASTILEAC — Apresentação do sistema</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Domine:wght@400..700&family=Nunito+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* ---- Apresentador: um slide de 1920x1080 por vez, escalado para a janela ---- */
+* { margin: 0; box-sizing: border-box; }
+html, body { height: 100%; background: #0B1A12; overflow: hidden; }
+body { font: 32px/1.2 sans-serif; }
+#palco { position: fixed; left: 50%; top: 50%; width: 1920px; height: 1080px; transform-origin: center center; }
+#palco > section { position: absolute; inset: 0; width: 1920px; height: 1080px; overflow: hidden; display: none; }
+#palco > section.atual { display: flex; }
+#palco > section aside { display: none; }
+h1 { font-size: 96px; font-weight: 600; } h2 { font-size: 64px; font-weight: 600; } h3 { font-size: 44px; font-weight: 600; }
+table { width: 100%; border-collapse: separate; border-spacing: 0; border-top: 2px solid #0002; }
+th, td { padding: .35em .6em; text-align: left; border-bottom: 2px solid #0002; }
+/* Setas do diagrama de camadas */
+x-connector.seta { display: block; position: relative; height: 3px; background: currentColor; margin-right: 10px; }
+x-connector.seta::after { content: ""; position: absolute; right: -12px; top: -8px; border-left: 14px solid currentColor; border-top: 9px solid transparent; border-bottom: 9px solid transparent; }
+/* Barra de controle e notas */
+#contador { position: fixed; right: 16px; bottom: 12px; font: 14px Arial, sans-serif; color: #9FB8A8; z-index: 2; }
+#notas { position: fixed; left: 0; right: 0; bottom: 0; max-height: 38vh; overflow: auto; background: #10261Aee; color: #E8F2EA; font: 18px/1.5 Arial, sans-serif; padding: 16px 24px 36px; white-space: pre-wrap; display: none; z-index: 3; }
+body.com-notas #notas { display: block; }
+</style>
+<style>
+:root {
+  --escuro: #10261A;
+  --claro: #F7F6EF;
+  --claro2: #ECEFE4;
+  --verde: #02703D;
+  --verde-marca: #04A75A;
+  --amarelo: #FEF013;
+  --vermelho: #AA2428;
+  --vermelho-marca: #EC3238;
+  --texto: #2B3A31;
+  --texto-suave: #4E5E54;
+  --texto-claro: #D5E6DA;
+  --linha: #C9D1C3;
+}
+
+body { font-family: 'Nunito Sans', Arial, sans-serif; color: var(--texto); }
+
+section {
+  background: var(--claro);
+  padding: 128px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  font-family: 'Nunito Sans', Arial, sans-serif;
+  color: var(--texto);
+}
+section.tom2 { background: var(--claro2); }
+section.escuro { background: var(--escuro); color: var(--texto-claro); }
+section.destaque { background: var(--amarelo); color: var(--escuro); }
+
+/* Faixa com as tres cores da logo (bandeira do Acre), so decorativa */
+.faixa {
+  position: absolute; left: 0; top: 0; width: 1920px; height: 14px;
+  background: linear-gradient(90deg, #04A75A 0%, #04A75A 33.3%, #FEF013 33.3%, #FEF013 66.6%, #EC3238 66.6%, #EC3238 100%);
+}
+
+.cabeca { display: flex; flex-direction: column; gap: 16px; }
+.olho {
+  font-size: 24px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--verde);
+}
+section.escuro .olho { color: var(--amarelo); }
+h1, h2, h3 { font-family: 'Domine', Georgia, serif; color: var(--escuro); }
+section.escuro h1, section.escuro h2, section.escuro h3 { color: #F7F6EF; }
+h2 { font-size: 60px; font-weight: 700; line-height: 1.15; }
+h3 { font-size: 34px; font-weight: 700; line-height: 1.2; }
+.corpo { font-size: 30px; line-height: 1.45; color: var(--texto-suave); }
+.miudo { font-size: 24px; line-height: 1.4; color: var(--texto-suave); }
+
+/* Cartoes */
+.linha-cartoes { display: flex; gap: 32px; }
+.grade3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 28px; }
+.grade2 { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+.cartao {
+  flex: 1; background: #FFFFFF; border: 2px solid var(--linha); border-radius: 18px;
+  padding: 36px; display: flex; flex-direction: column; gap: 14px;
+}
+.cartao.verde { border-top: 10px solid var(--verde-marca); }
+.cartao.amarelo { border-top: 10px solid #D9C800; }
+.cartao.vermelho { border-top: 10px solid var(--vermelho-marca); }
+.cartao h3 { font-size: 32px; }
+.cartao .corpo { font-size: 26px; }
+
+/* Tabelas */
+table { font-size: 26px; color: var(--texto); width: 100%; }
+tr.topo { background: var(--escuro); color: #F7F6EF; }
+tr.par { background: #FFFFFF; }
+
+/* Numeros grandes */
+.numero { font-family: 'Domine', Georgia, serif; font-size: 112px; font-weight: 700; line-height: 1; color: var(--verde); }
+.rotulo { font-size: 26px; line-height: 1.35; color: var(--texto-suave); }
+
+/* Codigo */
+.codigo {
+  font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 24px; line-height: 1.5;
+  background: var(--escuro); color: #E8F2EA; border-radius: 12px; padding: 24px 28px;
+}
+
+/* Diagrama de camadas */
+.camadas { display: flex; align-items: stretch; }
+.camada {
+  width: 214px; background: #FFFFFF; border: 2px solid var(--verde); border-radius: 14px;
+  padding: 32px 16px; display: flex; flex-direction: column; justify-content: center; gap: 8px;
+}
+.camada .nome { font-size: 26px; font-weight: 700; color: var(--escuro); text-align: center; }
+.camada .papel { font-size: 24px; line-height: 1.3; color: var(--texto-suave); text-align: center; }
+.camada.banco { background: var(--escuro); border-color: var(--escuro); }
+.camada.banco .nome { color: #F7F6EF; }
+.camada.banco .papel { color: var(--texto-claro); }
+x-connector.seta { width: 44px; align-self: center; color: var(--verde); border-width: 3px; }
+
+/* Selos de tabela do modelo */
+.tabela-bd {
+  background: #FFFFFF; border: 2px solid var(--linha); border-radius: 12px; padding: 24px 18px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.tabela-bd .nome { font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 24px; font-weight: 600; color: var(--escuro); }
+.tabela-bd .card { font-size: 24px; color: var(--texto-suave); }
+.tabela-bd.centro { background: var(--verde); border-color: var(--verde); }
+.tabela-bd.centro .nome { color: #FFFFFF; }
+.tabela-bd.centro .card { color: #E3F3E8; }
+
+.chamada {
+  background: var(--escuro); border-radius: 18px; padding: 40px; display: flex; flex-direction: column; gap: 18px;
+}
+.chamada h3 { color: var(--amarelo); }
+.chamada .corpo { font-size: 26px; color: var(--texto-claro); }
+
+/* Passos */
+.passo { display: flex; gap: 24px; align-items: flex-start; }
+.bolinha {
+  width: 56px; height: 56px; border-radius: 28px; background: var(--verde); color: #FFFFFF;
+  font-size: 28px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+
+/* Capa e fim */
+.capa-titulo { font-size: 96px; line-height: 1.08; font-weight: 700; color: #F7F6EF; }
+.capa-sub { font-size: 36px; line-height: 1.35; color: var(--texto-claro); }
+.capa-dados { font-size: 26px; line-height: 1.5; color: var(--texto-claro); }
+
+.citacao { font-family: 'Domine', Georgia, serif; font-size: 72px; line-height: 1.2; font-weight: 700; color: var(--escuro); }
+
+/* Chegada: o conteudo sobe e aparece, um bloco por vez */
+@keyframes sobe { from { opacity: 0; transform: translateY(24px); } }
+.entra { animation: sobe 500ms ease-out both; animation-delay: calc(var(--i, 0) * 120ms); }
+</style>
+</head>
+<body>
+<div id="palco">
+<section id="capa" class="escuro" style="justify-content:center; gap:48px">
+<div class="faixa"></div>
+<div style="display:flex; align-items:center; gap:72px">
+<img src="logo-astileac.webp" alt="" style="width:300px; height:288px; object-fit:contain; background:#F7F6EF; border-radius:28px; padding:24px">
+<div style="display:flex; flex-direction:column; gap:28px; flex:1">
+<p class="olho">Laboratório de Desenvolvimento de Software</p>
+<h1 class="capa-titulo">ASTILEAC</h1>
+<p class="capa-sub">Sistema de cadastro e gestão dos tradutores e intérpretes de Libras do Acre</p>
+</div>
+</div>
+<p class="capa-dados">Gabriel Nascimento Nogueira · Tecnologia em Sistemas para Internet · IFAC, Campus Rio Branco<br>Orientador: Prof. Dr. Marlon Amaro Coelho Teixeira · novembro de 2026</p>
+<aside>[0:00–0:15] “Este é o ASTILEAC, o sistema que desenvolvo como TCC para a associação dos tradutores e intérpretes de Libras do Acre. Em dez minutos: o problema, como foi construído, uma demonstração e o que aprendi.”
+
+TEMPO TOTAL: 10 min. Marcos: entrar na demonstração (slide 6) até 3:30. Se chegar lá depois de 4:30, pule o passo 4 da demo. Às 6:30 você deve estar no slide do convite e às 8:45 no de testes.
+
+ANTES DE COMEÇAR (checklist): PostgreSQL rodando; back-end no ar em :8080 (apontado para o banco de demonstração); front-end no ar em :4200; navegador aberto já no site público (localhost:4200); senha da conta de demonstração à mão, fora da tela projetada; um PDF de exemplo (Postman/certificado-exemplo.pdf) caso queira anexar documento.</aside>
+</section>
+<section id="problema">
+<div class="faixa"></div>
+<div class="cabeca">
+<p class="olho">O problema</p>
+<h2>Os dados dos associados estão espalhados em planilhas e papel</h2>
+</div>
+<div class="linha-cartoes">
+<div class="cartao verde entra" style="--i:1"><h3>Difícil de atualizar</h3><p class="corpo">Formações, certificados, áreas e contatos mudam, e cada mudança depende de alguém editar a planilha certa.</p></div>
+<div class="cartao amarelo entra" style="--i:2"><h3>Pouco confiável</h3><p class="corpo">Não se sabe qual cópia é a atual, nem se o certificado declarado tem documento.</p></div>
+<div class="cartao vermelho entra" style="--i:3"><h3>Lento na hora da demanda</h3><p class="corpo">Achar quem atende numa área específica significa varrer a planilha à mão.</p></div>
+</div>
+<div style="flex:1"></div>
+<p class="corpo entra" style="--i:4; border-left:8px solid var(--verde-marca); padding-left:28px; color:var(--escuro)"><b>Desde a Lei 14.704/2023,</b> formação e certificado comprovam a habilitação: por isso são o núcleo do sistema.</p>
+<aside>[0:15–1:00] Hoje o cadastro dos associados está em planilhas e papel. Atualizar dá trabalho, não se sabe qual cópia vale, e quando chega uma demanda — um tribunal, uma escola, um hospital — achar quem atende naquela área é lento. E não é só uma agenda de contatos: a Lei 14.704 de 2023 detalhou a titulação exigida para exercer a profissão, então formação e certificado são o dado que o sistema existe para tornar confiável.</aside>
+</section>
+<section id="requisitos">
+<div class="faixa"></div>
+<div class="cabeca">
+<p class="olho">O que o sistema faz</p>
+<h2>13 requisitos funcionais, em cinco grupos</h2>
+</div>
+<table>
+<tr class="topo"><th style="width:22%">Grupo</th><th style="width:16%">Requisitos</th><th style="width:62%">O que entrega</th></tr>
+<tr class="par"><td><b>Cadastro</b></td><td>RF01 a RF07</td><td>Identificação, endereço, contatos, áreas de atuação, formações, certificados e vínculos</td></tr>
+<tr><td><b>Consulta</b></td><td>RF08</td><td>Encontrar profissionais por área de atuação, nome e situação</td></tr>
+<tr class="par"><td><b>Acesso</b></td><td>RF09, RF12</td><td>Login com perfil (diretoria ou associado), cadastro por convite, troca de senha</td></tr>
+<tr><td><b>LGPD</b></td><td>RF10, RF11</td><td>Titular exporta os próprios dados e pede a eliminação; registro de quem acessou</td></tr>
+<tr class="par"><td><b>Documentos</b></td><td>RF13</td><td>PDF do certificado anexado pelo associado e visto da diretoria</td></tr>
+</table>
+<p class="miudo">O RF08 é o mais importante na prática: é como a associação atende uma demanda.</p>
+<aside>[1:00–1:40] Treze requisitos em cinco grupos. Cadastro é o grosso; a consulta por área, RF08, é a razão de existir. Como o sistema guarda dado pessoal, a LGPD entra como requisito: o titular exporta e pede a eliminação dos próprios dados, e todo acesso fica registrado. O RF12 (convites) e o RF13 (documento) não estavam no projeto inicial — vieram das conversas com a diretoria.</aside>
+</section>
+<section id="validacao" class="tom2">
+<div class="faixa"></div>
+<div class="cabeca">
+<p class="olho">Validado com a diretoria da ASTILEAC</p>
+<h2>Quatro conversas mudaram o sistema</h2>
+</div>
+<table>
+<tr class="topo"><th style="width:44%">O que a diretoria disse</th><th style="width:56%">O que mudou no sistema</th></tr>
+<tr class="par"><td>Cada membro terá login próprio</td><td>RF12: contas por convite; o registro de acesso diz quem fez</td></tr>
+<tr><td>O contato com o profissional é fora do sistema</td><td>A consulta localiza; não há agendamento nem pagamento</td></tr>
+<tr class="par"><td>A diretoria desativa, nunca apaga</td><td>Exclusão administrativa removida; só o titular pede eliminação</td></tr>
+<tr><td>Quem olha o documento só confere com o declarado</td><td>“Reconhecido” virou “documento visto”</td></tr>
+<tr class="par"><td>O documento é opcional; vale a boa-fé</td><td>Selo “sem documento (opcional)”, sem cara de pendência</td></tr>
+<tr><td>Quem é da área costuma ter Lattes</td><td>Campo Lattes, aceito só do lattes.cnpq.br</td></tr>
+</table>
+<aside>[1:40–2:30] Apresentei o sistema à diretoria quatro vezes, e cada conversa mudou alguma coisa. Dois exemplos só: cada membro terá login próprio — com um “admin” compartilhado, o registro de acesso da LGPD diria sempre a mesma coisa; daí nasceu o RF12. E eu chamava o documento de “reconhecido”, mas quem olha só confere se bate com o declarado; o sistema não pode afirmar mais do que verificou, então virou “documento visto”.</aside>
+</section>
+<section id="arquitetura" class="tom2" style="justify-content:space-between">
+<div class="faixa"></div>
+<div class="cabeca">
+<p class="olho">Arquitetura e tecnologias</p>
+<h2>Java 21 e Spring Boot 4 atrás, Angular 22 na frente</h2>
+</div>
+<div class="camadas entra" style="--i:1">
+<div class="camada"><p class="nome">Angular 22</p><p class="papel">telas no navegador</p></div>
+<x-connector class="seta" head="end"></x-connector>
+<div class="camada"><p class="nome">Security 7</p><p class="papel">sessão, CSRF, perfil</p></div>
+<x-connector class="seta" head="end"></x-connector>
+<div class="camada"><p class="nome">Controller</p><p class="papel">REST em /api, só DTO</p></div>
+<x-connector class="seta" head="end"></x-connector>
+<div class="camada"><p class="nome">Service</p><p class="papel">regras e transação</p></div>
+<x-connector class="seta" head="end"></x-connector>
+<div class="camada"><p class="nome">Repository</p><p class="papel">Spring Data JPA</p></div>
+<x-connector class="seta" head="end"></x-connector>
+<div class="camada banco"><p class="nome">PostgreSQL</p><p class="papel">11 tabelas, Flyway</p></div>
+</div>
+<div class="grade3 entra" style="--i:2">
+<div class="cartao"><h3>Nunca a entidade</h3><p class="corpo">O controller recebe e devolve DTO. A listagem mostra o CPF mascarado; só a ficha o mostra inteiro.</p></div>
+<div class="cartao"><h3>Um processo só</h3><p class="corpo">Em produção o Spring Boot serve o Angular compilado. A API fica sob /api para não colidir com as rotas das telas.</p></div>
+<div class="cartao"><h3>Registro de acesso</h3><p class="corpo">Um interceptor grava quem consultou ou alterou cada dado, em transação própria.</p></div>
+</div>
+<aside>[2:30–3:30] Falar em 1 minuto: camadas clássica; o controller nunca expõe entidade, sempre DTO (a lista mostra CPF mascarado); o registro de acesso fica num interceptor, então nenhum endpoint esquece de registrar; e o Spring Boot 4 é recente — quase todo tutorial ainda é do 3.x, tive de conferir na documentação oficial. Se perguntarem do banco: 11 tabelas criadas pelo Flyway; áreas de atuação numa tabela associativa, não em colunas booleanas, para área nova não exigir alterar o schema.
+
+Detalhe, se houver pergunta: Arquitetura em camadas clássica. A requisição sai do Angular, passa pelo Spring Security (sessão por cookie, CSRF, perfil), chega ao controller, que nunca expõe entidade JPA — sempre DTO. Isso não é só estética: a listagem usa um DTO com CPF mascarado e a ficha outro com CPF inteiro, o princípio da necessidade da LGPD aplicado na forma do dado. O service tem as regras e as transações; o repository é Spring Data. Duas coisas que não aparecem num diagrama comum: o registro de acesso (RF11) fica num interceptor, então nenhum endpoint novo esquece de registrar; e em produção é um processo só, o Spring Boot serve o Angular, por isso a API mora em /api. Em desenvolvimento o ng serve faz proxy de /api para a porta 8080, e o navegador vê tudo na mesma origem — sem isso o CSRF do Angular não funciona.</aside>
+</section>
+<section id="demo-roteiro">
+<div class="faixa"></div>
+<div class="cabeca">
+<p class="olho">Demonstração ao vivo · 3 minutos · dados fictícios</p>
+<h2>“Preciso de um intérprete para uma audiência judicial.”</h2>
+</div>
+<table>
+<tr class="topo"><th style="width:6%">#</th><th style="width:32%">Onde</th><th style="width:62%">O que mostrar</th></tr>
+<tr class="par"><td>1</td><td>Login da diretoria</td><td>A barra separa “Diretoria” e “Minha área”</td></tr>
+<tr><td>2</td><td>Consulta, área jurídica</td><td>Três ativos; Ana atua em duas áreas e aparece uma vez</td></tr>
+<tr class="par"><td>3</td><td>Ver ficha da Ana</td><td>Janela com contatos, formações e certificados com selo</td></tr>
+<tr><td>4</td><td>Editar o Bruno</td><td>Abrir o PDF do certificado e dar o visto; o selo muda</td></tr>
+<tr class="par"><td>5</td><td>Dados pessoais da Ana</td><td>O registro de acesso já mostra a consulta que acabei de fazer</td></tr>
+</table>
+<aside>[3:30–6:30, no navegador] Deixe o navegador já na tela de login (localhost:4200/login) e com a senha à mão, fora da tela projetada. Cerca de 35 s por passo.
+1) Entrar com a conta da diretoria da demonstração. Mostrar a barra: seletor “Diretoria | Minha área” e a faixa verde com o menu só da diretoria.
+2) Consulta de profissionais → Área: jurídica → Buscar. Três ativos (Ana Paula Ribeiro, Bruno Cavalcante Lima, Isabela Pinto Queiroz). A Ana atua em jurídica e educacional e aparece uma vez só. CPF mascarado na lista.
+3) “Ver ficha” da Ana: a janela abre sobre a consulta. Contatos com o principal primeiro, formações, certificado com selo “documento visto”. Esc fecha. (Se estiver atrasado, pule este passo.)
+4) “Editar” do Bruno → Certificados: selo “documento anexado”. “Dar visto no documento” → vira “documento visto”, com quem e quando. Dizer: o diretor não consegue dar visto no próprio documento, nem pela API.
+5) Voltar à consulta → “Dados pessoais” da Ana → registro de acesso: aparece a conta da diretoria consultando agora há pouco. É o RF11 funcionando.
+Se algo falhar: não depurar ao vivo; voltar aos slides.</aside>
+</section>
+<section id="convite" class="tom2">
+<div class="faixa"></div>
+<div class="cabeca">
+<p class="olho">Como entra um associado novo · RF12</p>
+<h2>Emitir um convite, passo a passo</h2>
+</div>
+<div class="grade2" style="gap:64px">
+<div class="entra" style="--i:1; display:flex; flex-direction:column; gap:22px">
+<h3>Na diretoria</h3>
+<div class="passo"><p class="bolinha">1</p><p class="corpo">Confirmar o pagamento e abrir <b>Diretoria › Convites</b></p></div>
+<div class="passo"><p class="bolinha">2</p><p class="corpo">Digitar o e-mail da pessoa e clicar em <b>Emitir convite</b></p></div>
+<div class="passo"><p class="bolinha">3</p><p class="corpo"><b>Copiar o link na hora:</b> ele aparece uma vez só</p></div>
+<div class="passo"><p class="bolinha">4</p><p class="corpo">Enviar o link à pessoa, por e-mail ou WhatsApp</p></div>
+</div>
+<div class="entra" style="--i:2; display:flex; flex-direction:column; gap:22px">
+<h3>Na pessoa convidada</h3>
+<div class="passo"><p class="bolinha">5</p><p class="corpo">Abrir o link: vale <b>7 dias</b> e serve <b>uma vez</b></p></div>
+<div class="passo"><p class="bolinha">6</p><p class="corpo">Preencher nome, CPF, nascimento, login e senha e clicar em <b>Criar meu cadastro</b></p></div>
+<div class="passo"><p class="bolinha">7</p><p class="corpo">Entrar e completar a ficha em <b>Meu cadastro</b></p></div>
+</div>
+</div>
+<p class="miudo">O banco guarda só o hash SHA-256 do código. A conta nasce como associado; perfil de diretoria só se concede em Contas de acesso.</p>
+<aside>[6:30–7:15] “Como entra um associado novo: ninguém se cadastra sozinho. A diretoria confirma o pagamento e emite um convite para o e-mail da pessoa. O link aparece uma vez só — o banco guarda apenas o hash do código, então não dá para mostrá-lo de novo; se perder, emite-se outro. A pessoa abre o link sem ter conta, preenche os dados e escolhe a própria senha. Tudo é criado numa transação: se der erro, por exemplo CPF já cadastrado, o convite volta a valer. A conta nasce sempre como associado.”
+Se for mostrar ao vivo (só se a demo estiver adiantada): Diretoria › Convites → e-mail @example.org → Emitir convite → Copiar → abrir o link numa janela anônima (Ctrl+Shift+N), para não trocar a sessão da diretoria → preencher com um CPF fictício de dígitos válidos → Criar meu cadastro.
+Se perguntarem: SHA-256 e não BCrypt porque o código tem 256 bits aleatórios (não se quebra por tentativa) e o SHA-256 permite buscar o convite direto pelo índice. Convite inválido, usado ou vencido dá a mesma mensagem, para não revelar que um código existe.</aside>
+</section>
+<section id="decisoes">
+<div class="faixa"></div>
+<div class="cabeca">
+<p class="olho">Decisões técnicas</p>
+<h2>Quatro escolhas e o motivo de cada uma</h2>
+</div>
+<div class="grade2" style="flex:1">
+<div class="cartao verde entra" style="--i:1"><h3>Sessão, não JWT</h3><p class="corpo">Cookie HttpOnly que o JavaScript não lê. Logout com JWT exigiria lista de revogação.</p></div>
+<div class="cartao verde entra" style="--i:2"><h3>EXISTS, não JOIN</h3><p class="corpo">Com JOIN, quem atua em duas áreas sairia duplicado e a paginação contaria errado.</p></div>
+<div class="cartao amarelo entra" style="--i:3"><h3>Apagar, não anonimizar</h3><p class="corpo">Numa base pequena, áreas e formações reidentificam a pessoa. Há 30 dias para desistir.</p></div>
+<div class="cartao amarelo entra" style="--i:4"><h3>PDF conferido</h3><p class="corpo">Nome gerado (UUID) contra path traversal e assinatura %PDF- lida do conteúdo.</p></div>
+</div>
+<aside>[7:15–8:00] Uns dez segundos por cartão. (1) Sessão com cookie e não JWT: JWT resolve escala horizontal, que um sistema interno com um servidor não tem, e logout com JWT precisaria de lista de revogação. (2) EXISTS e não JOIN: foi o que vocês viram na demo — a Ana, em duas áreas, aparece uma vez. (3) LGPD: quando o titular pede a eliminação, o sistema apaga de verdade depois de 30 dias de arrependimento; anonimizar numa base pequena não protege, porque áreas e formações reidentificam a pessoa. (4) Upload: o nome do arquivo é gerado pelo servidor e o conteúdo precisa começar com %PDF- — extensão e content-type são declaração do cliente, não prova.</aside>
+</section>
+<section id="defeitos" class="tom2">
+<div class="faixa"></div>
+<div class="cabeca">
+<p class="olho">O que aprendi</p>
+<h2>Defeitos que só apareceram rodando</h2>
+</div>
+<table>
+<tr class="topo"><th style="width:34%">Defeito</th><th style="width:66%">Causa</th></tr>
+<tr class="par"><td><b>Primeira gravação após o login dava 403</b></td><td>O Spring troca o token CSRF ao autenticar, e o cookie só se renova quando alguém lê o token</td></tr>
+<tr><td><b>Convite de uso único valia para sempre</b></td><td>Um save() regravava a entidade obsoleta por cima do UPDATE em massa</td></tr>
+<tr class="par"><td><b>PDF sobrevivia à exclusão</b></td><td>As linhas eram apagadas e o arquivo ficava no disco, sem nada apontando para ele</td></tr>
+<tr><td><b>CEP com hífen nunca salvava</b></td><td>O validador exigia o formato do banco, mas recebia o que a pessoa digita</td></tr>
+</table>
+<p class="corpo" style="color:var(--escuro)">Nenhum deles era visível nos testes de unidade com repositório simulado. Cada um virou um teste.</p>
+<aside>[8:00–8:45] Contar só os dois primeiros, uns 20 s cada (o do convite liga com o slide anterior). CSRF: o Spring troca o token ao autenticar e o front-end renovava antes do login, não depois; a segunda tentativa funcionava, o que escondia o problema. Convite: um UPDATE em massa marcava o convite como usado, e logo depois um save() regravava a entidade antiga por cima — o convite de uso único valia para sempre. Os testes de unidade passavam e não tinham como pegar; o teste de integração contra PostgreSQL pegou. Os outros dois ficam na tabela.
+
+Detalhe, se houver pergunta: A parte que mais me ensinou. Quatro defeitos que passaram por todos os testes de unidade e só apareceram rodando o sistema de verdade. (1) CSRF: desde o Security 6 o token é resolvido preguiçosamente e o Spring troca o token ao autenticar; o front-end renovava antes do login e não depois. A segunda tentativa funcionava, o que mascarava o problema. Esse mesmo padrão apareceu três vezes (login, primeira escrita, link do convite). (2) O convite: o service fazia um UPDATE em massa (que muda o banco e não a entidade) e depois chamava save() com a entidade obsoleta, zerando o consumo. Os 11 testes de unidade passavam e não tinham como pegar: com repositório simulado não existe contexto de persistência. O teste de integração pegou, inclusive com duas tentativas simultâneas criando dois cadastros. (3) O PDF ficava no disco depois de apagar o certificado: o Art. 18 era cumprido no banco e não no disco. Agora o arquivo é apagado depois do commit. (4) O CEP: lição de validar o formato de entrada, não o de armazenamento.</aside>
+</section>
+<section id="testes">
+<div class="faixa"></div>
+<div class="cabeca">
+<p class="olho">Testes</p>
+<h2>Escolhidos pelo que já deu errado</h2>
+</div>
+<div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:40px; flex:1; align-items:center">
+<div class="entra" style="--i:1; display:flex; flex-direction:column; gap:16px"><p class="numero">95</p><p class="rotulo">testes de unidade no back-end (JUnit, Mockito, MockMvc)</p></div>
+<div class="entra" style="--i:2; display:flex; flex-direction:column; gap:16px"><p class="numero">11</p><p class="rotulo">testes de integração contra PostgreSQL de verdade</p></div>
+<div class="entra" style="--i:3; display:flex; flex-direction:column; gap:16px"><p class="numero">73</p><p class="rotulo">testes no front-end com Vitest</p></div>
+<div class="entra" style="--i:4; display:flex; flex-direction:column; gap:16px"><p class="numero">139</p><p class="rotulo">asserções na coleção do Postman, rodada com o newman</p></div>
+</div>
+<div class="grade2 entra" style="--i:5">
+<p class="corpo"><b style="color:var(--escuro)">Conferido que pegam o defeito:</b> reintroduzindo cada erro antigo, o teste correspondente falha.</p>
+<p class="corpo"><b style="color:var(--escuro)">Acessibilidade:</b> axe-core em todas as telas, sem violação das regras WCAG A e AA.</p>
+</div>
+<aside>[8:45–9:10] Só a frase principal: os testes foram escolhidos pelo que já deu errado, e para cada defeito corrigido eu reintroduzi o erro e conferi que o teste falha — um teste que nunca falhou não prova nada.
+
+Detalhe, se houver pergunta: Os testes foram escolhidos pelo que já deu errado, não por porcentagem de cobertura. 95 de unidade no back-end, incluindo os de autorização, que importam o SecurityConfig de verdade — sem isso o @PreAuthorize nem é avaliado e o teste passaria sem verificar nada. 11 de integração contra um banco PostgreSQL só de teste (astileac_teste); eles conferem o nome do banco antes de limpar as tabelas. 73 no front-end. E a coleção do Postman roda várias vezes seguidas. O mais importante: para cada defeito corrigido, eu reintroduzi o erro e conferi que o teste falha — um teste que nunca falhou não prova nada. Acessibilidade: paleta da logo ajustada para contraste 4,5:1, verificada com o axe-core.</aside>
+</section>
+<section id="fim" class="escuro" style="justify-content:center; gap:40px">
+<div class="faixa"></div>
+<p class="olho">ASTILEAC · Laboratório de Desenvolvimento de Software</p>
+<h1 class="capa-titulo entra" style="--i:1">Obrigado. Perguntas?</h1>
+<p class="capa-sub entra" style="--i:2">Próximo passo: sessão de validação em que a diretoria usa o sistema, cada membro com a própria conta.</p>
+<p class="capa-dados entra" style="--i:3">Gabriel Nascimento Nogueira</p>
+<aside>[9:10–10:00] “O próximo passo é a sessão de validação com a diretoria, já preparada com dados fictícios. Obrigado.” Em aberto, se perguntarem: hospedagem (não bloqueia o TCC), migração das planilhas antigas, confirmar as cinco áreas de atuação, pagamento pelo banco fora do escopo.
+Perguntas prováveis e respostas curtas:
+• Por que não JWT? Sessão com cookie HttpOnly; logout com JWT exige lista de revogação; não há escala horizontal num sistema interno.
+• Por que Spring Boot 4 e não 3? Versão atual; o custo foi conferir a documentação oficial, porque os tutoriais são do 3.x.
+• Como garante que o associado não vê dado de outro? @PreAuthorize com o bean autorizacao (eOProprioProfissional) em cada controller; a rota do “Meu cadastro” não recebe id, o profissional vem da sessão.
+• E se o banco cair no meio do cadastro pelo convite? Transação: o cadastro desfaz e o convite não é queimado (teste de integração).
+• Por que o log de acesso não tem FK? Precisa sobreviver à eliminação do dado.
+• Quanto a consulta demora? Medido: menos de 0,5 ms com 300 cadastros; o índice só passa a ser usado perto de 10 mil.</aside>
+</section>
+</div>
+<div id="notas" aria-live="polite"></div>
+<div id="contador"></div>
+<script>
+// Setas, espaco ou PageUp/PageDown passam os slides; Home e End vao ao primeiro e ao ultimo;
+// F liga a tela cheia; N mostra as notas do apresentador (o roteiro de fala).
+(function () {
+  var palco = document.getElementById('palco');
+  var slides = Array.prototype.slice.call(palco.querySelectorAll(':scope > section'));
+  var notas = document.getElementById('notas');
+  var contador = document.getElementById('contador');
+  var atual = 0;
+
+  function ajustar() {
+    var escala = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    palco.style.transform = 'translate(-50%, -50%) scale(' + escala + ')';
+  }
+
+  function mostrar(n) {
+    atual = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function (s, i) { s.classList.toggle('atual', i === atual); });
+    // Reinicia a animacao de chegada a cada troca de slide.
+    slides[atual].querySelectorAll('.entra').forEach(function (e) {
+      e.style.animation = 'none'; void e.offsetWidth; e.style.animation = '';
+    });
+    var aside = slides[atual].querySelector('aside');
+    notas.textContent = aside ? aside.textContent.trim() : '(sem notas)';
+    contador.textContent = (atual + 1) + ' / ' + slides.length;
+    history.replaceState(null, '', '#' + (atual + 1));
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter'].indexOf(e.key) >= 0) { mostrar(atual + 1); e.preventDefault(); }
+    else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].indexOf(e.key) >= 0) { mostrar(atual - 1); e.preventDefault(); }
+    else if (e.key === 'Home') { mostrar(0); }
+    else if (e.key === 'End') { mostrar(slides.length - 1); }
+    else if (e.key === 'n' || e.key === 'N') { document.body.classList.toggle('com-notas'); }
+    else if (e.key === 'f' || e.key === 'F') {
+      if (document.fullscreenElement) { document.exitFullscreen(); } else { document.documentElement.requestFullscreen(); }
+    }
+  });
+  palco.addEventListener('click', function () { mostrar(atual + 1); });
+
+  window.addEventListener('resize', ajustar);
+  ajustar();
+  mostrar((parseInt(location.hash.slice(1), 10) || 1) - 1);
+})();
+</script>
+</body>
+</html>

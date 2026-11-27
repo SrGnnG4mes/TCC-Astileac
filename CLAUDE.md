@@ -76,6 +76,7 @@ astileac/
 │   ├── diagramas/              ← demais diagramas do TCC (Mermaid + PNG) e gerar.mjs
 │   ├── medicao/                ← medição do índice do RF08 (script, saídas, conclusão)
 │   ├── validacao/              ← sessão de validação: script dos dados fictícios e passo a passo
+│   ├── apresentacao/           ← slides da apresentação da disciplina (HTML; setas, F, N)
 │   └── ASTILEAC_Projeto_TCC.pdf ← documento do TCC compilado
 ├── Postman/      Coleção de demonstração da API (importar no Postman)
 ├── .gitignore
