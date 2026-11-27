@@ -13,7 +13,11 @@
 		<a routerLink="/associe-se" routerLinkActive="ativo">Associe-se</a>
 	</nav>
 
-	<a class="area-do-associado" routerLink="/login">Área do associado</a>
+	@if (usuario()) {
+		<a class="area-do-associado" [routerLink]="destinoNoSistema()">Voltar ao sistema</a>
+	} @else {
+		<a class="area-do-associado" routerLink="/login">Área do associado</a>
+	}
 </header>
 
 <main id="conteudo" #conteudo tabindex="-1">
