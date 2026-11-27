@@ -76,7 +76,7 @@ astileac/
 │   ├── diagramas/              ← demais diagramas do TCC (Mermaid + PNG) e gerar.mjs
 │   ├── medicao/                ← medição do índice do RF08 (script, saídas, conclusão)
 │   ├── validacao/              ← sessão de validação: script dos dados fictícios e passo a passo
-│   ├── apresentacao/           ← slides da apresentação da disciplina (HTML; setas, F, N)
+│   ├── apresentacao/           ← slides da apresentação da disciplina (HTML; setas, F, N) e como subir a demo
 │   └── ASTILEAC_Projeto_TCC.pdf ← documento do TCC compilado
 ├── Postman/      Coleção de demonstração da API (importar no Postman)
 ├── .gitignore
@@ -977,6 +977,11 @@ Testes de integração: `CREATE DATABASE astileac_teste;` (o Flyway aplica as mi
 >   diretoria. Recusa rodar em banco que já tenha cadastros.
 > - Senhas provisórias em `docs/validacao/contas-da-sessao.txt`, no `.gitignore`.
 >   E-mails em `example.org`, domínio reservado para exemplos.
+> - **Banco da apresentação da disciplina, `astileac_apresentacao`** (nov/2026): os mesmos
+>   dados fictícios, montados pelo mesmo script com `--contas 1 --saida
+>   docs/apresentacao/contas-da-apresentacao.txt`. Separado porque a demonstração altera
+>   dados (dá o visto do Bruno) e não pode mexer no banco da sessão de validação. Como subir
+>   e como recriar: `docs/apresentacao/README.md`.
 
 ### Próximos passos (nesta ordem)
 1. ~~Migrations Flyway `V1` — criar as 9 tabelas + carga inicial das áreas de atuação~~ ✅

@@ -3,7 +3,7 @@
 //
 // Uso, com o back-end da validacao no ar e o banco ainda vazio:
 //     ASTILEAC_ADMIN_LOGIN=instalacao ASTILEAC_ADMIN_SENHA=... \
-//         node docs/validacao/preparar.mjs [--url http://127.0.0.1:8080] [--contas 4]
+//         node docs/validacao/preparar.mjs [--url http://127.0.0.1:8080] [--contas 4] [--saida arquivo.txt]
 //
 // Tudo passa pela API, como uma pessoa faria pelas telas: as regras do
 // sistema valem para estes dados como para quaisquer outros, e as contas
@@ -20,13 +20,16 @@ import { fileURLToPath } from 'node:url';
 
 const PASTA = dirname(fileURLToPath(import.meta.url));
 const PDF_DE_EXEMPLO = join(PASTA, '..', '..', 'Postman', 'certificado-exemplo.pdf');
-const ARQUIVO_DAS_CONTAS = join(PASTA, 'contas-da-sessao.txt');
 
 const argumentos = process.argv.slice(2);
 const opcao = (nome, padrao) => {
 	const i = argumentos.indexOf(`--${nome}`);
 	return i >= 0 ? argumentos[i + 1] : padrao;
 };
+// --saida permite preparar outro banco (o da apresentacao, por exemplo)
+// sem sobrescrever as senhas da sessao de validacao. O arquivo escolhido
+// precisa estar no .gitignore.
+const ARQUIVO_DAS_CONTAS = opcao('saida', join(PASTA, 'contas-da-sessao.txt'));
 const API = `${opcao('url', 'http://127.0.0.1:8080')}/api`;
 const QUANTAS_CONTAS = Number(opcao('contas', '4'));
 const ADMIN_LOGIN = process.env.ASTILEAC_ADMIN_LOGIN;
