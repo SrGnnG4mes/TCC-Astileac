@@ -75,6 +75,7 @@ astileac/
 │   ├── ASTILEAC-BDimage.png    ← DER inicial exportado como imagem
 │   ├── diagramas/              ← demais diagramas do TCC (Mermaid + PNG) e gerar.mjs
 │   ├── medicao/                ← medição do índice do RF08 (script, saídas, conclusão)
+│   ├── validacao/              ← sessão de validação: script dos dados fictícios e passo a passo
 │   └── ASTILEAC_Projeto_TCC.pdf ← documento do TCC compilado
 ├── Postman/      Coleção de demonstração da API (importar no Postman)
 ├── .gitignore
@@ -964,6 +965,17 @@ Testes de integração: `CREATE DATABASE astileac_teste;` (o Flyway aplica as mi
 >   segundo `:` numa nota de estado também; bloco (`subgraph`) com ligação saindo de um nó
 >   interno ignora a própria direção; num bloco `LR`, nós sem ligação ficam empilhados;
 >   e o fluxograma não tem seta só à esquerda (`<-.-` sai sem ponta).
+
+> **Preparação da sessão de validação** (`docs/validacao/`, out/2026).
+> - **Banco próprio, `astileac_validacao`**, só com dados fictícios: o de uso da
+>   associação (`astileac`) fica intocado, e a sessão pode ser refeita do zero.
+> - `preparar.mjs` monta tudo **pela API**, como uma pessoa faria pelas telas: 10
+>   associados fictícios pensados para as tarefas do roteiro (três ativos na área
+>   jurídica, uma inativa, uma pessoa em duas áreas, os três estados do documento) e uma
+>   conta de diretoria por membro presente, nascida pelo convite e promovida a
+>   diretoria. Recusa rodar em banco que já tenha cadastros.
+> - Senhas provisórias em `docs/validacao/contas-da-sessao.txt`, no `.gitignore`.
+>   E-mails em `example.org`, domínio reservado para exemplos.
 
 ### Próximos passos (nesta ordem)
 1. ~~Migrations Flyway `V1` — criar as 9 tabelas + carga inicial das áreas de atuação~~ ✅
