@@ -166,9 +166,9 @@ x-connector.seta { width: 44px; align-self: center; color: var(--verde); border-
 </div>
 </div>
 <p class="capa-dados">Gabriel Nascimento Nogueira · Tecnologia em Sistemas para Internet · IFAC, Campus Rio Branco<br>Orientador: Prof. Dr. Marlon Amaro Coelho Teixeira · novembro de 2026</p>
-<aside>[0:00–0:15] “Este é o ASTILEAC, o sistema que desenvolvo como TCC para a associação dos tradutores e intérpretes de Libras do Acre. Em dez minutos: o problema, como foi construído, uma demonstração e o que aprendi.”
+<aside>[0:00–0:15] “Este é o ASTILEAC, o sistema que desenvolvo como TCC para a associação dos tradutores e intérpretes de Libras do Acre. Em dez minutos: o problema, como foi construído, uma demonstração, como os dados dos associados ficam protegidos e o que aprendi.”
 
-TEMPO TOTAL: 10 min. Marcos: entrar na demonstração (slide 6) até 3:30. Se chegar lá depois de 4:30, pule o passo 4 da demo. Às 6:30 você deve estar no slide do convite e às 8:45 no de testes.
+TEMPO TOTAL: 10 min. Marcos: entrar na demonstração (slide 6) até 3:00. Se chegar lá depois de 4:00, pule o passo 3 da demo. Às 6:00 no slide do convite e às 6:40 na segurança (slides 8 e 9) — é a parte que não se corta; se precisar, encurte os defeitos.
 
 ANTES DE COMEÇAR (checklist, comandos em docs/apresentacao/README.md): PostgreSQL rodando; back-end no ar em :8080 apontado para o banco astileac_apresentacao (só dados fictícios); front-end no ar em :4200; navegador aberto em localhost:4200/login; conta diretoria1, com a senha de docs/apresentacao/contas-da-apresentacao.txt à mão, fora da tela projetada. Depois de um ensaio, recriar o banco (o visto do Bruno já estará dado) — passo a passo no mesmo README.</aside>
 </section>
@@ -185,7 +185,7 @@ ANTES DE COMEÇAR (checklist, comandos em docs/apresentacao/README.md): PostgreS
 </div>
 <div style="flex:1"></div>
 <p class="corpo entra" style="--i:4; border-left:8px solid var(--verde-marca); padding-left:28px; color:var(--escuro)"><b>Desde a Lei 14.704/2023,</b> formação e certificado comprovam a habilitação: por isso são o núcleo do sistema.</p>
-<aside>[0:15–1:00] Hoje o cadastro dos associados está em planilhas e papel. Atualizar dá trabalho, não se sabe qual cópia vale, e quando chega uma demanda — um tribunal, uma escola, um hospital — achar quem atende naquela área é lento. E não é só uma agenda de contatos: a Lei 14.704 de 2023 detalhou a titulação exigida para exercer a profissão, então formação e certificado são o dado que o sistema existe para tornar confiável.</aside>
+<aside>[0:15–0:55] Hoje o cadastro dos associados está em planilhas e papel. Atualizar dá trabalho, não se sabe qual cópia vale, e quando chega uma demanda — um tribunal, uma escola, um hospital — achar quem atende naquela área é lento. E não é só uma agenda de contatos: a Lei 14.704 de 2023 detalhou a titulação exigida para exercer a profissão, então formação e certificado são o dado que o sistema existe para tornar confiável.</aside>
 </section>
 <section id="requisitos">
 <div class="faixa"></div>
@@ -202,7 +202,7 @@ ANTES DE COMEÇAR (checklist, comandos em docs/apresentacao/README.md): PostgreS
 <tr class="par"><td><b>Documentos</b></td><td>RF13</td><td>PDF do certificado anexado pelo associado e visto da diretoria</td></tr>
 </table>
 <p class="miudo">O RF08 é o mais importante na prática: é como a associação atende uma demanda.</p>
-<aside>[1:00–1:40] Treze requisitos em cinco grupos. Cadastro é o grosso; a consulta por área, RF08, é a razão de existir. Como o sistema guarda dado pessoal, a LGPD entra como requisito: o titular exporta e pede a eliminação dos próprios dados, e todo acesso fica registrado. O RF12 (convites) e o RF13 (documento) não estavam no projeto inicial — vieram das conversas com a diretoria.</aside>
+<aside>[0:55–1:30] Treze requisitos em cinco grupos. Cadastro é o grosso; a consulta por área, RF08, é a razão de existir. Como o sistema guarda dado pessoal, a LGPD entra como requisito: o titular exporta e pede a eliminação dos próprios dados, e todo acesso fica registrado. O RF12 (convites) e o RF13 (documento) não estavam no projeto inicial — vieram das conversas com a diretoria.</aside>
 </section>
 <section id="validacao" class="tom2">
 <div class="faixa"></div>
@@ -219,7 +219,7 @@ ANTES DE COMEÇAR (checklist, comandos em docs/apresentacao/README.md): PostgreS
 <tr class="par"><td>O documento é opcional; vale a boa-fé</td><td>Selo “sem documento (opcional)”, sem cara de pendência</td></tr>
 <tr><td>Quem é da área costuma ter Lattes</td><td>Campo Lattes, aceito só do lattes.cnpq.br</td></tr>
 </table>
-<aside>[1:40–2:30] Apresentei o sistema à diretoria quatro vezes, e cada conversa mudou alguma coisa. Dois exemplos só: cada membro terá login próprio — com um “admin” compartilhado, o registro de acesso da LGPD diria sempre a mesma coisa; daí nasceu o RF12. E eu chamava o documento de “reconhecido”, mas quem olha só confere se bate com o declarado; o sistema não pode afirmar mais do que verificou, então virou “documento visto”.</aside>
+<aside>[1:30–2:15] Apresentei o sistema à diretoria quatro vezes, e cada conversa mudou alguma coisa. Dois exemplos só: cada membro terá login próprio — com um “admin” compartilhado, o registro de acesso da LGPD diria sempre a mesma coisa; daí nasceu o RF12. E eu chamava o documento de “reconhecido”, mas quem olha só confere se bate com o declarado; o sistema não pode afirmar mais do que verificou, então virou “documento visto”.</aside>
 </section>
 <section id="arquitetura" class="tom2" style="justify-content:space-between">
 <div class="faixa"></div>
@@ -245,7 +245,7 @@ ANTES DE COMEÇAR (checklist, comandos em docs/apresentacao/README.md): PostgreS
 <div class="cartao"><h3>Um processo só</h3><p class="corpo">Em produção o Spring Boot serve o Angular compilado. A API fica sob /api para não colidir com as rotas das telas.</p></div>
 <div class="cartao"><h3>Registro de acesso</h3><p class="corpo">Um interceptor grava quem consultou ou alterou cada dado, em transação própria.</p></div>
 </div>
-<aside>[2:30–3:30] Falar em 1 minuto: camadas clássica; o controller nunca expõe entidade, sempre DTO (a lista mostra CPF mascarado); o registro de acesso fica num interceptor, então nenhum endpoint esquece de registrar; e o Spring Boot 4 é recente — quase todo tutorial ainda é do 3.x, tive de conferir na documentação oficial. Se perguntarem do banco: 11 tabelas criadas pelo Flyway; áreas de atuação numa tabela associativa, não em colunas booleanas, para área nova não exigir alterar o schema.
+<aside>[2:15–3:00] Falar em 45 segundos: camadas clássica; o controller nunca expõe entidade, sempre DTO (a lista mostra CPF mascarado); o registro de acesso fica num interceptor, então nenhum endpoint esquece de registrar; e o Spring Boot 4 é recente — quase todo tutorial ainda é do 3.x, tive de conferir na documentação oficial. Se perguntarem do banco: 11 tabelas criadas pelo Flyway; áreas de atuação numa tabela associativa, não em colunas booleanas, para área nova não exigir alterar o schema.
 
 Detalhe, se houver pergunta: Arquitetura em camadas clássica. A requisição sai do Angular, passa pelo Spring Security (sessão por cookie, CSRF, perfil), chega ao controller, que nunca expõe entidade JPA — sempre DTO. Isso não é só estética: a listagem usa um DTO com CPF mascarado e a ficha outro com CPF inteiro, o princípio da necessidade da LGPD aplicado na forma do dado. O service tem as regras e as transações; o repository é Spring Data. Duas coisas que não aparecem num diagrama comum: o registro de acesso (RF11) fica num interceptor, então nenhum endpoint novo esquece de registrar; e em produção é um processo só, o Spring Boot serve o Angular, por isso a API mora em /api. Em desenvolvimento o ng serve faz proxy de /api para a porta 8080, e o navegador vê tudo na mesma origem — sem isso o CSRF do Angular não funciona.</aside>
 </section>
@@ -263,12 +263,12 @@ Detalhe, se houver pergunta: Arquitetura em camadas clássica. A requisição sa
 <tr><td>4</td><td>Editar o Bruno</td><td>Abrir o PDF do certificado e dar o visto; o selo muda</td></tr>
 <tr class="par"><td>5</td><td>Dados pessoais da Ana</td><td>O registro de acesso já mostra a consulta que acabei de fazer</td></tr>
 </table>
-<aside>[3:30–6:30, no navegador] Deixe o navegador já na tela de login (localhost:4200/login) e com a senha à mão, fora da tela projetada. Cerca de 35 s por passo.
+<aside>[3:00–6:00, no navegador] Deixe o navegador já na tela de login (localhost:4200/login) e com a senha à mão, fora da tela projetada. Cerca de 35 s por passo.
 1) Entrar como diretoria1 (banco astileac_apresentacao; senha em docs/apresentacao/contas-da-apresentacao.txt). Mostrar a barra: seletor “Diretoria | Minha área” e a faixa verde com o menu só da diretoria.
 2) Consulta de profissionais → Área: jurídica → Buscar. Três ativos (Ana Paula Ribeiro, Bruno Cavalcante Lima, Isabela Pinto Queiroz). A Ana atua em jurídica e educacional e aparece uma vez só. CPF mascarado na lista.
 3) “Ver ficha” da Ana: a janela abre sobre a consulta. Contatos com o principal primeiro, formações, certificado com selo “documento visto”. Esc fecha. (Se estiver atrasado, pule este passo.)
 4) “Editar” do Bruno → Certificados: selo “documento anexado”. “Dar visto no documento” → vira “documento visto”, com quem e quando. Dizer: o diretor não consegue dar visto no próprio documento, nem pela API.
-5) Voltar à consulta → “Dados pessoais” da Ana → registro de acesso: aparece a conta da diretoria consultando agora há pouco. É o RF11 funcionando.
+5) Voltar à consulta → “Dados pessoais” da Ana → registro de acesso: aparece a conta da diretoria consultando agora há pouco. É o RF11 funcionando — e é o gancho para os slides de segurança.
 Se algo falhar: não depurar ao vivo; voltar aos slides.</aside>
 </section>
 <section id="convite" class="tom2">
@@ -293,25 +293,53 @@ Se algo falhar: não depurar ao vivo; voltar aos slides.</aside>
 </div>
 </div>
 <p class="miudo">O banco guarda só o hash SHA-256 do código. A conta nasce como associado; perfil de diretoria só se concede em Contas de acesso.</p>
-<aside>[6:30–7:15] “Como entra um associado novo: ninguém se cadastra sozinho. A diretoria confirma o pagamento e emite um convite para o e-mail da pessoa. O link aparece uma vez só — o banco guarda apenas o hash do código, então não dá para mostrá-lo de novo; se perder, emite-se outro. A pessoa abre o link sem ter conta, preenche os dados e escolhe a própria senha. Tudo é criado numa transação: se der erro, por exemplo CPF já cadastrado, o convite volta a valer. A conta nasce sempre como associado.”
+<aside>[6:00–6:40] “Como entra um associado novo: ninguém se cadastra sozinho. A diretoria confirma o pagamento e emite um convite para o e-mail da pessoa. O link aparece uma vez só — o banco guarda apenas o hash do código, então não dá para mostrá-lo de novo; se perder, emite-se outro. A pessoa abre o link sem ter conta, preenche os dados e escolhe a própria senha. Tudo é criado numa transação: se der erro, por exemplo CPF já cadastrado, o convite volta a valer. A conta nasce sempre como associado.”
 Se for mostrar ao vivo (só se a demo estiver adiantada): Diretoria › Convites → e-mail @example.org → Emitir convite → Copiar → abrir o link numa janela anônima (Ctrl+Shift+N), para não trocar a sessão da diretoria → preencher com um CPF fictício de dígitos válidos → Criar meu cadastro.
 Se perguntarem: SHA-256 e não BCrypt porque o código tem 256 bits aleatórios (não se quebra por tentativa) e o SHA-256 permite buscar o convite direto pelo índice. Convite inválido, usado ou vencido dá a mesma mensagem, para não revelar que um código existe.</aside>
 </section>
-<section id="decisoes">
+<section id="seguranca-acesso">
 <div class="faixa"></div>
 <div class="cabeca">
-<p class="olho">Decisões técnicas</p>
-<h2>Quatro escolhas e o motivo de cada uma</h2>
+<p class="olho">Segurança da informação dos associados · 1 de 2</p>
+<h2>Cada pessoa vê só o que precisa ver</h2>
 </div>
-<div class="grade2" style="flex:1">
-<div class="cartao verde entra" style="--i:1"><h3>Sessão, não JWT</h3><p class="corpo">Cookie HttpOnly que o JavaScript não lê. Logout com JWT exigiria lista de revogação.</p></div>
-<div class="cartao verde entra" style="--i:2"><h3>EXISTS, não JOIN</h3><p class="corpo">Com JOIN, quem atua em duas áreas sairia duplicado e a paginação contaria errado.</p></div>
-<div class="cartao amarelo entra" style="--i:3"><h3>Apagar, não anonimizar</h3><p class="corpo">Numa base pequena, áreas e formações reidentificam a pessoa. Há 30 dias para desistir.</p></div>
-<div class="cartao amarelo entra" style="--i:4"><h3>PDF conferido</h3><p class="corpo">Nome gerado (UUID) contra path traversal e assinatura %PDF- lida do conteúdo.</p></div>
-</div>
-<aside>[7:15–8:00] Uns dez segundos por cartão. (1) Sessão com cookie e não JWT: JWT resolve escala horizontal, que um sistema interno com um servidor não tem, e logout com JWT precisaria de lista de revogação. (2) EXISTS e não JOIN: foi o que vocês viram na demo — a Ana, em duas áreas, aparece uma vez. (3) LGPD: quando o titular pede a eliminação, o sistema apaga de verdade depois de 30 dias de arrependimento; anonimizar numa base pequena não protege, porque áreas e formações reidentificam a pessoa. (4) Upload: o nome do arquivo é gerado pelo servidor e o conteúdo precisa começar com %PDF- — extensão e content-type são declaração do cliente, não prova.</aside>
+<table class="entra" style="--i:1; font-size:30px">
+<tr class="topo"><th style="width:27%">O quê</th><th style="width:19%">Visitante do site</th><th style="width:22%">Associado</th><th style="width:32%">Diretoria</th></tr>
+<tr class="par"><td><b>Lista de associados</b></td><td>Não existe</td><td>Não</td><td>Consulta por área</td></tr>
+<tr><td><b>CPF</b></td><td>Não</td><td>O próprio</td><td>Mascarado na lista, inteiro na ficha</td></tr>
+<tr class="par"><td><b>Contatos, formações e certificados</b></td><td>Não</td><td>Os próprios</td><td>Os de todos</td></tr>
+<tr><td><b>Quem acessou os dados</b></td><td>Não</td><td>Dos próprios dados</td><td>De qualquer titular</td></tr>
+<tr class="par"><td><b>Visto no documento</b></td><td>Não</td><td>Nunca</td><td>Só no documento de outra pessoa</td></tr>
+</table>
+<p class="corpo entra" style="--i:2; border-left:8px solid var(--verde-marca); padding-left:28px; color:var(--escuro)"><b>A tela esconde, mas quem garante é o servidor:</b> pedido fora da regra recebe 403, mesmo feito direto na API.</p>
+<aside>[6:40–7:30] “O sistema guarda dado pessoal de profissionais — CPF, endereço, formação —, então a pergunta central é quem vê o quê.” Percorrer as colunas: o visitante do site não vê ninguém — de propósito não há lista pública de intérpretes, ao contrário de outras entidades; o associado vê e edita só o próprio cadastro; a diretoria consulta o quadro, mas o CPF aparece mascarado na lista e inteiro só na ficha (princípio da necessidade da LGPD, Art. 6º, III). E ninguém dá visto no próprio documento.
+Frase de fechamento: a tela esconde o que não é seu, mas isso é conveniência; quem decide é o servidor, com o @PreAuthorize em cada endpoint. Testei com uma conta de associado de verdade: 403 em tudo o que é de outra pessoa.
+Se perguntarem como: perfil pelo Spring Security (hasRole) e posse do registro por um bean (eOProprioProfissional); a rota “Meu cadastro” não recebe id — o profissional vem da sessão, então não há id de outra pessoa para digitar.</aside>
 </section>
-<section id="defeitos" class="tom2">
+<section id="seguranca-protecao" class="tom2">
+<div class="faixa"></div>
+<div class="cabeca">
+<p class="olho">Segurança da informação dos associados · 2 de 2</p>
+<h2>Como os dados ficam protegidos</h2>
+</div>
+<div class="grade3" style="flex:1">
+<div class="cartao verde entra" style="--i:1"><h3>Senhas</h3><p class="corpo">Guardadas só como hash BCrypt. Ninguém, nem a diretoria, conhece a senha de outra pessoa.</p></div>
+<div class="cartao verde entra" style="--i:2"><h3>Sessão</h3><p class="corpo">Cookie HttpOnly, fora do alcance de scripts, e token CSRF em toda gravação.</p></div>
+<div class="cartao verde entra" style="--i:3"><h3>Registro de acesso</h3><p class="corpo">Quem consultou ou alterou cada dado, e quando. O titular vê o próprio registro (LGPD, Art. 46).</p></div>
+<div class="cartao amarelo entra" style="--i:4"><h3>Direitos do titular</h3><p class="corpo">Exporta tudo o que há sobre si e pede a eliminação: 30 dias para desistir, depois apaga do banco e do disco (Art. 18).</p></div>
+<div class="cartao amarelo entra" style="--i:5"><h3>Documentos</h3><p class="corpo">PDF conferido pelo conteúdo, nome gerado pelo servidor e download só com permissão.</p></div>
+<div class="cartao amarelo entra" style="--i:6"><h3>Sem vazamento</h3><p class="corpo">Senhas fora do Git; erro de CPF duplicado não repete o CPF; nenhuma fonte externa recebe o IP de quem acessa.</p></div>
+</div>
+<aside>[7:30–8:30] Uns dez segundos por cartão; os verdes protegem o acesso, os amarelos cumprem a LGPD.
+(1) Senhas: só o hash BCrypt fica no banco — se o banco vazar, as senhas não vazam junto.
+(2) Sessão com cookie HttpOnly, que JavaScript não lê, em vez de token no navegador; CSRF em toda gravação.
+(3) Registro de acesso: um interceptor grava autor, data, ação e registro de cada consulta ou alteração — foi o que vocês viram no passo 5 da demo. Sem chave estrangeira, de propósito: o registro precisa sobreviver à eliminação do dado.
+(4) Direitos do titular: exportação completa em JSON e pedido de eliminação com 30 dias de arrependimento; depois apaga de verdade, inclusive o PDF no disco. Apagar e não anonimizar: numa base pequena, áreas e formações reidentificam a pessoa.
+(5) Documentos: o conteúdo precisa começar com %PDF-; o nome do arquivo é um UUID gerado pelo servidor (contra path traversal); não há URL pública do arquivo, o download passa pela autorização.
+(6) Sem vazamento por descuido: credenciais fora do Git e do pacote .jar; a mensagem de CPF duplicado não repete o CPF (senão viraria consulta de filiação); convite inválido e convite usado dão a mesma resposta; o sistema não carrega fonte do Google, que receberia o IP de cada usuário.
+Limite honesto, se perguntarem: para colocar na internet faltam HTTPS (TLS) e limite de tentativas de login; hoje o servidor só escuta na própria máquina (127.0.0.1).</aside>
+</section>
+<section id="defeitos">
 <div class="faixa"></div>
 <div class="cabeca">
 <p class="olho">O que aprendi</p>
@@ -324,30 +352,10 @@ Se perguntarem: SHA-256 e não BCrypt porque o código tem 256 bits aleatórios 
 <tr class="par"><td><b>PDF sobrevivia à exclusão</b></td><td>As linhas eram apagadas e o arquivo ficava no disco, sem nada apontando para ele</td></tr>
 <tr><td><b>CEP com hífen nunca salvava</b></td><td>O validador exigia o formato do banco, mas recebia o que a pessoa digita</td></tr>
 </table>
-<p class="corpo" style="color:var(--escuro)">Nenhum deles era visível nos testes de unidade com repositório simulado. Cada um virou um teste.</p>
-<aside>[8:00–8:45] Contar só os dois primeiros, uns 20 s cada (o do convite liga com o slide anterior). CSRF: o Spring troca o token ao autenticar e o front-end renovava antes do login, não depois; a segunda tentativa funcionava, o que escondia o problema. Convite: um UPDATE em massa marcava o convite como usado, e logo depois um save() regravava a entidade antiga por cima — o convite de uso único valia para sempre. Os testes de unidade passavam e não tinham como pegar; o teste de integração contra PostgreSQL pegou. Os outros dois ficam na tabela.
+<p class="corpo" style="color:var(--escuro)"><b>Cada um virou um teste:</b> 95 de unidade e 11 de integração no back-end, 77 no front-end e 139 asserções no Postman.</p>
+<aside>[8:30–9:15] Contar só os dois primeiros, uns 20 s cada — os dois são de segurança: o CSRF protege as gravações, e o convite de uso único é a prova de identidade de quem se cadastra. Fechar com: os testes foram escolhidos pelo que já deu errado, e para cada defeito eu reintroduzi o erro e conferi que o teste falha — um teste que nunca falhou não prova nada. CSRF: o Spring troca o token ao autenticar e o front-end renovava antes do login, não depois; a segunda tentativa funcionava, o que escondia o problema. Convite: um UPDATE em massa marcava o convite como usado, e logo depois um save() regravava a entidade antiga por cima — o convite de uso único valia para sempre. Os testes de unidade passavam e não tinham como pegar; o teste de integração contra PostgreSQL pegou. Os outros dois ficam na tabela.
 
 Detalhe, se houver pergunta: A parte que mais me ensinou. Quatro defeitos que passaram por todos os testes de unidade e só apareceram rodando o sistema de verdade. (1) CSRF: desde o Security 6 o token é resolvido preguiçosamente e o Spring troca o token ao autenticar; o front-end renovava antes do login e não depois. A segunda tentativa funcionava, o que mascarava o problema. Esse mesmo padrão apareceu três vezes (login, primeira escrita, link do convite). (2) O convite: o service fazia um UPDATE em massa (que muda o banco e não a entidade) e depois chamava save() com a entidade obsoleta, zerando o consumo. Os 11 testes de unidade passavam e não tinham como pegar: com repositório simulado não existe contexto de persistência. O teste de integração pegou, inclusive com duas tentativas simultâneas criando dois cadastros. (3) O PDF ficava no disco depois de apagar o certificado: o Art. 18 era cumprido no banco e não no disco. Agora o arquivo é apagado depois do commit. (4) O CEP: lição de validar o formato de entrada, não o de armazenamento.</aside>
-</section>
-<section id="testes">
-<div class="faixa"></div>
-<div class="cabeca">
-<p class="olho">Testes</p>
-<h2>Escolhidos pelo que já deu errado</h2>
-</div>
-<div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:40px; flex:1; align-items:center">
-<div class="entra" style="--i:1; display:flex; flex-direction:column; gap:16px"><p class="numero">95</p><p class="rotulo">testes de unidade no back-end (JUnit, Mockito, MockMvc)</p></div>
-<div class="entra" style="--i:2; display:flex; flex-direction:column; gap:16px"><p class="numero">11</p><p class="rotulo">testes de integração contra PostgreSQL de verdade</p></div>
-<div class="entra" style="--i:3; display:flex; flex-direction:column; gap:16px"><p class="numero">73</p><p class="rotulo">testes no front-end com Vitest</p></div>
-<div class="entra" style="--i:4; display:flex; flex-direction:column; gap:16px"><p class="numero">139</p><p class="rotulo">asserções na coleção do Postman, rodada com o newman</p></div>
-</div>
-<div class="grade2 entra" style="--i:5">
-<p class="corpo"><b style="color:var(--escuro)">Conferido que pegam o defeito:</b> reintroduzindo cada erro antigo, o teste correspondente falha.</p>
-<p class="corpo"><b style="color:var(--escuro)">Acessibilidade:</b> axe-core em todas as telas, sem violação das regras WCAG A e AA.</p>
-</div>
-<aside>[8:45–9:10] Só a frase principal: os testes foram escolhidos pelo que já deu errado, e para cada defeito corrigido eu reintroduzi o erro e conferi que o teste falha — um teste que nunca falhou não prova nada.
-
-Detalhe, se houver pergunta: Os testes foram escolhidos pelo que já deu errado, não por porcentagem de cobertura. 95 de unidade no back-end, incluindo os de autorização, que importam o SecurityConfig de verdade — sem isso o @PreAuthorize nem é avaliado e o teste passaria sem verificar nada. 11 de integração contra um banco PostgreSQL só de teste (astileac_teste); eles conferem o nome do banco antes de limpar as tabelas. 73 no front-end. E a coleção do Postman roda várias vezes seguidas. O mais importante: para cada defeito corrigido, eu reintroduzi o erro e conferi que o teste falha — um teste que nunca falhou não prova nada. Acessibilidade: paleta da logo ajustada para contraste 4,5:1, verificada com o axe-core.</aside>
 </section>
 <section id="fim" class="escuro" style="justify-content:center; gap:40px">
 <div class="faixa"></div>
@@ -355,7 +363,7 @@ Detalhe, se houver pergunta: Os testes foram escolhidos pelo que já deu errado,
 <h1 class="capa-titulo entra" style="--i:1">Obrigado. Perguntas?</h1>
 <p class="capa-sub entra" style="--i:2">Próximo passo: sessão de validação em que a diretoria usa o sistema, cada membro com a própria conta.</p>
 <p class="capa-dados entra" style="--i:3">Gabriel Nascimento Nogueira</p>
-<aside>[9:10–10:00] “O próximo passo é a sessão de validação com a diretoria, já preparada com dados fictícios. Obrigado.” Em aberto, se perguntarem: hospedagem (não bloqueia o TCC), migração das planilhas antigas, confirmar as cinco áreas de atuação, pagamento pelo banco fora do escopo.
+<aside>[9:15–10:00] “O próximo passo é a sessão de validação com a diretoria, já preparada com dados fictícios. Obrigado.” Em aberto, se perguntarem: hospedagem (não bloqueia o TCC), migração das planilhas antigas, confirmar as cinco áreas de atuação, pagamento pelo banco fora do escopo.
 Perguntas prováveis e respostas curtas:
 • Por que não JWT? Sessão com cookie HttpOnly; logout com JWT exige lista de revogação; não há escala horizontal num sistema interno.
 • Por que Spring Boot 4 e não 3? Versão atual; o custo foi conferir a documentação oficial, porque os tutoriais são do 3.x.
