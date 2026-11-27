@@ -39,3 +39,7 @@ docs/tcc/*.xml
 docs/tcc/desenvolvimento.tex
 docs/tcc/GUIA-ESCRITA-CAPITULO.md
 docs/tcc/LEVANTAMENTO-CAPITULO.md
+
+# --- Sessao de validacao: senhas provisorias das contas de teste ---
+docs/validacao/contas-da-sessao.txt
+docs/apresentacao/contas-da-apresentacao.txt
