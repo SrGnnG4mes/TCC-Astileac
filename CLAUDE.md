@@ -937,6 +937,15 @@ Testes de integração: `CREATE DATABASE astileac_teste;` (o Flyway aplica as mi
 >   rota**, e não o perfil, que decide: o `FichaVinculos` recebe a área, e a tela de dados
 >   pessoais fala do titular em terceira pessoa na área da diretoria. A rota
 >   `/profissionais/:id/dados-pessoais` ganhou o `adminGuard`, como as demais da área.
+> - **Caminho de volta ao site da associação para quem está logado** (nov/2026). O site
+>   público (valores de referência, associe-se) continua útil para quem tem conta, mas o
+>   sistema não tinha link para ele: só saindo ou digitando o endereço. A barra ganhou
+>   "Site da associação", e no site o botão "Área do associado" vira **"Voltar ao
+>   sistema"** para quem está logado — mandar ao login quem já entrou pediria a senha à
+>   toa. O site pergunta ao servidor (`/autenticacao/eu`) quem está logado, porque quem
+>   abre o site em aba nova não tem o estado local; para o visitante a resposta é 401 e
+>   nada muda (o navegador registra esse 401 no console, e é esperado). A volta vai para
+>   a última área visitada; após recarregar a página, para a principal da conta.
 > - **Diretor não dá nem retira o visto do próprio documento** (decisão do autor, out/2026).
 >   É a mesma razão pela qual o associado não dá visto no próprio: um visto dado por quem
 >   é dono do documento não confere nada. O back-end recusa com 403

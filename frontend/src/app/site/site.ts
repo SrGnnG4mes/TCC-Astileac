@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { AutenticacaoService } from '../core/autenticacao.service';
+import { UltimaArea } from '../core/areas';
 
 /**
  * Site publico da associacao: a porta de entrada de quem ainda nao e
@@ -24,7 +26,33 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 })
 export class Site {
 
+	private readonly autenticacao = inject(AutenticacaoService);
+	private readonly ultimaArea = inject(UltimaArea);
+
 	readonly anoAtual = new Date().getFullYear();
+
+	/**
+	 * Quem esta logado e veio ao site pela barra do sistema ve "Voltar ao
+	 * sistema" no lugar de "Area do associado": mandar para o login quem ja
+	 * entrou seria pedir a senha de novo sem motivo.
+	 */
+	readonly usuario = this.autenticacao.usuario;
+
+	/** Volta para a ultima area visitada; na falta dela, a principal da conta. */
+	readonly destinoNoSistema = computed(() => {
+		const area = this.ultimaArea.valor()
+			?? (this.usuario()?.perfil === 'ADMIN' ? 'diretoria' : 'associado');
+		return area === 'diretoria' ? '/profissionais' : '/painel';
+	});
+
+	constructor() {
+		// Quem abre o site direto (aba nova, recarga) ainda nao tem o estado
+		// local: pergunta ao servidor. Para o visitante a resposta e 401, e
+		// nada muda -- o site continua igual para quem nao tem conta.
+		if (!this.usuario()) {
+			this.autenticacao.carregarUsuario().subscribe({ error: () => undefined });
+		}
+	}
 
 	/**
 	 * "Pular para o conteudo" (WCAG 2.4.1): quem usa teclado ou leitor de

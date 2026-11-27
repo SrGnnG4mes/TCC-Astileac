@@ -85,4 +85,14 @@ describe('Barra', () => {
 		expect(tela.querySelector('.areas')).toBeNull();
 		expect(menu(tela)).toContain('Área da diretoria');
 	});
+
+	it('de qualquer area, ha caminho de volta ao site da associacao', async () => {
+		// Associado comum: so tem a area dele, e mesmo assim chega ao site.
+		await entrar({ perfil: 'PROFISSIONAL', profissionalId: 9 });
+		const tela = await abrir('/tela-do-associado');
+
+		const link = [...tela.querySelectorAll<HTMLAnchorElement>('.barra a')]
+			.find(a => a.textContent?.trim() === 'Site da associação');
+		expect(link?.getAttribute('href')).toBe('/');
+	});
 });

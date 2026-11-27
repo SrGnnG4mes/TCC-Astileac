@@ -1,5 +1,5 @@
 import { provideHttpClient } from '@angular/common/http';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
@@ -67,5 +67,56 @@ describe('site publico', () => {
 		await harness.navigateByUrl('/pagina-que-nao-existe');
 
 		expect(texto()).toContain('Tradutores, intérpretes e guias-intérpretes de Língua Brasileira de Sinais do Acre');
+	});
+});
+
+/**
+ * Quem ja entrou no sistema e volta ao site nao deve ser mandado ao login
+ * de novo: o cabecalho troca "Area do associado" por "Voltar ao sistema".
+ */
+describe('site publico com sessao', () => {
+	let harness: RouterTestingHarness;
+	let http: HttpTestingController;
+
+	beforeEach(async () => {
+		TestBed.configureTestingModule({
+			providers: [provideRouter(routes), provideHttpClient(), provideHttpClientTesting()]
+		});
+		http = TestBed.inject(HttpTestingController);
+		harness = await RouterTestingHarness.create();
+	});
+
+	afterEach(() => http.verify());
+
+	function linkDoCabecalho(): HTMLAnchorElement | null {
+		return (harness.routeNativeElement as HTMLElement).querySelector('.area-do-associado');
+	}
+
+	it('para a diretoria, "Voltar ao sistema" leva a consulta do quadro', async () => {
+		await harness.navigateByUrl('/valores-de-referencia');
+		http.expectOne('/api/autenticacao/eu').flush({ login: 'diretora', perfil: 'ADMIN', profissionalId: 7 });
+		harness.detectChanges();
+
+		expect(linkDoCabecalho()?.textContent?.trim()).toBe('Voltar ao sistema');
+		expect(linkDoCabecalho()?.getAttribute('href')).toBe('/profissionais');
+	});
+
+	it('para o associado, "Voltar ao sistema" leva ao painel dele', async () => {
+		await harness.navigateByUrl('/');
+		http.expectOne('/api/autenticacao/eu').flush({ login: 'maria', perfil: 'PROFISSIONAL', profissionalId: 9 });
+		harness.detectChanges();
+
+		expect(linkDoCabecalho()?.getAttribute('href')).toBe('/painel');
+	});
+
+	it('o visitante sem conta continua vendo "Area do associado", que leva ao login', async () => {
+		await harness.navigateByUrl('/');
+		http.expectOne('/api/autenticacao/eu').flush(
+			{ status: 401, mensagem: 'Entre no sistema para continuar.' },
+			{ status: 401, statusText: 'Unauthorized' });
+		harness.detectChanges();
+
+		expect(linkDoCabecalho()?.textContent?.trim()).toBe('Área do associado');
+		expect(linkDoCabecalho()?.getAttribute('href')).toBe('/login');
 	});
 });

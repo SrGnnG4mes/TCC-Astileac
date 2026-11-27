@@ -17,6 +17,10 @@
 		}
 
 		<span class="identidade">{{ eu.login }} &middot; {{ eu.perfil | perfil }}</span>
+		<!-- O site publico (valores de referencia, associe-se) continua
+		     util para quem ja tem conta; sem este link, o unico caminho de
+		     volta era sair do sistema ou digitar o endereco. -->
+		<a class="conta" routerLink="/">Site da associação</a>
 		<a class="conta" routerLink="/minha-senha" routerLinkActive="ativo">Alterar senha</a>
 	}
 
